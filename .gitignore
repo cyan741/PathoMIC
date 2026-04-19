@@ -1,0 +1,6 @@
+scripts/wandb/
+artifacts/
+**/__pycache__/
+*.py[cod]
+.pytest_cache/
+.ipynb_checkpoints/
