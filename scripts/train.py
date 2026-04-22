@@ -1,5 +1,6 @@
 import os
 import math
+import warnings
 import pandas as pd
 import torch
 from tqdm import tqdm
@@ -31,9 +32,15 @@ def save_checkpoint(model,
                     optimizer: torch.optim.Optimizer,
                     output_path: str,
                     scheduler=None,
-                    epoch: int = None) -> None:
+                    epoch: int = None,
+                    best_val_loss: float = None,
+                    best_ep: int = None) -> None:
     '''
-    save model / optimizer / (optional) scheduler / epoch state to output_path.
+    Save model / optimizer / (optional) scheduler / epoch state to output_path.
+
+    ``best_val_loss`` and ``best_ep`` are also persisted so a resumed run can
+    faithfully continue tracking the best checkpoint without having to rerun
+    validation from scratch.
     '''
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     checkpoint = {
@@ -41,6 +48,8 @@ def save_checkpoint(model,
         'optimizer_state_dict': optimizer.state_dict(),
         'scheduler_state_dict': scheduler.state_dict() if scheduler is not None else None,
         'epoch': epoch,
+        'best_val_loss': best_val_loss,
+        'best_ep': best_ep,
     }
     torch.save(checkpoint, output_path)
 
@@ -189,6 +198,18 @@ def main():
     parser.add_argument("--early_stop_patience", type=int, default=10)
     parser.add_argument("--es_min_epoch", type=int, default=20,
                         help="Early stopping is only considered once epoch >= this value.")
+
+    # ----- Resume from a saved checkpoint -------------------------------------
+    parser.add_argument("--resume", type=str, default=None,
+                        help="Path to a .pth checkpoint to resume training from. "
+                             "`--epochs` is interpreted as the TOTAL number of epochs "
+                             "(including those already completed in the checkpoint).")
+    parser.add_argument("--resume_reset_optimizer", action="store_true",
+                        help="If set, do NOT restore optimizer state (use a fresh "
+                             "AdamW). Useful when changing learning-rate regime.")
+    parser.add_argument("--resume_reset_best", action="store_true",
+                        help="If set, ignore the saved best_val_loss / best_ep "
+                             "(start tracking from scratch on the resumed run).")
     parser.add_argument("--save_dir", type=str, default="/NAS/luyq/PLM_AMP_Regression/ckp")
     parser.add_argument("--metrics_name", type=str, default="train_metrics.csv")
     parser.add_argument("--device", type=str, default="0")
@@ -266,7 +287,64 @@ def main():
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr)
 
     # ------------------------------------------------------------------
+    # Resume: load model / optimizer / best-tracking from a checkpoint.
+    # `start_epoch` is the NEXT epoch to train (1-indexed, inclusive).
+    # ------------------------------------------------------------------
+    start_epoch = 1
+    best_val_loss = float('inf')
+    best_ep = -1
+
+    if args.resume is not None:
+        if not os.path.isfile(args.resume):
+            raise FileNotFoundError(f"--resume path does not exist: {args.resume}")
+        print(f"[Resume] Loading checkpoint from {args.resume}")
+        ckpt = torch.load(args.resume, map_location=device)
+
+        # -- model --
+        missing, unexpected = model.load_state_dict(ckpt["model_state_dict"], strict=False)
+        if missing:
+            print(f"[Resume] Missing keys (left at init): {missing}")
+        if unexpected:
+            print(f"[Resume] Unexpected keys (ignored): {unexpected}")
+
+        # -- optimizer --
+        if (not args.resume_reset_optimizer) and ckpt.get("optimizer_state_dict") is not None:
+            try:
+                optimizer.load_state_dict(ckpt["optimizer_state_dict"])
+                # Override LR with CLI value so the resumed run uses the new peak lr.
+                for pg in optimizer.param_groups:
+                    pg["lr"]          = args.lr
+                    pg["initial_lr"]  = args.lr
+                print("[Resume] Optimizer state restored (LR overridden to --lr).")
+            except ValueError as e:
+                print(f"[Resume] Could not load optimizer state ({e}); using fresh optimizer.")
+        else:
+            print("[Resume] Using fresh optimizer state.")
+
+        # -- starting epoch --
+        saved_ep = int(ckpt.get("epoch") or 0)
+        start_epoch = saved_ep + 1
+        print(f"[Resume] Saved epoch = {saved_ep} → training will start at epoch {start_epoch}")
+
+        # -- best val loss tracking --
+        if (not args.resume_reset_best) and ckpt.get("best_val_loss") is not None:
+            best_val_loss = float(ckpt["best_val_loss"])
+            best_ep       = int(ckpt.get("best_ep") or saved_ep)
+            print(f"[Resume] Restored best_val_loss={best_val_loss:.4f} at epoch {best_ep}")
+        else:
+            print("[Resume] Not restoring best-val tracker (fresh).")
+
+        if start_epoch > args.epochs:
+            raise ValueError(
+                f"--epochs={args.epochs} but the checkpoint is already at epoch "
+                f"{saved_ep}. Pass a larger --epochs (total, including past) to "
+                f"continue training."
+            )
+
+    # ------------------------------------------------------------------
     # LR scheduler: linear warmup → cosine decay (per-step update)
+    # When resuming we build a FRESH scheduler covering the new [1..epochs]
+    # horizon and fast-forward it past the already-completed steps.
     # ------------------------------------------------------------------
     scheduler = None
     if args.use_scheduler:
@@ -285,12 +363,20 @@ def main():
               f"warmup_steps={warmup_steps} | "
               f"peak_lr={args.lr:.2e} | "
               f"min_lr={args.lr * args.min_lr_ratio:.2e}")
+
+        # fast-forward to the correct step on the new schedule
+        completed_steps = (start_epoch - 1) * len(train_loader)
+        if completed_steps > 0:
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                for _ in range(completed_steps):
+                    scheduler.step()
+            print(f"[LR scheduler] fast-forwarded {completed_steps} steps → "
+                  f"LR now = {optimizer.param_groups[0]['lr']:.2e}")
     else:
         print("[LR scheduler] disabled (constant LR)")
 
-    best_val_loss = float('inf')
-    best_ep = -1
-    for epoch in range(1, args.epochs+1):
+    for epoch in range(start_epoch, args.epochs+1):
         avg_train_loss, train_loss = train_epoch(
             epoch, model, train_loader, tokenizer, criterion, optimizer, device,
             use_species=args.use_species, scheduler=scheduler)
@@ -329,7 +415,8 @@ def main():
             print(f"New best model found at epoch {best_ep} with Val MSE: {best_val_loss:.4f}. Saving model...")
             save_checkpoint(model, optimizer,
                             os.path.join(ckp_path, f"{args.plm}_lr{args.lr}_bs{args.batch_size}_ep{epoch}_val_best.pth"),
-                            scheduler=scheduler, epoch=epoch)
+                            scheduler=scheduler, epoch=epoch,
+                            best_val_loss=best_val_loss, best_ep=best_ep)
 
         # ------------------------------------------------------------------
         # Early stopping: only activates AFTER --es_min_epoch (i.e. give the
@@ -342,7 +429,8 @@ def main():
                   f"best was epoch {best_ep} with val MSE {best_val_loss:.4f}).")
             save_checkpoint(model, optimizer,
                             os.path.join(ckp_path, f"{args.plm}_lr{args.lr}_bs{args.batch_size}_es_ep{epoch}.pth"),
-                            scheduler=scheduler, epoch=epoch)
+                            scheduler=scheduler, epoch=epoch,
+                            best_val_loss=best_val_loss, best_ep=best_ep)
             break
         elif args.early_stopping and epoch < args.es_min_epoch and (epoch - best_ep) >= args.early_stop_patience:
             # still in warmup/peak phase – log but do NOT stop
@@ -354,7 +442,8 @@ def main():
             print(f"Training complete. Saving final model at epoch {epoch}. Best Val MSE: {best_val_loss:.4f} at epoch {best_ep}.")
             save_checkpoint(model, optimizer,
                             os.path.join(ckp_path, f"{args.plm}_lr{args.lr}_bs{args.batch_size}_ep{epoch}.pth"),
-                            scheduler=scheduler, epoch=epoch)
+                            scheduler=scheduler, epoch=epoch,
+                            best_val_loss=best_val_loss, best_ep=best_ep)
     # --- 测试 ---
     print("\n","*"*30, "Testing model...", "*"*30,"\n")
     avg_test_loss, test_loss = validate_epoch(
@@ -365,7 +454,17 @@ def main():
     metrics_df = pd.DataFrame(metrics_rows)
     metrics_df["best_val_loss"] = best_val_loss
     metrics_df["final_test_loss"] = avg_test_loss
-    metrics_df.to_csv(os.path.join(args.save_dir, args.metrics_name), index=False)
+
+    # If resuming, append to an existing metrics file instead of overwriting.
+    metrics_path = os.path.join(args.save_dir, args.metrics_name)
+    if args.resume is not None and os.path.exists(metrics_path):
+        try:
+            prev = pd.read_csv(metrics_path)
+            metrics_df = pd.concat([prev, metrics_df], ignore_index=True)
+            print(f"[Resume] Appended new metrics to existing {metrics_path}")
+        except Exception as e:
+            print(f"[Resume] Could not read previous metrics ({e}); writing fresh.")
+    metrics_df.to_csv(metrics_path, index=False)
     
     if args.use_wandb:
         wandb.log({"test_mse": avg_test_loss, "best_val_mse": best_val_loss})
