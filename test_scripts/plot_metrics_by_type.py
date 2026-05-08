@@ -19,9 +19,9 @@ from scipy.stats import spearmanr, kendalltau
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 
 TEST_DIRS = [
-    "/home/luyq/PLM_AMP_Regression/test/raw_sequence/esm35m/splits1_test",
-    "/home/luyq/PLM_AMP_Regression/test/raw_sequence/esm35m/splits2_test",
-    "/home/luyq/PLM_AMP_Regression/test/raw_sequence/esm35m/external_test",
+    "/root/PLM_AMP_Regression/test_results/tax_gnn/esm150m/splits1_test",
+    "/root/PLM_AMP_Regression/test_results/tax_gnn/esm150m/splits2_test",
+    "/root/PLM_AMP_Regression/test_results/tax_gnn/esm150m/external_test",
 ]
 
 # Column order used for the printed table (as requested)
@@ -31,7 +31,7 @@ TYPES = ["Gram-positive", "Gram-negative", "Fungi"]
 METRIC_KEYS = ["RMSE", "MAE", "Spearman", "Kendall τ"]
 
 # Flip to True to also save bar-chart figures.
-MAKE_PLOTS = False
+MAKE_PLOTS = True
 
 TYPE_COLORS = {
     "Gram-negative": "#4C9BE8",

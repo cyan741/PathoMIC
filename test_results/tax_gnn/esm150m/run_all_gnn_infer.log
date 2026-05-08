@@ -1,0 +1,182 @@
+============================================================
+GNN batch inference started: Fri May  8 17:29:07 CST 2026
+  device : 0
+  batch  : 128
+  taxo   : /NAS/luyq/AMP_datasets/taxonomy_graph.pt
+  log    : /root/PLM_AMP_Regression/test_results/tax_gnn/esm150m/run_all_gnn_infer.log
+============================================================
+
+>>> [splits1 GNN] models on splits1/test.csv
+
+[RUN] 17:29:07 | model: /NAS/luyq/PLM_AMP_Regression/gnn_runs/esm2-150M/v1_splits1/esm2-150M_lr1e-05_bs32_ep29_val_best.pth
+       test : /NAS/luyq/AMP_datasets/splits1/test.csv
+       out  : /root/PLM_AMP_Regression/test_results/tax_gnn/esm150m/splits1_test/csv/esm2-150M_lr1e-05_bs32_ep29_val_best_test_results.csv
+[Model Info] PLM type: esm2-150M | ESM size: 150M
+[Model Name] esm2-150M_lr1e-05_bs32_ep29_val_best
+[Device] cuda:0
+[Model] Loading checkpoint...
+[Model] Taxonomy GNN only (type=gcn, layers=2, hidden=128, out=64, fusion=leaf).
+[Data] Loaded 4257 samples from /NAS/luyq/AMP_datasets/splits1/test.csv
+[Tokenizer] Loading...
+mean 640 species_mode= gnn
+[Model] Checkpoint loaded.
+[Species/GNN] 307/307 species present in taxonomy graph.
+Inference:   0%|          | 0/34 [00:00<?, ?it/s]Inference:   3%|▎         | 1/34 [00:00<00:15,  2.15it/s]Inference:   6%|▌         | 2/34 [00:00<00:10,  2.99it/s]Inference:   9%|▉         | 3/34 [00:00<00:09,  3.41it/s]Inference:  12%|█▏        | 4/34 [00:01<00:08,  3.66it/s]Inference:  15%|█▍        | 5/34 [00:01<00:07,  3.81it/s]Inference:  18%|█▊        | 6/34 [00:01<00:07,  3.90it/s]Inference:  21%|██        | 7/34 [00:01<00:06,  3.97it/s]Inference:  24%|██▎       | 8/34 [00:02<00:06,  4.01it/s]Inference:  26%|██▋       | 9/34 [00:02<00:06,  4.04it/s]Inference:  29%|██▉       | 10/34 [00:02<00:05,  4.06it/s]Inference:  32%|███▏      | 11/34 [00:02<00:05,  4.08it/s]Inference:  35%|███▌      | 12/34 [00:03<00:05,  4.09it/s]Inference:  38%|███▊      | 13/34 [00:03<00:05,  4.10it/s]Inference:  41%|████      | 14/34 [00:03<00:04,  4.10it/s]Inference:  44%|████▍     | 15/34 [00:03<00:04,  4.11it/s]Inference:  47%|████▋     | 16/34 [00:04<00:04,  4.11it/s]Inference:  50%|█████     | 17/34 [00:04<00:04,  4.11it/s]Inference:  53%|█████▎    | 18/34 [00:04<00:03,  4.11it/s]Inference:  56%|█████▌    | 19/34 [00:04<00:03,  4.11it/s]Inference:  59%|█████▉    | 20/34 [00:05<00:03,  4.15it/s]Inference:  62%|██████▏   | 21/34 [00:05<00:03,  4.18it/s]Inference:  65%|██████▍   | 22/34 [00:05<00:02,  4.20it/s]Inference:  68%|██████▊   | 23/34 [00:05<00:02,  4.22it/s]Inference:  71%|███████   | 24/34 [00:06<00:02,  4.22it/s]Inference:  74%|███████▎  | 25/34 [00:06<00:02,  4.23it/s]Inference:  76%|███████▋  | 26/34 [00:06<00:01,  4.24it/s]Inference:  79%|███████▉  | 27/34 [00:06<00:01,  4.25it/s]Inference:  82%|████████▏ | 28/34 [00:06<00:01,  4.24it/s]Inference:  85%|████████▌ | 29/34 [00:07<00:01,  4.24it/s]Inference:  88%|████████▊ | 30/34 [00:07<00:00,  4.23it/s]Inference:  91%|█████████ | 31/34 [00:07<00:00,  4.23it/s]Inference:  94%|█████████▍| 32/34 [00:07<00:00,  4.23it/s]Inference:  97%|█████████▋| 33/34 [00:08<00:00,  4.23it/s]Inference: 100%|██████████| 34/34 [00:08<00:00,  4.14it/s]
+[Done] Saved 4257 rows -> /root/PLM_AMP_Regression/test_results/tax_gnn/esm150m/splits1_test/csv/esm2-150M_lr1e-05_bs32_ep29_val_best_test_results.csv
+[DONE] esm2-150M_lr1e-05_bs32_ep29_val_best
+[RENAME] -> /root/PLM_AMP_Regression/test_results/tax_gnn/esm150m/splits1_test/csv/v1_splits1_esm2-150M_lr1e-05_bs32_ep29_val_best_test_results.csv
+
+[RUN] 17:29:22 | model: /NAS/luyq/PLM_AMP_Regression/gnn_runs/esm2-150M/v15_splits1/esm2-150M_lr1e-05_bs32_ep16_val_best.pth
+       test : /NAS/luyq/AMP_datasets/splits1/test.csv
+       out  : /root/PLM_AMP_Regression/test_results/tax_gnn/esm150m/splits1_test/csv/esm2-150M_lr1e-05_bs32_ep16_val_best_test_results.csv
+[Model Info] PLM type: esm2-150M | ESM size: 150M
+[Model Name] esm2-150M_lr1e-05_bs32_ep16_val_best
+[Device] cuda:0
+[Model] Loading checkpoint...
+[Model] Taxonomy GNN only (type=gcn, layers=2, hidden=128, out=64, fusion=hier).
+[Data] Loaded 4257 samples from /NAS/luyq/AMP_datasets/splits1/test.csv
+[Tokenizer] Loading...
+mean 640 species_mode= gnn
+[Model] Checkpoint loaded.
+[Species/GNN] 307/307 species present in taxonomy graph.
+Inference:   0%|          | 0/34 [00:00<?, ?it/s]Inference:   3%|▎         | 1/34 [00:00<00:13,  2.52it/s]Inference:   6%|▌         | 2/34 [00:00<00:09,  3.31it/s]Inference:   9%|▉         | 3/34 [00:00<00:08,  3.67it/s]Inference:  12%|█▏        | 4/34 [00:01<00:07,  3.88it/s]Inference:  15%|█▍        | 5/34 [00:01<00:07,  4.01it/s]Inference:  18%|█▊        | 6/34 [00:01<00:06,  4.08it/s]Inference:  21%|██        | 7/34 [00:01<00:06,  4.13it/s]Inference:  24%|██▎       | 8/34 [00:02<00:06,  4.17it/s]Inference:  26%|██▋       | 9/34 [00:02<00:05,  4.19it/s]Inference:  29%|██▉       | 10/34 [00:02<00:05,  4.21it/s]Inference:  32%|███▏      | 11/34 [00:02<00:05,  4.22it/s]Inference:  35%|███▌      | 12/34 [00:02<00:05,  4.23it/s]Inference:  38%|███▊      | 13/34 [00:03<00:04,  4.24it/s]Inference:  41%|████      | 14/34 [00:03<00:04,  4.24it/s]Inference:  44%|████▍     | 15/34 [00:03<00:04,  4.24it/s]Inference:  47%|████▋     | 16/34 [00:03<00:04,  4.24it/s]Inference:  50%|█████     | 17/34 [00:04<00:04,  4.24it/s]Inference:  53%|█████▎    | 18/34 [00:04<00:03,  4.25it/s]Inference:  56%|█████▌    | 19/34 [00:04<00:03,  4.25it/s]Inference:  59%|█████▉    | 20/34 [00:04<00:03,  4.24it/s]Inference:  62%|██████▏   | 21/34 [00:05<00:03,  4.25it/s]Inference:  65%|██████▍   | 22/34 [00:05<00:02,  4.25it/s]Inference:  68%|██████▊   | 23/34 [00:05<00:02,  4.25it/s]Inference:  71%|███████   | 24/34 [00:05<00:02,  4.24it/s]Inference:  74%|███████▎  | 25/34 [00:06<00:02,  4.24it/s]Inference:  76%|███████▋  | 26/34 [00:06<00:01,  4.24it/s]Inference:  79%|███████▉  | 27/34 [00:06<00:01,  4.25it/s]Inference:  82%|████████▏ | 28/34 [00:06<00:01,  4.24it/s]Inference:  85%|████████▌ | 29/34 [00:06<00:01,  4.24it/s]Inference:  88%|████████▊ | 30/34 [00:07<00:00,  4.24it/s]Inference:  91%|█████████ | 31/34 [00:07<00:00,  4.25it/s]Inference:  94%|█████████▍| 32/34 [00:07<00:00,  4.24it/s]Inference:  97%|█████████▋| 33/34 [00:07<00:00,  4.24it/s]Inference: 100%|██████████| 34/34 [00:08<00:00,  4.25it/s]
+[Done] Saved 4257 rows -> /root/PLM_AMP_Regression/test_results/tax_gnn/esm150m/splits1_test/csv/esm2-150M_lr1e-05_bs32_ep16_val_best_test_results.csv
+[DONE] esm2-150M_lr1e-05_bs32_ep16_val_best
+[RENAME] -> /root/PLM_AMP_Regression/test_results/tax_gnn/esm150m/splits1_test/csv/v15_splits1_esm2-150M_lr1e-05_bs32_ep16_val_best_test_results.csv
+
+[RUN] 17:29:39 | model: /NAS/luyq/PLM_AMP_Regression/gnn_runs/esm2-150M/v2_splits1/esm2-150M_lr1e-05_bs32_ep26_val_best.pth
+       test : /NAS/luyq/AMP_datasets/splits1/test.csv
+       out  : /root/PLM_AMP_Regression/test_results/tax_gnn/esm150m/splits1_test/csv/esm2-150M_lr1e-05_bs32_ep26_val_best_test_results.csv
+[Model Info] PLM type: esm2-150M | ESM size: 150M
+[Model Name] esm2-150M_lr1e-05_bs32_ep26_val_best
+[Device] cuda:0
+[Model] Loading checkpoint...
+[Model] Taxonomy GNN only (type=gat, layers=2, hidden=128, out=64, fusion=leaf, heads=4).
+[Data] Loaded 4257 samples from /NAS/luyq/AMP_datasets/splits1/test.csv
+[Tokenizer] Loading...
+mean 640 species_mode= gnn
+[Model] Checkpoint loaded.
+[Species/GNN] 307/307 species present in taxonomy graph.
+Inference:   0%|          | 0/34 [00:00<?, ?it/s]Inference:   3%|▎         | 1/34 [00:00<00:13,  2.38it/s]Inference:   6%|▌         | 2/34 [00:00<00:09,  3.20it/s]Inference:   9%|▉         | 3/34 [00:00<00:08,  3.60it/s]Inference:  12%|█▏        | 4/34 [00:01<00:07,  3.83it/s]Inference:  15%|█▍        | 5/34 [00:01<00:07,  3.97it/s]Inference:  18%|█▊        | 6/34 [00:01<00:06,  4.06it/s]Inference:  21%|██        | 7/34 [00:01<00:06,  4.11it/s]Inference:  24%|██▎       | 8/34 [00:02<00:06,  4.14it/s]Inference:  26%|██▋       | 9/34 [00:02<00:05,  4.17it/s]Inference:  29%|██▉       | 10/34 [00:02<00:05,  4.19it/s]Inference:  32%|███▏      | 11/34 [00:02<00:05,  4.20it/s]Inference:  35%|███▌      | 12/34 [00:03<00:05,  4.21it/s]Inference:  38%|███▊      | 13/34 [00:03<00:04,  4.22it/s]Inference:  41%|████      | 14/34 [00:03<00:04,  4.21it/s]Inference:  44%|████▍     | 15/34 [00:03<00:04,  4.18it/s]Inference:  47%|████▋     | 16/34 [00:03<00:04,  4.15it/s]Inference:  50%|█████     | 17/34 [00:04<00:04,  4.14it/s]Inference:  53%|█████▎    | 18/34 [00:04<00:03,  4.13it/s]Inference:  56%|█████▌    | 19/34 [00:04<00:03,  4.12it/s]Inference:  59%|█████▉    | 20/34 [00:04<00:03,  4.11it/s]Inference:  62%|██████▏   | 21/34 [00:05<00:03,  4.13it/s]Inference:  65%|██████▍   | 22/34 [00:05<00:02,  4.15it/s]Inference:  68%|██████▊   | 23/34 [00:05<00:02,  4.17it/s]Inference:  71%|███████   | 24/34 [00:05<00:02,  4.19it/s]Inference:  74%|███████▎  | 25/34 [00:06<00:02,  4.20it/s]Inference:  76%|███████▋  | 26/34 [00:06<00:01,  4.21it/s]Inference:  79%|███████▉  | 27/34 [00:06<00:01,  4.22it/s]Inference:  82%|████████▏ | 28/34 [00:06<00:01,  4.22it/s]Inference:  85%|████████▌ | 29/34 [00:07<00:01,  4.22it/s]Inference:  88%|████████▊ | 30/34 [00:07<00:00,  4.23it/s]Inference:  91%|█████████ | 31/34 [00:07<00:00,  4.23it/s]Inference:  94%|█████████▍| 32/34 [00:07<00:00,  4.23it/s]Inference:  97%|█████████▋| 33/34 [00:08<00:00,  4.24it/s]Inference: 100%|██████████| 34/34 [00:08<00:00,  4.19it/s]
+[Done] Saved 4257 rows -> /root/PLM_AMP_Regression/test_results/tax_gnn/esm150m/splits1_test/csv/esm2-150M_lr1e-05_bs32_ep26_val_best_test_results.csv
+[DONE] esm2-150M_lr1e-05_bs32_ep26_val_best
+[RENAME] -> /root/PLM_AMP_Regression/test_results/tax_gnn/esm150m/splits1_test/csv/v2_splits1_esm2-150M_lr1e-05_bs32_ep26_val_best_test_results.csv
+
+>>> [splits2 GNN] models on splits2/test.csv
+
+[RUN] 17:29:55 | model: /NAS/luyq/PLM_AMP_Regression/gnn_runs/esm2-150M/v1_splits2/esm2-150M_lr1e-05_bs32_ep33_val_best.pth
+       test : /NAS/luyq/AMP_datasets/splits2/test.csv
+       out  : /root/PLM_AMP_Regression/test_results/tax_gnn/esm150m/splits2_test/csv/esm2-150M_lr1e-05_bs32_ep33_val_best_test_results.csv
+[Model Info] PLM type: esm2-150M | ESM size: 150M
+[Model Name] esm2-150M_lr1e-05_bs32_ep33_val_best
+[Device] cuda:0
+[Model] Loading checkpoint...
+[Model] Taxonomy GNN only (type=gcn, layers=2, hidden=128, out=64, fusion=leaf).
+[Data] Loaded 4943 samples from /NAS/luyq/AMP_datasets/splits2/test.csv
+[Tokenizer] Loading...
+mean 640 species_mode= gnn
+[Model] Checkpoint loaded.
+[Species/GNN] 177/177 species present in taxonomy graph.
+Inference:   0%|          | 0/39 [00:00<?, ?it/s]Inference:   3%|▎         | 1/39 [00:00<00:17,  2.14it/s]Inference:   5%|▌         | 2/39 [00:00<00:12,  2.97it/s]Inference:   8%|▊         | 3/39 [00:00<00:10,  3.40it/s]Inference:  10%|█         | 4/39 [00:01<00:09,  3.65it/s]Inference:  13%|█▎        | 5/39 [00:01<00:08,  3.80it/s]Inference:  15%|█▌        | 6/39 [00:01<00:08,  3.89it/s]Inference:  18%|█▊        | 7/39 [00:01<00:08,  3.96it/s]Inference:  21%|██        | 8/39 [00:02<00:07,  4.01it/s]Inference:  23%|██▎       | 9/39 [00:02<00:07,  4.04it/s]Inference:  26%|██▌       | 10/39 [00:02<00:07,  4.06it/s]Inference:  28%|██▊       | 11/39 [00:02<00:06,  4.08it/s]Inference:  31%|███       | 12/39 [00:03<00:06,  4.09it/s]Inference:  33%|███▎      | 13/39 [00:03<00:06,  4.10it/s]Inference:  36%|███▌      | 14/39 [00:03<00:06,  4.11it/s]Inference:  38%|███▊      | 15/39 [00:03<00:05,  4.15it/s]Inference:  41%|████      | 16/39 [00:04<00:05,  4.18it/s]Inference:  44%|████▎     | 17/39 [00:04<00:05,  4.20it/s]Inference:  46%|████▌     | 18/39 [00:04<00:04,  4.21it/s]Inference:  49%|████▊     | 19/39 [00:04<00:04,  4.22it/s]Inference:  51%|█████▏    | 20/39 [00:05<00:04,  4.23it/s]Inference:  54%|█████▍    | 21/39 [00:05<00:04,  4.23it/s]Inference:  56%|█████▋    | 22/39 [00:05<00:04,  4.24it/s]Inference:  59%|█████▉    | 23/39 [00:05<00:03,  4.24it/s]Inference:  62%|██████▏   | 24/39 [00:05<00:03,  4.24it/s]Inference:  64%|██████▍   | 25/39 [00:06<00:03,  4.24it/s]Inference:  67%|██████▋   | 26/39 [00:06<00:03,  4.24it/s]Inference:  69%|██████▉   | 27/39 [00:06<00:02,  4.25it/s]Inference:  72%|███████▏  | 28/39 [00:06<00:02,  4.25it/s]Inference:  74%|███████▍  | 29/39 [00:07<00:02,  4.24it/s]Inference:  77%|███████▋  | 30/39 [00:07<00:02,  4.25it/s]Inference:  79%|███████▉  | 31/39 [00:07<00:01,  4.25it/s]Inference:  82%|████████▏ | 32/39 [00:07<00:01,  4.25it/s]Inference:  85%|████████▍ | 33/39 [00:08<00:01,  4.24it/s]Inference:  87%|████████▋ | 34/39 [00:08<00:01,  4.24it/s]Inference:  90%|████████▉ | 35/39 [00:08<00:00,  4.24it/s]Inference:  92%|█████████▏| 36/39 [00:08<00:00,  4.24it/s]Inference:  95%|█████████▍| 37/39 [00:09<00:00,  4.25it/s]Inference:  97%|█████████▋| 38/39 [00:09<00:00,  4.25it/s]Inference: 100%|██████████| 39/39 [00:09<00:00,  4.74it/s]Inference: 100%|██████████| 39/39 [00:09<00:00,  4.13it/s]
+[Done] Saved 4943 rows -> /root/PLM_AMP_Regression/test_results/tax_gnn/esm150m/splits2_test/csv/esm2-150M_lr1e-05_bs32_ep33_val_best_test_results.csv
+[DONE] esm2-150M_lr1e-05_bs32_ep33_val_best
+[RENAME] -> /root/PLM_AMP_Regression/test_results/tax_gnn/esm150m/splits2_test/csv/v1_splits2_esm2-150M_lr1e-05_bs32_ep33_val_best_test_results.csv
+
+[RUN] 17:30:13 | model: /NAS/luyq/PLM_AMP_Regression/gnn_runs/esm2-150M/v15_splits2/esm2-150M_lr1e-05_bs32_ep32_val_best.pth
+       test : /NAS/luyq/AMP_datasets/splits2/test.csv
+       out  : /root/PLM_AMP_Regression/test_results/tax_gnn/esm150m/splits2_test/csv/esm2-150M_lr1e-05_bs32_ep32_val_best_test_results.csv
+[Model Info] PLM type: esm2-150M | ESM size: 150M
+[Model Name] esm2-150M_lr1e-05_bs32_ep32_val_best
+[Device] cuda:0
+[Model] Loading checkpoint...
+[Model] Taxonomy GNN only (type=gcn, layers=2, hidden=128, out=64, fusion=hier).
+[Data] Loaded 4943 samples from /NAS/luyq/AMP_datasets/splits2/test.csv
+[Tokenizer] Loading...
+mean 640 species_mode= gnn
+[Model] Checkpoint loaded.
+[Species/GNN] 177/177 species present in taxonomy graph.
+Inference:   0%|          | 0/39 [00:00<?, ?it/s]Inference:   3%|▎         | 1/39 [00:00<00:17,  2.12it/s]Inference:   5%|▌         | 2/39 [00:00<00:12,  2.96it/s]Inference:   8%|▊         | 3/39 [00:00<00:10,  3.39it/s]Inference:  10%|█         | 4/39 [00:01<00:09,  3.64it/s]Inference:  13%|█▎        | 5/39 [00:01<00:08,  3.80it/s]Inference:  15%|█▌        | 6/39 [00:01<00:08,  3.90it/s]Inference:  18%|█▊        | 7/39 [00:01<00:08,  3.96it/s]Inference:  21%|██        | 8/39 [00:02<00:07,  4.01it/s]Inference:  23%|██▎       | 9/39 [00:02<00:07,  4.04it/s]Inference:  26%|██▌       | 10/39 [00:02<00:07,  4.06it/s]Inference:  28%|██▊       | 11/39 [00:02<00:06,  4.08it/s]Inference:  31%|███       | 12/39 [00:03<00:06,  4.09it/s]Inference:  33%|███▎      | 13/39 [00:03<00:06,  4.14it/s]Inference:  36%|███▌      | 14/39 [00:03<00:05,  4.17it/s]Inference:  38%|███▊      | 15/39 [00:03<00:05,  4.20it/s]Inference:  41%|████      | 16/39 [00:04<00:05,  4.21it/s]Inference:  44%|████▎     | 17/39 [00:04<00:05,  4.22it/s]Inference:  46%|████▌     | 18/39 [00:04<00:04,  4.23it/s]Inference:  49%|████▊     | 19/39 [00:04<00:04,  4.24it/s]Inference:  51%|█████▏    | 20/39 [00:05<00:04,  4.23it/s]Inference:  54%|█████▍    | 21/39 [00:05<00:04,  4.24it/s]Inference:  56%|█████▋    | 22/39 [00:05<00:04,  4.24it/s]Inference:  59%|█████▉    | 23/39 [00:05<00:03,  4.24it/s]Inference:  62%|██████▏   | 24/39 [00:05<00:03,  4.24it/s]Inference:  64%|██████▍   | 25/39 [00:06<00:03,  4.24it/s]Inference:  67%|██████▋   | 26/39 [00:06<00:03,  4.24it/s]Inference:  69%|██████▉   | 27/39 [00:06<00:02,  4.24it/s]Inference:  72%|███████▏  | 28/39 [00:06<00:02,  4.24it/s]Inference:  74%|███████▍  | 29/39 [00:07<00:02,  4.24it/s]Inference:  77%|███████▋  | 30/39 [00:07<00:02,  4.24it/s]Inference:  79%|███████▉  | 31/39 [00:07<00:01,  4.25it/s]Inference:  82%|████████▏ | 32/39 [00:07<00:01,  4.24it/s]Inference:  85%|████████▍ | 33/39 [00:08<00:01,  4.24it/s]Inference:  87%|████████▋ | 34/39 [00:08<00:01,  4.25it/s]Inference:  90%|████████▉ | 35/39 [00:08<00:00,  4.25it/s]Inference:  92%|█████████▏| 36/39 [00:08<00:00,  4.25it/s]Inference:  95%|█████████▍| 37/39 [00:09<00:00,  4.24it/s]Inference:  97%|█████████▋| 38/39 [00:09<00:00,  4.25it/s]Inference: 100%|██████████| 39/39 [00:09<00:00,  4.73it/s]Inference: 100%|██████████| 39/39 [00:09<00:00,  4.14it/s]
+[Done] Saved 4943 rows -> /root/PLM_AMP_Regression/test_results/tax_gnn/esm150m/splits2_test/csv/esm2-150M_lr1e-05_bs32_ep32_val_best_test_results.csv
+[DONE] esm2-150M_lr1e-05_bs32_ep32_val_best
+[RENAME] -> /root/PLM_AMP_Regression/test_results/tax_gnn/esm150m/splits2_test/csv/v15_splits2_esm2-150M_lr1e-05_bs32_ep32_val_best_test_results.csv
+
+[RUN] 17:30:30 | model: /NAS/luyq/PLM_AMP_Regression/gnn_runs/esm2-150M/v2_splits2/esm2-150M_lr1e-05_bs32_ep39_val_best.pth
+       test : /NAS/luyq/AMP_datasets/splits2/test.csv
+       out  : /root/PLM_AMP_Regression/test_results/tax_gnn/esm150m/splits2_test/csv/esm2-150M_lr1e-05_bs32_ep39_val_best_test_results.csv
+[Model Info] PLM type: esm2-150M | ESM size: 150M
+[Model Name] esm2-150M_lr1e-05_bs32_ep39_val_best
+[Device] cuda:0
+[Model] Loading checkpoint...
+[Model] Taxonomy GNN only (type=gat, layers=2, hidden=128, out=64, fusion=leaf, heads=4).
+[Data] Loaded 4943 samples from /NAS/luyq/AMP_datasets/splits2/test.csv
+[Tokenizer] Loading...
+mean 640 species_mode= gnn
+[Model] Checkpoint loaded.
+[Species/GNN] 177/177 species present in taxonomy graph.
+Inference:   0%|          | 0/39 [00:00<?, ?it/s]Inference:   3%|▎         | 1/39 [00:00<00:17,  2.14it/s]Inference:   5%|▌         | 2/39 [00:00<00:12,  2.98it/s]Inference:   8%|▊         | 3/39 [00:00<00:10,  3.40it/s]Inference:  10%|█         | 4/39 [00:01<00:09,  3.65it/s]Inference:  13%|█▎        | 5/39 [00:01<00:08,  3.80it/s]Inference:  15%|█▌        | 6/39 [00:01<00:08,  3.90it/s]Inference:  18%|█▊        | 7/39 [00:01<00:08,  3.97it/s]Inference:  21%|██        | 8/39 [00:02<00:07,  4.01it/s]Inference:  23%|██▎       | 9/39 [00:02<00:07,  4.04it/s]Inference:  26%|██▌       | 10/39 [00:02<00:07,  4.06it/s]Inference:  28%|██▊       | 11/39 [00:02<00:06,  4.08it/s]Inference:  31%|███       | 12/39 [00:03<00:06,  4.09it/s]Inference:  33%|███▎      | 13/39 [00:03<00:06,  4.10it/s]Inference:  36%|███▌      | 14/39 [00:03<00:06,  4.10it/s]Inference:  38%|███▊      | 15/39 [00:03<00:05,  4.11it/s]Inference:  41%|████      | 16/39 [00:04<00:05,  4.15it/s]Inference:  44%|████▎     | 17/39 [00:04<00:05,  4.18it/s]Inference:  46%|████▌     | 18/39 [00:04<00:05,  4.20it/s]Inference:  49%|████▊     | 19/39 [00:04<00:04,  4.21it/s]Inference:  51%|█████▏    | 20/39 [00:05<00:04,  4.22it/s]Inference:  54%|█████▍    | 21/39 [00:05<00:04,  4.22it/s]Inference:  56%|█████▋    | 22/39 [00:05<00:04,  4.23it/s]Inference:  59%|█████▉    | 23/39 [00:05<00:03,  4.24it/s]Inference:  62%|██████▏   | 24/39 [00:05<00:03,  4.23it/s]Inference:  64%|██████▍   | 25/39 [00:06<00:03,  4.24it/s]Inference:  67%|██████▋   | 26/39 [00:06<00:03,  4.24it/s]Inference:  69%|██████▉   | 27/39 [00:06<00:02,  4.24it/s]Inference:  72%|███████▏  | 28/39 [00:06<00:02,  4.24it/s]Inference:  74%|███████▍  | 29/39 [00:07<00:02,  4.24it/s]Inference:  77%|███████▋  | 30/39 [00:07<00:02,  4.24it/s]Inference:  79%|███████▉  | 31/39 [00:07<00:01,  4.24it/s]Inference:  82%|████████▏ | 32/39 [00:07<00:01,  4.24it/s]Inference:  85%|████████▍ | 33/39 [00:08<00:01,  4.24it/s]Inference:  87%|████████▋ | 34/39 [00:08<00:01,  4.24it/s]Inference:  90%|████████▉ | 35/39 [00:08<00:00,  4.24it/s]Inference:  92%|█████████▏| 36/39 [00:08<00:00,  4.24it/s]Inference:  95%|█████████▍| 37/39 [00:09<00:00,  4.24it/s]Inference:  97%|█████████▋| 38/39 [00:09<00:00,  4.24it/s]Inference: 100%|██████████| 39/39 [00:09<00:00,  4.74it/s]Inference: 100%|██████████| 39/39 [00:09<00:00,  4.13it/s]
+[Done] Saved 4943 rows -> /root/PLM_AMP_Regression/test_results/tax_gnn/esm150m/splits2_test/csv/esm2-150M_lr1e-05_bs32_ep39_val_best_test_results.csv
+[DONE] esm2-150M_lr1e-05_bs32_ep39_val_best
+[RENAME] -> /root/PLM_AMP_Regression/test_results/tax_gnn/esm150m/splits2_test/csv/v2_splits2_esm2-150M_lr1e-05_bs32_ep39_val_best_test_results.csv
+
+>>> [splits2 GNN] models on splits2/external_test.csv
+
+[RUN] 17:30:48 | model: /NAS/luyq/PLM_AMP_Regression/gnn_runs/esm2-150M/v1_splits2/esm2-150M_lr1e-05_bs32_ep33_val_best.pth
+       test : /NAS/luyq/AMP_datasets/splits2/external_test.csv
+       out  : /root/PLM_AMP_Regression/test_results/tax_gnn/esm150m/external_test/csv/esm2-150M_lr1e-05_bs32_ep33_val_best_test_results.csv
+[Model Info] PLM type: esm2-150M | ESM size: 150M
+[Model Name] esm2-150M_lr1e-05_bs32_ep33_val_best
+[Device] cuda:0
+[Model] Loading checkpoint...
+[Model] Taxonomy GNN only (type=gcn, layers=2, hidden=128, out=64, fusion=leaf).
+[Data] Loaded 575 samples from /NAS/luyq/AMP_datasets/splits2/external_test.csv
+[Tokenizer] Loading...
+mean 640 species_mode= gnn
+[Model] Checkpoint loaded.
+[Species/GNN] 189/189 species present in taxonomy graph.
+Inference:   0%|          | 0/5 [00:00<?, ?it/s]Inference:  20%|██        | 1/5 [00:00<00:01,  2.15it/s]Inference:  40%|████      | 2/5 [00:00<00:01,  2.98it/s]Inference:  60%|██████    | 3/5 [00:00<00:00,  3.41it/s]Inference:  80%|████████  | 4/5 [00:01<00:00,  3.65it/s]Inference: 100%|██████████| 5/5 [00:01<00:00,  4.51it/s]Inference: 100%|██████████| 5/5 [00:01<00:00,  3.77it/s]
+[Done] Saved 575 rows -> /root/PLM_AMP_Regression/test_results/tax_gnn/esm150m/external_test/csv/esm2-150M_lr1e-05_bs32_ep33_val_best_test_results.csv
+[DONE] esm2-150M_lr1e-05_bs32_ep33_val_best
+[RENAME] -> /root/PLM_AMP_Regression/test_results/tax_gnn/esm150m/external_test/csv/v1_splits2_esm2-150M_lr1e-05_bs32_ep33_val_best_test_results.csv
+
+[RUN] 17:30:57 | model: /NAS/luyq/PLM_AMP_Regression/gnn_runs/esm2-150M/v15_splits2/esm2-150M_lr1e-05_bs32_ep32_val_best.pth
+       test : /NAS/luyq/AMP_datasets/splits2/external_test.csv
+       out  : /root/PLM_AMP_Regression/test_results/tax_gnn/esm150m/external_test/csv/esm2-150M_lr1e-05_bs32_ep32_val_best_test_results.csv
+[Model Info] PLM type: esm2-150M | ESM size: 150M
+[Model Name] esm2-150M_lr1e-05_bs32_ep32_val_best
+[Device] cuda:0
+[Model] Loading checkpoint...
+[Model] Taxonomy GNN only (type=gcn, layers=2, hidden=128, out=64, fusion=hier).
+[Data] Loaded 575 samples from /NAS/luyq/AMP_datasets/splits2/external_test.csv
+[Tokenizer] Loading...
+mean 640 species_mode= gnn
+[Model] Checkpoint loaded.
+[Species/GNN] 189/189 species present in taxonomy graph.
+Inference:   0%|          | 0/5 [00:00<?, ?it/s]Inference:  20%|██        | 1/5 [00:00<00:01,  2.45it/s]Inference:  40%|████      | 2/5 [00:00<00:00,  3.26it/s]Inference:  60%|██████    | 3/5 [00:00<00:00,  3.64it/s]Inference:  80%|████████  | 4/5 [00:01<00:00,  3.86it/s]Inference: 100%|██████████| 5/5 [00:01<00:00,  4.74it/s]Inference: 100%|██████████| 5/5 [00:01<00:00,  4.03it/s]
+[Done] Saved 575 rows -> /root/PLM_AMP_Regression/test_results/tax_gnn/esm150m/external_test/csv/esm2-150M_lr1e-05_bs32_ep32_val_best_test_results.csv
+[DONE] esm2-150M_lr1e-05_bs32_ep32_val_best
+[RENAME] -> /root/PLM_AMP_Regression/test_results/tax_gnn/esm150m/external_test/csv/v15_splits2_esm2-150M_lr1e-05_bs32_ep32_val_best_test_results.csv
+
+[RUN] 17:31:05 | model: /NAS/luyq/PLM_AMP_Regression/gnn_runs/esm2-150M/v2_splits2/esm2-150M_lr1e-05_bs32_ep39_val_best.pth
+       test : /NAS/luyq/AMP_datasets/splits2/external_test.csv
+       out  : /root/PLM_AMP_Regression/test_results/tax_gnn/esm150m/external_test/csv/esm2-150M_lr1e-05_bs32_ep39_val_best_test_results.csv
+[Model Info] PLM type: esm2-150M | ESM size: 150M
+[Model Name] esm2-150M_lr1e-05_bs32_ep39_val_best
+[Device] cuda:0
+[Model] Loading checkpoint...
+[Model] Taxonomy GNN only (type=gat, layers=2, hidden=128, out=64, fusion=leaf, heads=4).
+[Data] Loaded 575 samples from /NAS/luyq/AMP_datasets/splits2/external_test.csv
+[Tokenizer] Loading...
+mean 640 species_mode= gnn
+[Model] Checkpoint loaded.
+[Species/GNN] 189/189 species present in taxonomy graph.
+Inference:   0%|          | 0/5 [00:00<?, ?it/s]Inference:  20%|██        | 1/5 [00:00<00:01,  2.19it/s]Inference:  40%|████      | 2/5 [00:00<00:00,  3.01it/s]Inference:  60%|██████    | 3/5 [00:00<00:00,  3.42it/s]Inference:  80%|████████  | 4/5 [00:01<00:00,  3.66it/s]Inference: 100%|██████████| 5/5 [00:01<00:00,  4.51it/s]Inference: 100%|██████████| 5/5 [00:01<00:00,  3.78it/s]
+[Done] Saved 575 rows -> /root/PLM_AMP_Regression/test_results/tax_gnn/esm150m/external_test/csv/esm2-150M_lr1e-05_bs32_ep39_val_best_test_results.csv
+[DONE] esm2-150M_lr1e-05_bs32_ep39_val_best
+[RENAME] -> /root/PLM_AMP_Regression/test_results/tax_gnn/esm150m/external_test/csv/v2_splits2_esm2-150M_lr1e-05_bs32_ep39_val_best_test_results.csv
+
+============================================================
+All done: Fri May  8 17:31:15 CST 2026
+splits1_test : 3 files
+splits2_test : 3 files
+external_test: 3 files
+============================================================
