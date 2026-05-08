@@ -1,1527 +1,0 @@
-============================================================
-Batch inference started: Tue 31 Mar 2026 04:16:33 PM CST
-============================================================
-
->>> [splits1] models on splits1/test.csv
-
-[RUN] 16:16:34 | model: esm2-150M_lr0.0001_bs16_ep5_val_best
-       test : /NAS/luyq/AMP_datasets/splits1/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-150M_lr0.0001_bs16_ep5_val_best_test_results.csv
-Traceback (most recent call last):
-  File "/home/luyq/PLM_AMP_Regression/test/infer.py", line 160, in <module>
-    main()
-  File "/home/luyq/PLM_AMP_Regression/test/infer.py", line 149, in main
-    run_inference(
-  File "/home/luyq/PLM_AMP_Regression/test/infer.py", line 84, in run_inference
-    checkpoint = torch.load(model_path, map_location=device)
-  File "/home/luyq/miniconda3/envs/pytorch3.9/lib/python3.9/site-packages/torch/serialization.py", line 1026, in load
-    return _load(opened_zipfile,
-  File "/home/luyq/miniconda3/envs/pytorch3.9/lib/python3.9/site-packages/torch/serialization.py", line 1438, in _load
-    result = unpickler.load()
-  File "/home/luyq/miniconda3/envs/pytorch3.9/lib/python3.9/site-packages/torch/serialization.py", line 1408, in persistent_load
-    typed_storage = load_tensor(dtype, nbytes, key, _maybe_decode_ascii(location))
-  File "/home/luyq/miniconda3/envs/pytorch3.9/lib/python3.9/site-packages/torch/serialization.py", line 1382, in load_tensor
-    wrap_storage=restore_location(storage, location),
-  File "/home/luyq/miniconda3/envs/pytorch3.9/lib/python3.9/site-packages/torch/serialization.py", line 1311, in restore_location
-    return default_restore_location(storage, str(map_location))
-  File "/home/luyq/miniconda3/envs/pytorch3.9/lib/python3.9/site-packages/torch/serialization.py", line 391, in default_restore_location
-    result = fn(storage, location)
-  File "/home/luyq/miniconda3/envs/pytorch3.9/lib/python3.9/site-packages/torch/serialization.py", line 271, in _cuda_deserialize
-    return obj.cuda(device)
-  File "/home/luyq/miniconda3/envs/pytorch3.9/lib/python3.9/site-packages/torch/_utils.py", line 115, in _cuda
-    untyped_storage = torch.UntypedStorage(
-torch.cuda.OutOfMemoryError: CUDA out of memory. Tried to allocate 20.00 MiB. GPU 0 has a total capacity of 44.35 GiB of which 15.56 MiB is free. Process 1140955 has 42.14 GiB memory in use. Process 481246 has 260.00 MiB memory in use. Process 513134 has 600.79 MiB memory in use. Including non-PyTorch memory, this process has 1.31 GiB memory in use. Of the allocated memory 1013.38 MiB is allocated by PyTorch, and 70.62 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
-ERROR conda.cli.main_run:execute(124): `conda run python /home/luyq/PLM_AMP_Regression/test/infer.py --model_path /NAS/luyq/PLM_AMP_Regression/ckp/splits1/esm2-150M_lr0.0001_bs16_ep5_val_best.pth --test_csv /NAS/luyq/AMP_datasets/splits1/test.csv --output_dir /home/luyq/PLM_AMP_Regression/test/splits1_test --batch_size 512 --device 0` failed. (See above for error)
-[Model Info] PLM type: esm2-150M | ESM size: 150M
-[Model Name] esm2-150M_lr0.0001_bs16_ep5_val_best
-[Device] cuda:0
-[Data] Loaded 4257 samples from /NAS/luyq/AMP_datasets/splits1/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 640
-============================================================
-Batch inference started: Tue 31 Mar 2026 04:17:16 PM CST
-============================================================
-
->>> [splits1] models on splits1/test.csv
-
-[RUN] 16:17:17 | model: esm2-150M_lr0.0001_bs16_ep5_val_best
-       test : /NAS/luyq/AMP_datasets/splits1/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-150M_lr0.0001_bs16_ep5_val_best_test_results.csv
-Inference:   0%|          | 0/17 [00:00<?, ?it/s]Inference:   6%|▌         | 1/17 [00:01<00:20,  1.31s/it]Inference:  12%|█▏        | 2/17 [00:01<00:13,  1.12it/s]Inference:  18%|█▊        | 3/17 [00:02<00:10,  1.32it/s]Inference:  24%|██▎       | 4/17 [00:03<00:09,  1.44it/s]Inference:  29%|██▉       | 5/17 [00:03<00:07,  1.52it/s]Inference:  35%|███▌      | 6/17 [00:04<00:07,  1.57it/s]Inference:  41%|████      | 7/17 [00:04<00:06,  1.60it/s]Inference:  47%|████▋     | 8/17 [00:05<00:05,  1.63it/s]Inference:  53%|█████▎    | 9/17 [00:06<00:04,  1.64it/s]Inference:  59%|█████▉    | 10/17 [00:06<00:04,  1.65it/s]Inference:  65%|██████▍   | 11/17 [00:07<00:03,  1.66it/s]Inference:  71%|███████   | 12/17 [00:07<00:03,  1.66it/s]Inference:  76%|███████▋  | 13/17 [00:08<00:02,  1.67it/s]Inference:  82%|████████▏ | 14/17 [00:09<00:01,  1.67it/s]Inference:  88%|████████▊ | 15/17 [00:09<00:01,  1.67it/s]Inference:  94%|█████████▍| 16/17 [00:10<00:00,  1.67it/s]Inference: 100%|██████████| 17/17 [00:10<00:00,  1.88it/s]Inference: 100%|██████████| 17/17 [00:10<00:00,  1.60it/s]
-[Model Info] PLM type: esm2-150M | ESM size: 150M
-[Model Name] esm2-150M_lr0.0001_bs16_ep5_val_best
-[Device] cuda:1
-[Data] Loaded 4257 samples from /NAS/luyq/AMP_datasets/splits1/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 640
-[Model] Checkpoint loaded.
-[Done] Saved 4257 rows -> /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-150M_lr0.0001_bs16_ep5_val_best_test_results.csv
-[DONE] esm2-150M_lr0.0001_bs16_ep5_val_best
-
-[RUN] 16:17:35 | model: esm2-150M_lr1e-05_bs16_ep0_val_best
-       test : /NAS/luyq/AMP_datasets/splits1/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-150M_lr1e-05_bs16_ep0_val_best_test_results.csv
-Inference:   0%|          | 0/17 [00:00<?, ?it/s]Inference:   6%|▌         | 1/17 [00:01<00:22,  1.39s/it]Inference:  12%|█▏        | 2/17 [00:01<00:13,  1.08it/s]Inference:  18%|█▊        | 3/17 [00:02<00:10,  1.29it/s]Inference:  24%|██▎       | 4/17 [00:03<00:09,  1.42it/s]Inference:  29%|██▉       | 5/17 [00:03<00:08,  1.50it/s]Inference:  35%|███▌      | 6/17 [00:04<00:07,  1.55it/s]Inference:  41%|████      | 7/17 [00:04<00:06,  1.59it/s]Inference:  47%|████▋     | 8/17 [00:05<00:05,  1.61it/s]Inference:  53%|█████▎    | 9/17 [00:06<00:04,  1.63it/s]Inference:  59%|█████▉    | 10/17 [00:06<00:04,  1.64it/s]Inference:  65%|██████▍   | 11/17 [00:07<00:03,  1.65it/s]Inference:  71%|███████   | 12/17 [00:07<00:03,  1.65it/s]Inference:  76%|███████▋  | 13/17 [00:08<00:02,  1.66it/s]Inference:  82%|████████▏ | 14/17 [00:09<00:01,  1.66it/s]Inference:  88%|████████▊ | 15/17 [00:09<00:01,  1.66it/s]Inference:  94%|█████████▍| 16/17 [00:10<00:00,  1.66it/s]Inference: 100%|██████████| 17/17 [00:10<00:00,  1.87it/s]Inference: 100%|██████████| 17/17 [00:10<00:00,  1.58it/s]
-[Model Info] PLM type: esm2-150M | ESM size: 150M
-[Model Name] esm2-150M_lr1e-05_bs16_ep0_val_best
-[Device] cuda:1
-[Data] Loaded 4257 samples from /NAS/luyq/AMP_datasets/splits1/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 640
-[Model] Checkpoint loaded.
-[Done] Saved 4257 rows -> /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-150M_lr1e-05_bs16_ep0_val_best_test_results.csv
-[DONE] esm2-150M_lr1e-05_bs16_ep0_val_best
-
-[RUN] 16:17:52 | model: esm2-150M_lr1e-05_bs16_ep27_val_best
-       test : /NAS/luyq/AMP_datasets/splits1/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-150M_lr1e-05_bs16_ep27_val_best_test_results.csv
-Inference:   0%|          | 0/17 [00:00<?, ?it/s]Inference:   6%|▌         | 1/17 [00:01<00:21,  1.36s/it]Inference:  12%|█▏        | 2/17 [00:01<00:13,  1.10it/s]Inference:  18%|█▊        | 3/17 [00:02<00:10,  1.30it/s]Inference:  24%|██▎       | 4/17 [00:03<00:09,  1.42it/s]Inference:  29%|██▉       | 5/17 [00:03<00:07,  1.50it/s]Inference:  35%|███▌      | 6/17 [00:04<00:07,  1.55it/s]Inference:  41%|████      | 7/17 [00:04<00:06,  1.59it/s]Inference:  47%|████▋     | 8/17 [00:05<00:05,  1.61it/s]Inference:  53%|█████▎    | 9/17 [00:06<00:04,  1.62it/s]Inference:  59%|█████▉    | 10/17 [00:06<00:04,  1.64it/s]Inference:  65%|██████▍   | 11/17 [00:07<00:03,  1.64it/s]Inference:  71%|███████   | 12/17 [00:07<00:03,  1.65it/s]Inference:  76%|███████▋  | 13/17 [00:08<00:02,  1.65it/s]Inference:  82%|████████▏ | 14/17 [00:09<00:01,  1.66it/s]Inference:  88%|████████▊ | 15/17 [00:09<00:01,  1.66it/s]Inference:  94%|█████████▍| 16/17 [00:10<00:00,  1.66it/s]Inference: 100%|██████████| 17/17 [00:10<00:00,  1.87it/s]Inference: 100%|██████████| 17/17 [00:10<00:00,  1.58it/s]
-[Model Info] PLM type: esm2-150M | ESM size: 150M
-[Model Name] esm2-150M_lr1e-05_bs16_ep27_val_best
-[Device] cuda:1
-[Data] Loaded 4257 samples from /NAS/luyq/AMP_datasets/splits1/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 640
-[Model] Checkpoint loaded.
-[Done] Saved 4257 rows -> /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-150M_lr1e-05_bs16_ep27_val_best_test_results.csv
-[DONE] esm2-150M_lr1e-05_bs16_ep27_val_best
-
-[RUN] 16:19:06 | model: esm2-150M_lr1e-05_bs16_ep9_val_best
-       test : /NAS/luyq/AMP_datasets/splits1/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-150M_lr1e-05_bs16_ep9_val_best_test_results.csv
-Inference:   0%|          | 0/17 [00:00<?, ?it/s]Inference:   6%|▌         | 1/17 [00:01<00:22,  1.39s/it]Inference:  12%|█▏        | 2/17 [00:01<00:13,  1.08it/s]Inference:  18%|█▊        | 3/17 [00:02<00:10,  1.29it/s]Inference:  24%|██▎       | 4/17 [00:03<00:09,  1.41it/s]Inference:  29%|██▉       | 5/17 [00:03<00:08,  1.49it/s]Inference:  35%|███▌      | 6/17 [00:04<00:07,  1.55it/s]Inference:  41%|████      | 7/17 [00:04<00:06,  1.58it/s]Inference:  47%|████▋     | 8/17 [00:05<00:05,  1.61it/s]Inference:  53%|█████▎    | 9/17 [00:06<00:04,  1.63it/s]Inference:  59%|█████▉    | 10/17 [00:06<00:04,  1.64it/s]Inference:  65%|██████▍   | 11/17 [00:07<00:03,  1.65it/s]Inference:  71%|███████   | 12/17 [00:07<00:03,  1.65it/s]Inference:  76%|███████▋  | 13/17 [00:08<00:02,  1.66it/s]Inference:  82%|████████▏ | 14/17 [00:09<00:01,  1.66it/s]Inference:  88%|████████▊ | 15/17 [00:09<00:01,  1.66it/s]Inference:  94%|█████████▍| 16/17 [00:10<00:00,  1.66it/s]Inference: 100%|██████████| 17/17 [00:10<00:00,  1.87it/s]Inference: 100%|██████████| 17/17 [00:10<00:00,  1.58it/s]
-[Model Info] PLM type: esm2-150M | ESM size: 150M
-[Model Name] esm2-150M_lr1e-05_bs16_ep9_val_best
-[Device] cuda:1
-[Data] Loaded 4257 samples from /NAS/luyq/AMP_datasets/splits1/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 640
-[Model] Checkpoint loaded.
-[Done] Saved 4257 rows -> /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-150M_lr1e-05_bs16_ep9_val_best_test_results.csv
-[DONE] esm2-150M_lr1e-05_bs16_ep9_val_best
-
-[RUN] 16:23:22 | model: esm2-150M_lr1e-05_bs32_ep26_val_best
-       test : /NAS/luyq/AMP_datasets/splits1/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-150M_lr1e-05_bs32_ep26_val_best_test_results.csv
-Inference:   0%|          | 0/17 [00:00<?, ?it/s]Inference:   6%|▌         | 1/17 [00:01<00:21,  1.34s/it]Inference:  12%|█▏        | 2/17 [00:01<00:13,  1.10it/s]Inference:  18%|█▊        | 3/17 [00:02<00:10,  1.30it/s]Inference:  24%|██▎       | 4/17 [00:03<00:09,  1.42it/s]Inference:  29%|██▉       | 5/17 [00:03<00:07,  1.50it/s]Inference:  35%|███▌      | 6/17 [00:04<00:07,  1.55it/s]Inference:  41%|████      | 7/17 [00:04<00:06,  1.59it/s]Inference:  47%|████▋     | 8/17 [00:05<00:05,  1.61it/s]Inference:  53%|█████▎    | 9/17 [00:06<00:04,  1.63it/s]Inference:  59%|█████▉    | 10/17 [00:06<00:04,  1.64it/s]Inference:  65%|██████▍   | 11/17 [00:07<00:03,  1.65it/s]Inference:  71%|███████   | 12/17 [00:07<00:03,  1.65it/s]Inference:  76%|███████▋  | 13/17 [00:08<00:02,  1.66it/s]Inference:  82%|████████▏ | 14/17 [00:09<00:01,  1.66it/s]Inference:  88%|████████▊ | 15/17 [00:09<00:01,  1.66it/s]Inference:  94%|█████████▍| 16/17 [00:10<00:00,  1.66it/s]Inference: 100%|██████████| 17/17 [00:10<00:00,  1.87it/s]Inference: 100%|██████████| 17/17 [00:10<00:00,  1.58it/s]
-[Model Info] PLM type: esm2-150M | ESM size: 150M
-[Model Name] esm2-150M_lr1e-05_bs32_ep26_val_best
-[Device] cuda:1
-[Data] Loaded 4257 samples from /NAS/luyq/AMP_datasets/splits1/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 640
-[Model] Checkpoint loaded.
-[Done] Saved 4257 rows -> /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-150M_lr1e-05_bs32_ep26_val_best_test_results.csv
-[DONE] esm2-150M_lr1e-05_bs32_ep26_val_best
-
-[RUN] 16:23:42 | model: esm2-150M_lr1e-05_bs64_ep26_val_best
-       test : /NAS/luyq/AMP_datasets/splits1/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-150M_lr1e-05_bs64_ep26_val_best_test_results.csv
-Inference:   0%|          | 0/17 [00:00<?, ?it/s]Inference:   6%|▌         | 1/17 [00:01<00:21,  1.33s/it]Inference:  12%|█▏        | 2/17 [00:01<00:13,  1.11it/s]Inference:  18%|█▊        | 3/17 [00:02<00:10,  1.31it/s]Inference:  24%|██▎       | 4/17 [00:03<00:09,  1.43it/s]Inference:  29%|██▉       | 5/17 [00:03<00:07,  1.51it/s]Inference:  35%|███▌      | 6/17 [00:04<00:07,  1.56it/s]Inference:  41%|████      | 7/17 [00:04<00:06,  1.59it/s]Inference:  47%|████▋     | 8/17 [00:05<00:05,  1.61it/s]Inference:  53%|█████▎    | 9/17 [00:06<00:04,  1.63it/s]Inference:  59%|█████▉    | 10/17 [00:06<00:04,  1.64it/s]Inference:  65%|██████▍   | 11/17 [00:07<00:03,  1.65it/s]Inference:  71%|███████   | 12/17 [00:07<00:03,  1.65it/s]Inference:  76%|███████▋  | 13/17 [00:08<00:02,  1.66it/s]Inference:  82%|████████▏ | 14/17 [00:09<00:01,  1.66it/s]Inference:  88%|████████▊ | 15/17 [00:09<00:01,  1.66it/s]Inference:  94%|█████████▍| 16/17 [00:10<00:00,  1.66it/s]Inference: 100%|██████████| 17/17 [00:10<00:00,  1.87it/s]Inference: 100%|██████████| 17/17 [00:10<00:00,  1.59it/s]
-[Model Info] PLM type: esm2-150M | ESM size: 150M
-[Model Name] esm2-150M_lr1e-05_bs64_ep26_val_best
-[Device] cuda:1
-[Data] Loaded 4257 samples from /NAS/luyq/AMP_datasets/splits1/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 640
-[Model] Checkpoint loaded.
-[Done] Saved 4257 rows -> /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-150M_lr1e-05_bs64_ep26_val_best_test_results.csv
-[DONE] esm2-150M_lr1e-05_bs64_ep26_val_best
-
-[RUN] 16:24:00 | model: esm2-150M_lr1e-05_bs8_ep27_val_best
-       test : /NAS/luyq/AMP_datasets/splits1/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-150M_lr1e-05_bs8_ep27_val_best_test_results.csv
-Inference:   0%|          | 0/17 [00:00<?, ?it/s]Inference:   6%|▌         | 1/17 [00:01<00:20,  1.29s/it]Inference:  12%|█▏        | 2/17 [00:01<00:13,  1.13it/s]Inference:  18%|█▊        | 3/17 [00:02<00:10,  1.33it/s]Inference:  24%|██▎       | 4/17 [00:03<00:08,  1.45it/s]Inference:  29%|██▉       | 5/17 [00:03<00:07,  1.52it/s]Inference:  35%|███▌      | 6/17 [00:04<00:07,  1.57it/s]Inference:  41%|████      | 7/17 [00:04<00:06,  1.60it/s]Inference:  47%|████▋     | 8/17 [00:05<00:05,  1.62it/s]Inference:  53%|█████▎    | 9/17 [00:06<00:04,  1.64it/s]Inference:  59%|█████▉    | 10/17 [00:06<00:04,  1.65it/s]Inference:  65%|██████▍   | 11/17 [00:07<00:03,  1.66it/s]Inference:  71%|███████   | 12/17 [00:07<00:03,  1.66it/s]Inference:  76%|███████▋  | 13/17 [00:08<00:02,  1.66it/s]Inference:  82%|████████▏ | 14/17 [00:09<00:01,  1.67it/s]Inference:  88%|████████▊ | 15/17 [00:09<00:01,  1.67it/s]Inference:  94%|█████████▍| 16/17 [00:10<00:00,  1.67it/s]Inference: 100%|██████████| 17/17 [00:10<00:00,  1.88it/s]Inference: 100%|██████████| 17/17 [00:10<00:00,  1.60it/s]
-[Model Info] PLM type: esm2-150M | ESM size: 150M
-[Model Name] esm2-150M_lr1e-05_bs8_ep27_val_best
-[Device] cuda:1
-[Data] Loaded 4257 samples from /NAS/luyq/AMP_datasets/splits1/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 640
-[Model] Checkpoint loaded.
-[Done] Saved 4257 rows -> /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-150M_lr1e-05_bs8_ep27_val_best_test_results.csv
-[DONE] esm2-150M_lr1e-05_bs8_ep27_val_best
-
-[RUN] 16:24:21 | model: esm2-150M_lr1e-05_bs8_ep28_val_best
-       test : /NAS/luyq/AMP_datasets/splits1/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-150M_lr1e-05_bs8_ep28_val_best_test_results.csv
-Inference:   0%|          | 0/17 [00:00<?, ?it/s]Inference:   6%|▌         | 1/17 [00:01<00:20,  1.29s/it]Inference:  12%|█▏        | 2/17 [00:01<00:13,  1.12it/s]Inference:  18%|█▊        | 3/17 [00:02<00:10,  1.31it/s]Inference:  24%|██▎       | 4/17 [00:03<00:09,  1.43it/s]Inference:  29%|██▉       | 5/17 [00:03<00:07,  1.50it/s]Inference:  35%|███▌      | 6/17 [00:04<00:07,  1.55it/s]Inference:  41%|████      | 7/17 [00:04<00:06,  1.58it/s]Inference:  47%|████▋     | 8/17 [00:05<00:05,  1.60it/s]Inference:  53%|█████▎    | 9/17 [00:06<00:04,  1.61it/s]Inference:  59%|█████▉    | 10/17 [00:06<00:04,  1.62it/s]Inference:  65%|██████▍   | 11/17 [00:07<00:03,  1.63it/s]Inference:  71%|███████   | 12/17 [00:08<00:03,  1.59it/s]Inference:  76%|███████▋  | 13/17 [00:08<00:02,  1.60it/s]Inference:  82%|████████▏ | 14/17 [00:09<00:02,  1.36it/s]Inference:  88%|████████▊ | 15/17 [00:10<00:01,  1.11it/s]Inference:  94%|█████████▍| 16/17 [00:12<00:01,  1.02s/it]Inference: 100%|██████████| 17/17 [00:13<00:00,  1.05it/s]Inference: 100%|██████████| 17/17 [00:13<00:00,  1.31it/s]
-[Model Info] PLM type: esm2-150M | ESM size: 150M
-[Model Name] esm2-150M_lr1e-05_bs8_ep28_val_best
-[Device] cuda:1
-[Data] Loaded 4257 samples from /NAS/luyq/AMP_datasets/splits1/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 640
-[Model] Checkpoint loaded.
-[Done] Saved 4257 rows -> /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-150M_lr1e-05_bs8_ep28_val_best_test_results.csv
-[DONE] esm2-150M_lr1e-05_bs8_ep28_val_best
-
-[RUN] 16:24:40 | model: esm2-150M_lr5e-06_bs16_ep28_val_best
-       test : /NAS/luyq/AMP_datasets/splits1/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-150M_lr5e-06_bs16_ep28_val_best_test_results.csv
-Inference:   0%|          | 0/17 [00:00<?, ?it/s]Inference:   6%|▌         | 1/17 [00:01<00:30,  1.90s/it]Inference:  12%|█▏        | 2/17 [00:02<00:17,  1.14s/it]Inference:  18%|█▊        | 3/17 [00:03<00:12,  1.12it/s]Inference:  24%|██▎       | 4/17 [00:03<00:10,  1.28it/s]Inference:  29%|██▉       | 5/17 [00:04<00:08,  1.39it/s]Inference:  35%|███▌      | 6/17 [00:04<00:07,  1.46it/s]Inference:  41%|████      | 7/17 [00:05<00:06,  1.52it/s]Inference:  47%|████▋     | 8/17 [00:06<00:05,  1.56it/s]Inference:  53%|█████▎    | 9/17 [00:06<00:05,  1.59it/s]Inference:  59%|█████▉    | 10/17 [00:07<00:04,  1.61it/s]Inference:  65%|██████▍   | 11/17 [00:07<00:03,  1.62it/s]Inference:  71%|███████   | 12/17 [00:08<00:03,  1.63it/s]Inference:  76%|███████▋  | 13/17 [00:09<00:02,  1.64it/s]Inference:  82%|████████▏ | 14/17 [00:09<00:01,  1.65it/s]Inference:  88%|████████▊ | 15/17 [00:10<00:01,  1.65it/s]Inference:  94%|█████████▍| 16/17 [00:10<00:00,  1.65it/s]Inference: 100%|██████████| 17/17 [00:11<00:00,  1.86it/s]Inference: 100%|██████████| 17/17 [00:11<00:00,  1.50it/s]
-[Model Info] PLM type: esm2-150M | ESM size: 150M
-[Model Name] esm2-150M_lr5e-06_bs16_ep28_val_best
-[Device] cuda:1
-[Data] Loaded 4257 samples from /NAS/luyq/AMP_datasets/splits1/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 640
-[Model] Checkpoint loaded.
-[Done] Saved 4257 rows -> /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-150M_lr5e-06_bs16_ep28_val_best_test_results.csv
-[DONE] esm2-150M_lr5e-06_bs16_ep28_val_best
-
-[RUN] 16:25:02 | model: esm2-150M_lr5e-06_bs16_ep9_val_best
-       test : /NAS/luyq/AMP_datasets/splits1/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-150M_lr5e-06_bs16_ep9_val_best_test_results.csv
-Inference:   0%|          | 0/17 [00:00<?, ?it/s]Inference:   6%|▌         | 1/17 [00:01<00:21,  1.35s/it]Inference:  12%|█▏        | 2/17 [00:01<00:13,  1.10it/s]Inference:  18%|█▊        | 3/17 [00:02<00:10,  1.30it/s]Inference:  24%|██▎       | 4/17 [00:03<00:09,  1.42it/s]Inference:  29%|██▉       | 5/17 [00:03<00:08,  1.49it/s]Inference:  35%|███▌      | 6/17 [00:04<00:07,  1.54it/s]Inference:  41%|████      | 7/17 [00:04<00:06,  1.58it/s]Inference:  47%|████▋     | 8/17 [00:05<00:05,  1.61it/s]Inference:  53%|█████▎    | 9/17 [00:06<00:04,  1.62it/s]Inference:  59%|█████▉    | 10/17 [00:06<00:04,  1.64it/s]Inference:  65%|██████▍   | 11/17 [00:07<00:03,  1.65it/s]Inference:  71%|███████   | 12/17 [00:07<00:03,  1.65it/s]Inference:  76%|███████▋  | 13/17 [00:08<00:02,  1.66it/s]Inference:  82%|████████▏ | 14/17 [00:09<00:01,  1.66it/s]Inference:  88%|████████▊ | 15/17 [00:09<00:01,  1.66it/s]Inference:  94%|█████████▍| 16/17 [00:10<00:00,  1.66it/s]Inference: 100%|██████████| 17/17 [00:10<00:00,  1.87it/s]Inference: 100%|██████████| 17/17 [00:10<00:00,  1.58it/s]
-[Model Info] PLM type: esm2-150M | ESM size: 150M
-[Model Name] esm2-150M_lr5e-06_bs16_ep9_val_best
-[Device] cuda:1
-[Data] Loaded 4257 samples from /NAS/luyq/AMP_datasets/splits1/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 640
-[Model] Checkpoint loaded.
-[Done] Saved 4257 rows -> /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-150M_lr5e-06_bs16_ep9_val_best_test_results.csv
-[DONE] esm2-150M_lr5e-06_bs16_ep9_val_best
-
-[RUN] 16:25:42 | model: esm2-150M_lr5e-06_bs32_ep28_val_best
-       test : /NAS/luyq/AMP_datasets/splits1/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-150M_lr5e-06_bs32_ep28_val_best_test_results.csv
-Inference:   0%|          | 0/17 [00:00<?, ?it/s]Inference:   6%|▌         | 1/17 [00:01<00:23,  1.46s/it]Inference:  12%|█▏        | 2/17 [00:02<00:14,  1.05it/s]Inference:  18%|█▊        | 3/17 [00:02<00:11,  1.26it/s]Inference:  24%|██▎       | 4/17 [00:03<00:09,  1.40it/s]Inference:  29%|██▉       | 5/17 [00:03<00:08,  1.48it/s]Inference:  35%|███▌      | 6/17 [00:04<00:07,  1.54it/s]Inference:  41%|████      | 7/17 [00:05<00:06,  1.58it/s]Inference:  47%|████▋     | 8/17 [00:05<00:05,  1.60it/s]Inference:  53%|█████▎    | 9/17 [00:06<00:04,  1.62it/s]Inference:  59%|█████▉    | 10/17 [00:06<00:04,  1.64it/s]Inference:  65%|██████▍   | 11/17 [00:07<00:03,  1.65it/s]Inference:  71%|███████   | 12/17 [00:08<00:03,  1.65it/s]Inference:  76%|███████▋  | 13/17 [00:08<00:02,  1.66it/s]Inference:  82%|████████▏ | 14/17 [00:09<00:01,  1.66it/s]Inference:  88%|████████▊ | 15/17 [00:09<00:01,  1.66it/s]Inference:  94%|█████████▍| 16/17 [00:10<00:00,  1.66it/s]Inference: 100%|██████████| 17/17 [00:10<00:00,  1.87it/s]Inference: 100%|██████████| 17/17 [00:10<00:00,  1.57it/s]
-[Model Info] PLM type: esm2-150M | ESM size: 150M
-[Model Name] esm2-150M_lr5e-06_bs32_ep28_val_best
-[Device] cuda:1
-[Data] Loaded 4257 samples from /NAS/luyq/AMP_datasets/splits1/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 640
-[Model] Checkpoint loaded.
-[Done] Saved 4257 rows -> /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-150M_lr5e-06_bs32_ep28_val_best_test_results.csv
-[DONE] esm2-150M_lr5e-06_bs32_ep28_val_best
-
-[RUN] 16:26:32 | model: esm2-150M_lr5e-06_bs32_ep30_val_best
-       test : /NAS/luyq/AMP_datasets/splits1/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-150M_lr5e-06_bs32_ep30_val_best_test_results.csv
-Inference:   0%|          | 0/17 [00:00<?, ?it/s]Inference:   6%|▌         | 1/17 [00:01<00:21,  1.34s/it]Inference:  12%|█▏        | 2/17 [00:01<00:13,  1.11it/s]Inference:  18%|█▊        | 3/17 [00:02<00:10,  1.31it/s]Inference:  24%|██▎       | 4/17 [00:03<00:09,  1.43it/s]Inference:  29%|██▉       | 5/17 [00:03<00:07,  1.51it/s]Inference:  35%|███▌      | 6/17 [00:04<00:07,  1.56it/s]Inference:  41%|████      | 7/17 [00:04<00:06,  1.60it/s]Inference:  47%|████▋     | 8/17 [00:05<00:05,  1.62it/s]Inference:  53%|█████▎    | 9/17 [00:06<00:04,  1.64it/s]Inference:  59%|█████▉    | 10/17 [00:06<00:04,  1.65it/s]Inference:  65%|██████▍   | 11/17 [00:07<00:03,  1.66it/s]Inference:  71%|███████   | 12/17 [00:07<00:03,  1.66it/s]Inference:  76%|███████▋  | 13/17 [00:08<00:02,  1.66it/s]Inference:  82%|████████▏ | 14/17 [00:09<00:01,  1.67it/s]Inference:  88%|████████▊ | 15/17 [00:09<00:01,  1.67it/s]Inference:  94%|█████████▍| 16/17 [00:10<00:00,  1.67it/s]Inference: 100%|██████████| 17/17 [00:10<00:00,  1.88it/s]Inference: 100%|██████████| 17/17 [00:10<00:00,  1.59it/s]
-[Model Info] PLM type: esm2-150M | ESM size: 150M
-[Model Name] esm2-150M_lr5e-06_bs32_ep30_val_best
-[Device] cuda:1
-[Data] Loaded 4257 samples from /NAS/luyq/AMP_datasets/splits1/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 640
-[Model] Checkpoint loaded.
-[Done] Saved 4257 rows -> /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-150M_lr5e-06_bs32_ep30_val_best_test_results.csv
-[DONE] esm2-150M_lr5e-06_bs32_ep30_val_best
-
-[RUN] 16:27:39 | model: esm2-150M_lr5e-06_bs64_ep7_val_best
-       test : /NAS/luyq/AMP_datasets/splits1/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-150M_lr5e-06_bs64_ep7_val_best_test_results.csv
-Inference:   0%|          | 0/17 [00:00<?, ?it/s]Inference:   6%|▌         | 1/17 [00:01<00:21,  1.37s/it]Inference:  12%|█▏        | 2/17 [00:01<00:13,  1.09it/s]Inference:  18%|█▊        | 3/17 [00:02<00:10,  1.30it/s]Inference:  24%|██▎       | 4/17 [00:03<00:09,  1.42it/s]Inference:  29%|██▉       | 5/17 [00:03<00:07,  1.50it/s]Inference:  35%|███▌      | 6/17 [00:04<00:07,  1.56it/s]Inference:  41%|████      | 7/17 [00:04<00:06,  1.59it/s]Inference:  47%|████▋     | 8/17 [00:05<00:05,  1.62it/s]Inference:  53%|█████▎    | 9/17 [00:06<00:04,  1.63it/s]Inference:  59%|█████▉    | 10/17 [00:06<00:04,  1.65it/s]Inference:  65%|██████▍   | 11/17 [00:07<00:03,  1.65it/s]Inference:  71%|███████   | 12/17 [00:07<00:03,  1.66it/s]Inference:  76%|███████▋  | 13/17 [00:08<00:02,  1.66it/s]Inference:  82%|████████▏ | 14/17 [00:09<00:01,  1.66it/s]Inference:  88%|████████▊ | 15/17 [00:09<00:01,  1.67it/s]Inference:  94%|█████████▍| 16/17 [00:10<00:00,  1.67it/s]Inference: 100%|██████████| 17/17 [00:10<00:00,  1.87it/s]Inference: 100%|██████████| 17/17 [00:10<00:00,  1.58it/s]
-[Model Info] PLM type: esm2-150M | ESM size: 150M
-[Model Name] esm2-150M_lr5e-06_bs64_ep7_val_best
-[Device] cuda:1
-[Data] Loaded 4257 samples from /NAS/luyq/AMP_datasets/splits1/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 640
-[Model] Checkpoint loaded.
-[Done] Saved 4257 rows -> /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-150M_lr5e-06_bs64_ep7_val_best_test_results.csv
-[DONE] esm2-150M_lr5e-06_bs64_ep7_val_best
-
-[RUN] 16:28:28 | model: esm2-150M_lr5e-06_bs8_ep21_val_best
-       test : /NAS/luyq/AMP_datasets/splits1/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-150M_lr5e-06_bs8_ep21_val_best_test_results.csv
-Inference:   0%|          | 0/17 [00:00<?, ?it/s]Inference:   6%|▌         | 1/17 [00:01<00:21,  1.34s/it]Inference:  12%|█▏        | 2/17 [00:01<00:13,  1.10it/s]Inference:  18%|█▊        | 3/17 [00:02<00:10,  1.30it/s]Inference:  24%|██▎       | 4/17 [00:03<00:09,  1.42it/s]Inference:  29%|██▉       | 5/17 [00:03<00:08,  1.48it/s]Inference:  35%|███▌      | 6/17 [00:04<00:07,  1.54it/s]Inference:  41%|████      | 7/17 [00:04<00:06,  1.58it/s]Inference:  47%|████▋     | 8/17 [00:05<00:05,  1.60it/s]Inference:  53%|█████▎    | 9/17 [00:06<00:04,  1.62it/s]Inference:  59%|█████▉    | 10/17 [00:06<00:04,  1.64it/s]Inference:  65%|██████▍   | 11/17 [00:07<00:03,  1.64it/s]Inference:  71%|███████   | 12/17 [00:07<00:03,  1.65it/s]Inference:  76%|███████▋  | 13/17 [00:08<00:02,  1.65it/s]Inference:  82%|████████▏ | 14/17 [00:09<00:01,  1.66it/s]Inference:  88%|████████▊ | 15/17 [00:09<00:01,  1.66it/s]Inference:  94%|█████████▍| 16/17 [00:10<00:00,  1.66it/s]Inference: 100%|██████████| 17/17 [00:10<00:00,  1.87it/s]Inference: 100%|██████████| 17/17 [00:10<00:00,  1.58it/s]
-[Model Info] PLM type: esm2-150M | ESM size: 150M
-[Model Name] esm2-150M_lr5e-06_bs8_ep21_val_best
-[Device] cuda:1
-[Data] Loaded 4257 samples from /NAS/luyq/AMP_datasets/splits1/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 640
-[Model] Checkpoint loaded.
-[Done] Saved 4257 rows -> /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-150M_lr5e-06_bs8_ep21_val_best_test_results.csv
-[DONE] esm2-150M_lr5e-06_bs8_ep21_val_best
-
-[RUN] 16:29:25 | model: esm2-35M_lr0.0001_bs16_ep28_val_best
-       test : /NAS/luyq/AMP_datasets/splits1/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-35M_lr0.0001_bs16_ep28_val_best_test_results.csv
-Inference:   0%|          | 0/17 [00:00<?, ?it/s]Inference:   6%|▌         | 1/17 [00:00<00:15,  1.01it/s]Inference:  12%|█▏        | 2/17 [00:01<00:07,  1.91it/s]Inference:  18%|█▊        | 3/17 [00:01<00:05,  2.66it/s]Inference:  24%|██▎       | 4/17 [00:01<00:03,  3.26it/s]Inference:  29%|██▉       | 5/17 [00:01<00:03,  3.73it/s]Inference:  35%|███▌      | 6/17 [00:01<00:02,  4.09it/s]Inference:  41%|████      | 7/17 [00:02<00:02,  4.36it/s]Inference:  47%|████▋     | 8/17 [00:02<00:01,  4.55it/s]Inference:  53%|█████▎    | 9/17 [00:02<00:01,  4.69it/s]Inference:  59%|█████▉    | 10/17 [00:02<00:01,  4.79it/s]Inference:  65%|██████▍   | 11/17 [00:02<00:01,  4.86it/s]Inference:  71%|███████   | 12/17 [00:03<00:01,  4.91it/s]Inference:  76%|███████▋  | 13/17 [00:03<00:00,  4.95it/s]Inference:  82%|████████▏ | 14/17 [00:03<00:00,  4.95it/s]Inference:  88%|████████▊ | 15/17 [00:03<00:00,  4.98it/s]Inference:  94%|█████████▍| 16/17 [00:03<00:00,  4.99it/s]Inference: 100%|██████████| 17/17 [00:04<00:00,  5.63it/s]Inference: 100%|██████████| 17/17 [00:04<00:00,  4.15it/s]
-[Model Info] PLM type: esm2-35M | ESM size: 35M
-[Model Name] esm2-35M_lr0.0001_bs16_ep28_val_best
-[Device] cuda:1
-[Data] Loaded 4257 samples from /NAS/luyq/AMP_datasets/splits1/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 480
-[Model] Checkpoint loaded.
-[Done] Saved 4257 rows -> /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-35M_lr0.0001_bs16_ep28_val_best_test_results.csv
-[DONE] esm2-35M_lr0.0001_bs16_ep28_val_best
-
-[RUN] 16:29:49 | model: esm2-35M_lr0.0001_bs32_ep23_val_best
-       test : /NAS/luyq/AMP_datasets/splits1/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-35M_lr0.0001_bs32_ep23_val_best_test_results.csv
-Inference:   0%|          | 0/17 [00:00<?, ?it/s]Inference:   6%|▌         | 1/17 [00:00<00:15,  1.06it/s]Inference:  12%|█▏        | 2/17 [00:01<00:07,  1.98it/s]Inference:  18%|█▊        | 3/17 [00:01<00:05,  2.73it/s]Inference:  24%|██▎       | 4/17 [00:01<00:03,  3.33it/s]Inference:  29%|██▉       | 5/17 [00:01<00:03,  3.79it/s]Inference:  35%|███▌      | 6/17 [00:01<00:02,  4.13it/s]Inference:  41%|████      | 7/17 [00:02<00:02,  4.38it/s]Inference:  47%|████▋     | 8/17 [00:02<00:01,  4.57it/s]Inference:  53%|█████▎    | 9/17 [00:02<00:01,  4.70it/s]Inference:  59%|█████▉    | 10/17 [00:02<00:01,  4.79it/s]Inference:  65%|██████▍   | 11/17 [00:02<00:01,  4.85it/s]Inference:  71%|███████   | 12/17 [00:03<00:01,  4.90it/s]Inference:  76%|███████▋  | 13/17 [00:03<00:00,  4.93it/s]Inference:  82%|████████▏ | 14/17 [00:03<00:00,  4.93it/s]Inference:  88%|████████▊ | 15/17 [00:03<00:00,  4.96it/s]Inference:  94%|█████████▍| 16/17 [00:03<00:00,  4.96it/s]Inference: 100%|██████████| 17/17 [00:04<00:00,  5.59it/s]Inference: 100%|██████████| 17/17 [00:04<00:00,  4.18it/s]
-[Model Info] PLM type: esm2-35M | ESM size: 35M
-[Model Name] esm2-35M_lr0.0001_bs32_ep23_val_best
-[Device] cuda:1
-[Data] Loaded 4257 samples from /NAS/luyq/AMP_datasets/splits1/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 480
-[Model] Checkpoint loaded.
-[Done] Saved 4257 rows -> /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-35M_lr0.0001_bs32_ep23_val_best_test_results.csv
-[DONE] esm2-35M_lr0.0001_bs32_ep23_val_best
-
-[RUN] 16:30:09 | model: esm2-35M_lr0.0001_bs64_ep25_val_best
-       test : /NAS/luyq/AMP_datasets/splits1/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-35M_lr0.0001_bs64_ep25_val_best_test_results.csv
-Inference:   0%|          | 0/17 [00:00<?, ?it/s]Inference:   6%|▌         | 1/17 [00:01<00:19,  1.20s/it]Inference:  12%|█▏        | 2/17 [00:01<00:10,  1.39it/s]Inference:  18%|█▊        | 3/17 [00:01<00:07,  1.79it/s]Inference:  24%|██▎       | 4/17 [00:02<00:06,  2.04it/s]Inference:  29%|██▉       | 5/17 [00:02<00:05,  2.22it/s]Inference:  35%|███▌      | 6/17 [00:03<00:04,  2.33it/s]Inference:  41%|████      | 7/17 [00:03<00:04,  2.40it/s]Inference:  47%|████▋     | 8/17 [00:03<00:03,  2.48it/s]Inference:  53%|█████▎    | 9/17 [00:04<00:03,  2.51it/s]Inference:  59%|█████▉    | 10/17 [00:04<00:02,  2.53it/s]Inference:  65%|██████▍   | 11/17 [00:05<00:02,  2.57it/s]Inference:  71%|███████   | 12/17 [00:05<00:01,  2.57it/s]Inference:  76%|███████▋  | 13/17 [00:05<00:01,  2.59it/s]Inference:  82%|████████▏ | 14/17 [00:06<00:01,  2.61it/s]Inference:  88%|████████▊ | 15/17 [00:06<00:00,  2.60it/s]Inference:  94%|█████████▍| 16/17 [00:06<00:00,  2.61it/s]Inference: 100%|██████████| 17/17 [00:07<00:00,  2.92it/s]Inference: 100%|██████████| 17/17 [00:07<00:00,  2.37it/s]
-[Model Info] PLM type: esm2-35M | ESM size: 35M
-[Model Name] esm2-35M_lr0.0001_bs64_ep25_val_best
-[Device] cuda:1
-[Data] Loaded 4257 samples from /NAS/luyq/AMP_datasets/splits1/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 480
-[Model] Checkpoint loaded.
-[Done] Saved 4257 rows -> /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-35M_lr0.0001_bs64_ep25_val_best_test_results.csv
-[DONE] esm2-35M_lr0.0001_bs64_ep25_val_best
-
-[RUN] 16:30:29 | model: esm2-35M_lr1e-05_bs16_ep23_val_best
-       test : /NAS/luyq/AMP_datasets/splits1/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-35M_lr1e-05_bs16_ep23_val_best_test_results.csv
-Inference:   0%|          | 0/17 [00:00<?, ?it/s]Inference:   6%|▌         | 1/17 [00:01<00:19,  1.25s/it]Inference:  12%|█▏        | 2/17 [00:01<00:11,  1.34it/s]Inference:  18%|█▊        | 3/17 [00:02<00:08,  1.73it/s]Inference:  24%|██▎       | 4/17 [00:02<00:07,  1.73it/s]Inference:  29%|██▉       | 5/17 [00:03<00:06,  1.77it/s]Inference:  35%|███▌      | 6/17 [00:03<00:05,  2.01it/s]Inference:  41%|████      | 7/17 [00:03<00:04,  2.16it/s]Inference:  47%|████▋     | 8/17 [00:04<00:03,  2.29it/s]Inference:  53%|█████▎    | 9/17 [00:04<00:03,  2.39it/s]Inference:  59%|█████▉    | 10/17 [00:05<00:02,  2.44it/s]Inference:  65%|██████▍   | 11/17 [00:05<00:02,  2.49it/s]Inference:  71%|███████   | 12/17 [00:05<00:01,  2.51it/s]Inference:  76%|███████▋  | 13/17 [00:06<00:01,  2.51it/s]Inference:  82%|████████▏ | 14/17 [00:06<00:01,  2.54it/s]Inference:  88%|████████▊ | 15/17 [00:06<00:00,  2.55it/s]Inference:  94%|█████████▍| 16/17 [00:07<00:00,  2.54it/s]Inference: 100%|██████████| 17/17 [00:07<00:00,  2.85it/s]Inference: 100%|██████████| 17/17 [00:07<00:00,  2.22it/s]
-[Model Info] PLM type: esm2-35M | ESM size: 35M
-[Model Name] esm2-35M_lr1e-05_bs16_ep23_val_best
-[Device] cuda:1
-[Data] Loaded 4257 samples from /NAS/luyq/AMP_datasets/splits1/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 480
-[Model] Checkpoint loaded.
-[Done] Saved 4257 rows -> /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-35M_lr1e-05_bs16_ep23_val_best_test_results.csv
-[DONE] esm2-35M_lr1e-05_bs16_ep23_val_best
-
-[RUN] 16:30:52 | model: esm2-35M_lr1e-05_bs32_ep23_val_best
-       test : /NAS/luyq/AMP_datasets/splits1/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-35M_lr1e-05_bs32_ep23_val_best_test_results.csv
-Inference:   0%|          | 0/17 [00:00<?, ?it/s]Inference:   6%|▌         | 1/17 [00:01<00:19,  1.24s/it]Inference:  12%|█▏        | 2/17 [00:01<00:11,  1.36it/s]Inference:  18%|█▊        | 3/17 [00:02<00:08,  1.72it/s]Inference:  24%|██▎       | 4/17 [00:02<00:06,  1.98it/s]Inference:  29%|██▉       | 5/17 [00:02<00:05,  2.19it/s]Inference:  35%|███▌      | 6/17 [00:03<00:04,  2.30it/s]Inference:  41%|████      | 7/17 [00:03<00:04,  2.39it/s]Inference:  47%|████▋     | 8/17 [00:03<00:03,  2.45it/s]Inference:  53%|█████▎    | 9/17 [00:04<00:03,  2.47it/s]Inference:  59%|█████▉    | 10/17 [00:04<00:02,  2.51it/s]Inference:  65%|██████▍   | 11/17 [00:05<00:02,  2.52it/s]Inference:  71%|███████   | 12/17 [00:05<00:01,  2.51it/s]Inference:  76%|███████▋  | 13/17 [00:05<00:01,  2.55it/s]Inference:  82%|████████▏ | 14/17 [00:06<00:01,  2.54it/s]Inference:  88%|████████▊ | 15/17 [00:06<00:00,  2.53it/s]Inference:  94%|█████████▍| 16/17 [00:07<00:00,  2.55it/s]Inference: 100%|██████████| 17/17 [00:07<00:00,  2.85it/s]Inference: 100%|██████████| 17/17 [00:07<00:00,  2.32it/s]
-[Model Info] PLM type: esm2-35M | ESM size: 35M
-[Model Name] esm2-35M_lr1e-05_bs32_ep23_val_best
-[Device] cuda:1
-[Data] Loaded 4257 samples from /NAS/luyq/AMP_datasets/splits1/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 480
-[Model] Checkpoint loaded.
-[Done] Saved 4257 rows -> /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-35M_lr1e-05_bs32_ep23_val_best_test_results.csv
-[DONE] esm2-35M_lr1e-05_bs32_ep23_val_best
-
-[RUN] 16:31:14 | model: esm2-35M_lr1e-05_bs64_ep26_val_best
-       test : /NAS/luyq/AMP_datasets/splits1/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-35M_lr1e-05_bs64_ep26_val_best_test_results.csv
-Inference:   0%|          | 0/17 [00:00<?, ?it/s]Inference:   6%|▌         | 1/17 [00:01<00:20,  1.25s/it]Inference:  12%|█▏        | 2/17 [00:01<00:11,  1.33it/s]Inference:  18%|█▊        | 3/17 [00:02<00:08,  1.72it/s]Inference:  24%|██▎       | 4/17 [00:02<00:06,  1.97it/s]Inference:  29%|██▉       | 5/17 [00:02<00:05,  2.13it/s]Inference:  35%|███▌      | 6/17 [00:03<00:04,  2.28it/s]Inference:  41%|████      | 7/17 [00:03<00:04,  2.35it/s]Inference:  47%|████▋     | 8/17 [00:04<00:03,  2.39it/s]Inference:  53%|█████▎    | 9/17 [00:04<00:03,  2.45it/s]Inference:  59%|█████▉    | 10/17 [00:04<00:02,  2.48it/s]Inference:  65%|██████▍   | 11/17 [00:05<00:02,  2.51it/s]Inference:  71%|███████   | 12/17 [00:05<00:01,  2.55it/s]Inference:  76%|███████▋  | 13/17 [00:05<00:01,  2.55it/s]Inference:  82%|████████▏ | 14/17 [00:06<00:01,  2.56it/s]Inference:  88%|████████▊ | 15/17 [00:06<00:00,  2.56it/s]Inference:  94%|█████████▍| 16/17 [00:07<00:00,  2.55it/s]Inference: 100%|██████████| 17/17 [00:07<00:00,  2.90it/s]Inference: 100%|██████████| 17/17 [00:07<00:00,  2.31it/s]
-[Model Info] PLM type: esm2-35M | ESM size: 35M
-[Model Name] esm2-35M_lr1e-05_bs64_ep26_val_best
-[Device] cuda:1
-[Data] Loaded 4257 samples from /NAS/luyq/AMP_datasets/splits1/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 480
-[Model] Checkpoint loaded.
-[Done] Saved 4257 rows -> /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-35M_lr1e-05_bs64_ep26_val_best_test_results.csv
-[DONE] esm2-35M_lr1e-05_bs64_ep26_val_best
-
-[RUN] 16:31:40 | model: esm2-35M_lr5e-06_bs16_ep25_val_best
-       test : /NAS/luyq/AMP_datasets/splits1/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-35M_lr5e-06_bs16_ep25_val_best_test_results.csv
-Inference:   0%|          | 0/17 [00:00<?, ?it/s]Inference:   6%|▌         | 1/17 [00:01<00:19,  1.24s/it]Inference:  12%|█▏        | 2/17 [00:01<00:11,  1.36it/s]Inference:  18%|█▊        | 3/17 [00:02<00:08,  1.74it/s]Inference:  24%|██▎       | 4/17 [00:02<00:06,  1.98it/s]Inference:  29%|██▉       | 5/17 [00:02<00:05,  2.16it/s]Inference:  35%|███▌      | 6/17 [00:03<00:04,  2.29it/s]Inference:  41%|████      | 7/17 [00:03<00:04,  2.35it/s]Inference:  47%|████▋     | 8/17 [00:03<00:03,  2.43it/s]Inference:  53%|█████▎    | 9/17 [00:04<00:03,  2.46it/s]Inference:  59%|█████▉    | 10/17 [00:04<00:02,  2.50it/s]Inference:  65%|██████▍   | 11/17 [00:05<00:02,  2.55it/s]Inference:  71%|███████   | 12/17 [00:05<00:01,  2.55it/s]Inference:  76%|███████▋  | 13/17 [00:05<00:01,  2.57it/s]Inference:  82%|████████▏ | 14/17 [00:06<00:01,  2.55it/s]Inference:  88%|████████▊ | 15/17 [00:06<00:00,  2.52it/s]Inference:  94%|█████████▍| 16/17 [00:07<00:00,  2.55it/s]Inference: 100%|██████████| 17/17 [00:07<00:00,  2.86it/s]Inference: 100%|██████████| 17/17 [00:07<00:00,  2.32it/s]
-[Model Info] PLM type: esm2-35M | ESM size: 35M
-[Model Name] esm2-35M_lr5e-06_bs16_ep25_val_best
-[Device] cuda:1
-[Data] Loaded 4257 samples from /NAS/luyq/AMP_datasets/splits1/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 480
-[Model] Checkpoint loaded.
-[Done] Saved 4257 rows -> /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-35M_lr5e-06_bs16_ep25_val_best_test_results.csv
-[DONE] esm2-35M_lr5e-06_bs16_ep25_val_best
-
-[RUN] 16:32:03 | model: esm2-35M_lr5e-06_bs64_ep27_val_best
-       test : /NAS/luyq/AMP_datasets/splits1/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-35M_lr5e-06_bs64_ep27_val_best_test_results.csv
-Inference:   0%|          | 0/17 [00:00<?, ?it/s]Inference:   6%|▌         | 1/17 [00:01<00:19,  1.22s/it]Inference:  12%|█▏        | 2/17 [00:01<00:11,  1.36it/s]Inference:  18%|█▊        | 3/17 [00:01<00:08,  1.74it/s]Inference:  24%|██▎       | 4/17 [00:02<00:06,  1.98it/s]Inference:  29%|██▉       | 5/17 [00:02<00:05,  2.13it/s]Inference:  35%|███▌      | 6/17 [00:03<00:04,  2.28it/s]Inference:  41%|████      | 7/17 [00:03<00:04,  2.35it/s]Inference:  47%|████▋     | 8/17 [00:03<00:03,  2.38it/s]Inference:  53%|█████▎    | 9/17 [00:04<00:03,  2.45it/s]Inference:  59%|█████▉    | 10/17 [00:04<00:02,  2.47it/s]Inference:  65%|██████▍   | 11/17 [00:05<00:02,  2.50it/s]Inference:  71%|███████   | 12/17 [00:05<00:01,  2.56it/s]Inference:  76%|███████▋  | 13/17 [00:05<00:01,  2.54it/s]Inference:  82%|████████▏ | 14/17 [00:06<00:01,  2.55it/s]Inference:  88%|████████▊ | 15/17 [00:06<00:00,  2.54it/s]Inference:  94%|█████████▍| 16/17 [00:07<00:00,  2.53it/s]Inference: 100%|██████████| 17/17 [00:07<00:00,  2.89it/s]Inference: 100%|██████████| 17/17 [00:07<00:00,  2.32it/s]
-[Model Info] PLM type: esm2-35M | ESM size: 35M
-[Model Name] esm2-35M_lr5e-06_bs64_ep27_val_best
-[Device] cuda:1
-[Data] Loaded 4257 samples from /NAS/luyq/AMP_datasets/splits1/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 480
-[Model] Checkpoint loaded.
-[Done] Saved 4257 rows -> /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-35M_lr5e-06_bs64_ep27_val_best_test_results.csv
-[DONE] esm2-35M_lr5e-06_bs64_ep27_val_best
-
-[RUN] 16:32:26 | model: esm2-8M_lr0.0001_bs16_ep20_val_best
-       test : /NAS/luyq/AMP_datasets/splits1/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-8M_lr0.0001_bs16_ep20_val_best_test_results.csv
-Inference:   0%|          | 0/17 [00:00<?, ?it/s]Inference:   6%|▌         | 1/17 [00:01<00:16,  1.03s/it]Inference:  12%|█▏        | 2/17 [00:01<00:07,  1.93it/s]Inference:  18%|█▊        | 3/17 [00:01<00:04,  2.82it/s]Inference:  24%|██▎       | 4/17 [00:01<00:03,  3.62it/s]Inference:  29%|██▉       | 5/17 [00:01<00:02,  4.25it/s]Inference:  35%|███▌      | 6/17 [00:01<00:02,  4.70it/s]Inference:  41%|████      | 7/17 [00:01<00:01,  5.16it/s]Inference:  47%|████▋     | 8/17 [00:02<00:01,  5.46it/s]Inference:  53%|█████▎    | 9/17 [00:02<00:01,  5.67it/s]Inference:  59%|█████▉    | 10/17 [00:02<00:01,  5.81it/s]Inference:  65%|██████▍   | 11/17 [00:02<00:01,  5.99it/s]Inference:  71%|███████   | 12/17 [00:02<00:00,  6.36it/s]Inference:  76%|███████▋  | 13/17 [00:02<00:00,  6.29it/s]Inference:  82%|████████▏ | 14/17 [00:03<00:00,  6.41it/s]Inference:  88%|████████▊ | 15/17 [00:03<00:00,  6.34it/s]Inference:  94%|█████████▍| 16/17 [00:03<00:00,  6.27it/s]Inference: 100%|██████████| 17/17 [00:03<00:00,  6.98it/s]Inference: 100%|██████████| 17/17 [00:03<00:00,  4.84it/s]
-[Model Info] PLM type: esm2-8M | ESM size: 8M
-[Model Name] esm2-8M_lr0.0001_bs16_ep20_val_best
-[Device] cuda:1
-[Data] Loaded 4257 samples from /NAS/luyq/AMP_datasets/splits1/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 320
-[Model] Missing keys (version mismatch, non-critical): ['esm.embeddings.position_embeddings.weight']
-[Model] Checkpoint loaded.
-[Done] Saved 4257 rows -> /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-8M_lr0.0001_bs16_ep20_val_best_test_results.csv
-[DONE] esm2-8M_lr0.0001_bs16_ep20_val_best
-
-[RUN] 16:32:38 | model: esm2-8M_lr0.0001_bs32_ep20_val_best
-       test : /NAS/luyq/AMP_datasets/splits1/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-8M_lr0.0001_bs32_ep20_val_best_test_results.csv
-Inference:   0%|          | 0/17 [00:00<?, ?it/s]Inference:   6%|▌         | 1/17 [00:01<00:16,  1.03s/it]Inference:  12%|█▏        | 2/17 [00:01<00:07,  1.98it/s]Inference:  18%|█▊        | 3/17 [00:01<00:04,  2.87it/s]Inference:  24%|██▎       | 4/17 [00:01<00:03,  3.65it/s]Inference:  29%|██▉       | 5/17 [00:01<00:02,  4.38it/s]Inference:  35%|███▌      | 6/17 [00:01<00:02,  4.79it/s]Inference:  41%|████      | 7/17 [00:01<00:01,  5.20it/s]Inference:  47%|████▋     | 8/17 [00:02<00:01,  5.47it/s]Inference:  53%|█████▎    | 9/17 [00:02<00:01,  5.68it/s]Inference:  59%|█████▉    | 10/17 [00:02<00:01,  5.80it/s]Inference:  65%|██████▍   | 11/17 [00:02<00:01,  5.80it/s]Inference:  71%|███████   | 12/17 [00:02<00:00,  5.80it/s]Inference:  76%|███████▋  | 13/17 [00:02<00:00,  5.93it/s]Inference:  82%|████████▏ | 14/17 [00:03<00:00,  6.05it/s]Inference:  88%|████████▊ | 15/17 [00:03<00:00,  6.08it/s]Inference:  94%|█████████▍| 16/17 [00:03<00:00,  6.11it/s]Inference: 100%|██████████| 17/17 [00:03<00:00,  6.86it/s]Inference: 100%|██████████| 17/17 [00:03<00:00,  4.80it/s]
-[Model Info] PLM type: esm2-8M | ESM size: 8M
-[Model Name] esm2-8M_lr0.0001_bs32_ep20_val_best
-[Device] cuda:1
-[Data] Loaded 4257 samples from /NAS/luyq/AMP_datasets/splits1/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 320
-[Model] Missing keys (version mismatch, non-critical): ['esm.embeddings.position_embeddings.weight']
-[Model] Checkpoint loaded.
-[Done] Saved 4257 rows -> /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-8M_lr0.0001_bs32_ep20_val_best_test_results.csv
-[DONE] esm2-8M_lr0.0001_bs32_ep20_val_best
-
-[RUN] 16:32:49 | model: esm2-8M_lr1e-05_bs16_ep21_val_best
-       test : /NAS/luyq/AMP_datasets/splits1/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-8M_lr1e-05_bs16_ep21_val_best_test_results.csv
-Inference:   0%|          | 0/17 [00:00<?, ?it/s]Inference:   6%|▌         | 1/17 [00:01<00:16,  1.02s/it]Inference:  12%|█▏        | 2/17 [00:01<00:07,  1.94it/s]Inference:  18%|█▊        | 3/17 [00:01<00:04,  2.85it/s]Inference:  24%|██▎       | 4/17 [00:01<00:03,  3.62it/s]Inference:  29%|██▉       | 5/17 [00:01<00:02,  4.25it/s]Inference:  35%|███▌      | 6/17 [00:01<00:02,  4.81it/s]Inference:  41%|████      | 7/17 [00:01<00:01,  5.21it/s]Inference:  47%|████▋     | 8/17 [00:02<00:01,  5.50it/s]Inference:  53%|█████▎    | 9/17 [00:02<00:01,  5.75it/s]Inference:  59%|█████▉    | 10/17 [00:02<00:01,  5.89it/s]Inference:  65%|██████▍   | 11/17 [00:02<00:00,  6.07it/s]Inference:  71%|███████   | 12/17 [00:02<00:00,  6.10it/s]Inference:  76%|███████▋  | 13/17 [00:02<00:00,  6.23it/s]Inference:  82%|████████▏ | 14/17 [00:03<00:00,  6.51it/s]Inference:  88%|████████▊ | 15/17 [00:03<00:00,  6.41it/s]Inference:  94%|█████████▍| 16/17 [00:03<00:00,  6.48it/s]Inference: 100%|██████████| 17/17 [00:03<00:00,  7.19it/s]Inference: 100%|██████████| 17/17 [00:03<00:00,  4.89it/s]
-[Model Info] PLM type: esm2-8M | ESM size: 8M
-[Model Name] esm2-8M_lr1e-05_bs16_ep21_val_best
-[Device] cuda:1
-[Data] Loaded 4257 samples from /NAS/luyq/AMP_datasets/splits1/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 320
-[Model] Missing keys (version mismatch, non-critical): ['esm.embeddings.position_embeddings.weight']
-[Model] Checkpoint loaded.
-[Done] Saved 4257 rows -> /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-8M_lr1e-05_bs16_ep21_val_best_test_results.csv
-[DONE] esm2-8M_lr1e-05_bs16_ep21_val_best
-
-[RUN] 16:33:00 | model: esm2-8M_lr1e-05_bs32_ep0_val_best
-       test : /NAS/luyq/AMP_datasets/splits1/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-8M_lr1e-05_bs32_ep0_val_best_test_results.csv
-Inference:   0%|          | 0/17 [00:00<?, ?it/s]Inference:   6%|▌         | 1/17 [00:01<00:16,  1.01s/it]Inference:  12%|█▏        | 2/17 [00:01<00:07,  2.01it/s]Inference:  18%|█▊        | 3/17 [00:01<00:04,  2.90it/s]Inference:  24%|██▎       | 4/17 [00:01<00:03,  3.71it/s]Inference:  29%|██▉       | 5/17 [00:01<00:02,  4.37it/s]Inference:  35%|███▌      | 6/17 [00:01<00:02,  4.86it/s]Inference:  41%|████      | 7/17 [00:01<00:01,  5.26it/s]Inference:  47%|████▋     | 8/17 [00:02<00:01,  5.54it/s]Inference:  53%|█████▎    | 9/17 [00:02<00:01,  5.81it/s]Inference:  59%|█████▉    | 10/17 [00:02<00:01,  5.93it/s]Inference:  65%|██████▍   | 11/17 [00:02<00:00,  6.10it/s]Inference:  71%|███████   | 12/17 [00:02<00:00,  6.40it/s]Inference:  76%|███████▋  | 13/17 [00:02<00:00,  6.32it/s]Inference:  82%|████████▏ | 14/17 [00:03<00:00,  6.38it/s]Inference:  88%|████████▊ | 15/17 [00:03<00:00,  6.31it/s]Inference:  94%|█████████▍| 16/17 [00:03<00:00,  6.25it/s]Inference: 100%|██████████| 17/17 [00:03<00:00,  6.94it/s]Inference: 100%|██████████| 17/17 [00:03<00:00,  4.92it/s]
-[Model Info] PLM type: esm2-8M | ESM size: 8M
-[Model Name] esm2-8M_lr1e-05_bs32_ep0_val_best
-[Device] cuda:1
-[Data] Loaded 4257 samples from /NAS/luyq/AMP_datasets/splits1/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 320
-[Model] Checkpoint loaded.
-[Done] Saved 4257 rows -> /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-8M_lr1e-05_bs32_ep0_val_best_test_results.csv
-[DONE] esm2-8M_lr1e-05_bs32_ep0_val_best
-
-[RUN] 16:33:11 | model: esm2-8M_lr1e-05_bs32_ep29_val_best
-       test : /NAS/luyq/AMP_datasets/splits1/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-8M_lr1e-05_bs32_ep29_val_best_test_results.csv
-Inference:   0%|          | 0/17 [00:00<?, ?it/s]Inference:   6%|▌         | 1/17 [00:00<00:14,  1.07it/s]Inference:  12%|█▏        | 2/17 [00:01<00:07,  2.08it/s]Inference:  18%|█▊        | 3/17 [00:01<00:04,  2.99it/s]Inference:  24%|██▎       | 4/17 [00:01<00:03,  3.83it/s]Inference:  29%|██▉       | 5/17 [00:01<00:02,  4.44it/s]Inference:  35%|███▌      | 6/17 [00:01<00:02,  4.96it/s]Inference:  41%|████      | 7/17 [00:01<00:01,  5.53it/s]Inference:  47%|████▋     | 8/17 [00:02<00:01,  5.73it/s]Inference:  53%|█████▎    | 9/17 [00:02<00:01,  5.90it/s]Inference:  59%|█████▉    | 10/17 [00:02<00:01,  6.04it/s]Inference:  65%|██████▍   | 11/17 [00:02<00:00,  6.10it/s]Inference:  71%|███████   | 12/17 [00:02<00:00,  6.20it/s]Inference:  76%|███████▋  | 13/17 [00:02<00:00,  6.20it/s]Inference:  82%|████████▏ | 14/17 [00:02<00:00,  6.27it/s]Inference:  88%|████████▊ | 15/17 [00:03<00:00,  6.22it/s]Inference:  94%|█████████▍| 16/17 [00:03<00:00,  6.29it/s]Inference: 100%|██████████| 17/17 [00:03<00:00,  7.07it/s]Inference: 100%|██████████| 17/17 [00:03<00:00,  5.02it/s]
-[Model Info] PLM type: esm2-8M | ESM size: 8M
-[Model Name] esm2-8M_lr1e-05_bs32_ep29_val_best
-[Device] cuda:1
-[Data] Loaded 4257 samples from /NAS/luyq/AMP_datasets/splits1/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 320
-[Model] Missing keys (version mismatch, non-critical): ['esm.embeddings.position_embeddings.weight']
-[Model] Checkpoint loaded.
-[Done] Saved 4257 rows -> /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-8M_lr1e-05_bs32_ep29_val_best_test_results.csv
-[DONE] esm2-8M_lr1e-05_bs32_ep29_val_best
-
-[RUN] 16:33:22 | model: esm2-8M_lr1e-05_bs64_ep29_val_best
-       test : /NAS/luyq/AMP_datasets/splits1/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-8M_lr1e-05_bs64_ep29_val_best_test_results.csv
-Inference:   0%|          | 0/17 [00:00<?, ?it/s]Inference:   6%|▌         | 1/17 [00:01<00:16,  1.03s/it]Inference:  12%|█▏        | 2/17 [00:01<00:07,  1.93it/s]Inference:  18%|█▊        | 3/17 [00:01<00:04,  2.81it/s]Inference:  24%|██▎       | 4/17 [00:01<00:03,  3.58it/s]Inference:  29%|██▉       | 5/17 [00:01<00:02,  4.25it/s]Inference:  35%|███▌      | 6/17 [00:01<00:02,  4.77it/s]Inference:  41%|████      | 7/17 [00:01<00:01,  5.18it/s]Inference:  47%|████▋     | 8/17 [00:02<00:01,  5.46it/s]Inference:  53%|█████▎    | 9/17 [00:02<00:01,  5.76it/s]Inference:  59%|█████▉    | 10/17 [00:02<00:01,  6.15it/s]Inference:  65%|██████▍   | 11/17 [00:02<00:00,  6.16it/s]Inference:  71%|███████   | 12/17 [00:02<00:00,  6.30it/s]Inference:  76%|███████▋  | 13/17 [00:02<00:00,  6.30it/s]Inference:  82%|████████▏ | 14/17 [00:03<00:00,  6.28it/s]Inference:  88%|████████▊ | 15/17 [00:03<00:00,  6.33it/s]Inference:  94%|█████████▍| 16/17 [00:03<00:00,  6.34it/s]Inference: 100%|██████████| 17/17 [00:03<00:00,  4.89it/s]
-[Model Info] PLM type: esm2-8M | ESM size: 8M
-[Model Name] esm2-8M_lr1e-05_bs64_ep29_val_best
-[Device] cuda:1
-[Data] Loaded 4257 samples from /NAS/luyq/AMP_datasets/splits1/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 320
-[Model] Missing keys (version mismatch, non-critical): ['esm.embeddings.position_embeddings.weight']
-[Model] Checkpoint loaded.
-[Done] Saved 4257 rows -> /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-8M_lr1e-05_bs64_ep29_val_best_test_results.csv
-[DONE] esm2-8M_lr1e-05_bs64_ep29_val_best
-
-[RUN] 16:33:34 | model: esm2-8M_lr5e-06_bs16_ep28_val_best
-       test : /NAS/luyq/AMP_datasets/splits1/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-8M_lr5e-06_bs16_ep28_val_best_test_results.csv
-============================================================
-Batch inference started: Tue 31 Mar 2026 04:37:12 PM CST
-============================================================
-
->>> [splits1] models on splits1/test.csv
-[SKIP] Already exists: /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-150M_lr0.0001_bs16_ep5_val_best_test_results.csv
-[SKIP] Already exists: /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-150M_lr1e-05_bs16_ep0_val_best_test_results.csv
-[SKIP] Already exists: /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-150M_lr1e-05_bs16_ep27_val_best_test_results.csv
-[SKIP] Already exists: /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-150M_lr1e-05_bs16_ep9_val_best_test_results.csv
-[SKIP] Already exists: /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-150M_lr1e-05_bs32_ep26_val_best_test_results.csv
-[SKIP] Already exists: /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-150M_lr1e-05_bs64_ep26_val_best_test_results.csv
-[SKIP] Already exists: /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-150M_lr1e-05_bs8_ep27_val_best_test_results.csv
-[SKIP] Already exists: /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-150M_lr1e-05_bs8_ep28_val_best_test_results.csv
-[SKIP] Already exists: /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-150M_lr5e-06_bs16_ep28_val_best_test_results.csv
-[SKIP] Already exists: /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-150M_lr5e-06_bs16_ep9_val_best_test_results.csv
-[SKIP] Already exists: /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-150M_lr5e-06_bs32_ep28_val_best_test_results.csv
-[SKIP] Already exists: /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-150M_lr5e-06_bs32_ep30_val_best_test_results.csv
-[SKIP] Already exists: /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-150M_lr5e-06_bs64_ep7_val_best_test_results.csv
-[SKIP] Already exists: /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-150M_lr5e-06_bs8_ep21_val_best_test_results.csv
-[SKIP] Already exists: /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-35M_lr0.0001_bs16_ep28_val_best_test_results.csv
-[SKIP] Already exists: /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-35M_lr0.0001_bs32_ep23_val_best_test_results.csv
-[SKIP] Already exists: /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-35M_lr0.0001_bs64_ep25_val_best_test_results.csv
-[SKIP] Already exists: /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-35M_lr1e-05_bs16_ep23_val_best_test_results.csv
-[SKIP] Already exists: /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-35M_lr1e-05_bs32_ep23_val_best_test_results.csv
-[SKIP] Already exists: /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-35M_lr1e-05_bs64_ep26_val_best_test_results.csv
-[SKIP] Already exists: /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-35M_lr5e-06_bs16_ep25_val_best_test_results.csv
-[SKIP] Already exists: /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-35M_lr5e-06_bs64_ep27_val_best_test_results.csv
-[SKIP] Already exists: /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-8M_lr0.0001_bs16_ep20_val_best_test_results.csv
-[SKIP] Already exists: /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-8M_lr0.0001_bs32_ep20_val_best_test_results.csv
-[SKIP] Already exists: /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-8M_lr1e-05_bs16_ep21_val_best_test_results.csv
-[SKIP] Already exists: /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-8M_lr1e-05_bs32_ep0_val_best_test_results.csv
-[SKIP] Already exists: /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-8M_lr1e-05_bs32_ep29_val_best_test_results.csv
-[SKIP] Already exists: /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-8M_lr1e-05_bs64_ep29_val_best_test_results.csv
-
-[RUN] 16:37:12 | model: esm2-8M_lr5e-06_bs16_ep28_val_best
-       test : /NAS/luyq/AMP_datasets/splits1/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-8M_lr5e-06_bs16_ep28_val_best_test_results.csv
-Inference:   0%|          | 0/9 [00:00<?, ?it/s]Inference:  11%|█         | 1/9 [00:01<00:09,  1.21s/it]Inference:  22%|██▏       | 2/9 [00:01<00:04,  1.47it/s]Inference:  33%|███▎      | 3/9 [00:01<00:03,  1.99it/s]Inference:  44%|████▍     | 4/9 [00:02<00:02,  2.36it/s]Inference:  56%|█████▌    | 5/9 [00:02<00:01,  2.61it/s]Inference:  67%|██████▋   | 6/9 [00:02<00:01,  2.82it/s]Inference:  78%|███████▊  | 7/9 [00:03<00:00,  2.95it/s]Inference:  89%|████████▉ | 8/9 [00:03<00:00,  3.09it/s]Inference: 100%|██████████| 9/9 [00:03<00:00,  3.90it/s]Inference: 100%|██████████| 9/9 [00:03<00:00,  2.62it/s]
-[Model Info] PLM type: esm2-8M | ESM size: 8M
-[Model Name] esm2-8M_lr5e-06_bs16_ep28_val_best
-[Device] cuda:1
-[Data] Loaded 4257 samples from /NAS/luyq/AMP_datasets/splits1/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 320
-[Model] Missing keys (version mismatch, non-critical): ['esm.embeddings.position_embeddings.weight']
-[Model] Checkpoint loaded.
-[Done] Saved 4257 rows -> /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-8M_lr5e-06_bs16_ep28_val_best_test_results.csv
-[DONE] esm2-8M_lr5e-06_bs16_ep28_val_best
-
-[RUN] 16:37:23 | model: esm2-8M_lr5e-06_bs32_ep29_val_best
-       test : /NAS/luyq/AMP_datasets/splits1/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-8M_lr5e-06_bs32_ep29_val_best_test_results.csv
-Inference:   0%|          | 0/9 [00:00<?, ?it/s]Inference:  11%|█         | 1/9 [00:01<00:09,  1.20s/it]Inference:  22%|██▏       | 2/9 [00:01<00:04,  1.50it/s]Inference:  33%|███▎      | 3/9 [00:01<00:02,  2.00it/s]Inference:  44%|████▍     | 4/9 [00:02<00:02,  2.40it/s]Inference:  56%|█████▌    | 5/9 [00:02<00:01,  2.67it/s]Inference:  67%|██████▋   | 6/9 [00:02<00:01,  2.83it/s]Inference:  78%|███████▊  | 7/9 [00:02<00:00,  3.02it/s]Inference:  89%|████████▉ | 8/9 [00:03<00:00,  3.09it/s]Inference: 100%|██████████| 9/9 [00:03<00:00,  3.93it/s]Inference: 100%|██████████| 9/9 [00:03<00:00,  2.65it/s]
-[Model Info] PLM type: esm2-8M | ESM size: 8M
-[Model Name] esm2-8M_lr5e-06_bs32_ep29_val_best
-[Device] cuda:1
-[Data] Loaded 4257 samples from /NAS/luyq/AMP_datasets/splits1/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 320
-[Model] Missing keys (version mismatch, non-critical): ['esm.embeddings.position_embeddings.weight']
-[Model] Checkpoint loaded.
-[Done] Saved 4257 rows -> /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-8M_lr5e-06_bs32_ep29_val_best_test_results.csv
-[DONE] esm2-8M_lr5e-06_bs32_ep29_val_best
-
-[RUN] 16:37:35 | model: esm2-8M_lr5e-06_bs64_ep28_val_best
-       test : /NAS/luyq/AMP_datasets/splits1/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-8M_lr5e-06_bs64_ep28_val_best_test_results.csv
-Inference:   0%|          | 0/9 [00:00<?, ?it/s]Inference:  11%|█         | 1/9 [00:01<00:08,  1.12s/it]Inference:  22%|██▏       | 2/9 [00:01<00:04,  1.54it/s]Inference:  33%|███▎      | 3/9 [00:01<00:02,  2.03it/s]Inference:  44%|████▍     | 4/9 [00:02<00:02,  2.38it/s]Inference:  56%|█████▌    | 5/9 [00:02<00:01,  2.66it/s]Inference:  67%|██████▋   | 6/9 [00:02<00:01,  2.87it/s]Inference:  78%|███████▊  | 7/9 [00:02<00:00,  2.96it/s]Inference:  89%|████████▉ | 8/9 [00:03<00:00,  3.06it/s]Inference: 100%|██████████| 9/9 [00:03<00:00,  3.87it/s]Inference: 100%|██████████| 9/9 [00:03<00:00,  2.66it/s]
-[Model Info] PLM type: esm2-8M | ESM size: 8M
-[Model Name] esm2-8M_lr5e-06_bs64_ep28_val_best
-[Device] cuda:1
-[Data] Loaded 4257 samples from /NAS/luyq/AMP_datasets/splits1/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 320
-[Model] Missing keys (version mismatch, non-critical): ['esm.embeddings.position_embeddings.weight']
-[Model] Checkpoint loaded.
-[Done] Saved 4257 rows -> /home/luyq/PLM_AMP_Regression/test/splits1_test/esm2-8M_lr5e-06_bs64_ep28_val_best_test_results.csv
-[DONE] esm2-8M_lr5e-06_bs64_ep28_val_best
-
->>> [splits2] models on splits2/test.csv
-
-[RUN] 16:37:46 | model: esm2-35M_lr0.0001_bs16_ep24_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-35M_lr0.0001_bs16_ep24_val_best_test_results.csv
-Inference:   0%|          | 0/10 [00:00<?, ?it/s]Inference:  10%|█         | 1/10 [00:01<00:14,  1.57s/it]Inference:  20%|██        | 2/10 [00:02<00:08,  1.09s/it]Inference:  30%|███       | 3/10 [00:03<00:06,  1.07it/s]Inference:  40%|████      | 4/10 [00:03<00:05,  1.16it/s]Inference:  50%|█████     | 5/10 [00:04<00:04,  1.13it/s]Inference:  60%|██████    | 6/10 [00:05<00:03,  1.17it/s]Inference:  70%|███████   | 7/10 [00:06<00:02,  1.06it/s]Inference:  80%|████████  | 8/10 [00:07<00:01,  1.03it/s]Inference:  90%|█████████ | 9/10 [00:08<00:01,  1.02s/it]Inference: 100%|██████████| 10/10 [00:09<00:00,  1.06it/s]Inference: 100%|██████████| 10/10 [00:09<00:00,  1.04it/s]
-[Model Info] PLM type: esm2-35M | ESM size: 35M
-[Model Name] esm2-35M_lr0.0001_bs16_ep24_val_best
-[Device] cuda:1
-[Data] Loaded 4943 samples from /NAS/luyq/AMP_datasets/splits2/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 480
-[Model] Checkpoint loaded.
-[Done] Saved 4943 rows -> /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-35M_lr0.0001_bs16_ep24_val_best_test_results.csv
-[DONE] esm2-35M_lr0.0001_bs16_ep24_val_best
-
-[RUN] 16:38:12 | model: esm2-35M_lr0.0001_bs16_ep29_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-35M_lr0.0001_bs16_ep29_val_best_test_results.csv
-Inference:   0%|          | 0/10 [00:00<?, ?it/s]Inference:  10%|█         | 1/10 [00:01<00:17,  1.97s/it]Inference:  20%|██        | 2/10 [00:03<00:11,  1.47s/it]Inference:  30%|███       | 3/10 [00:04<00:09,  1.31s/it]Inference:  40%|████      | 4/10 [00:05<00:07,  1.23s/it]Inference:  50%|█████     | 5/10 [00:06<00:06,  1.23s/it]Inference:  60%|██████    | 6/10 [00:07<00:05,  1.26s/it]Inference:  70%|███████   | 7/10 [00:08<00:03,  1.21s/it]Inference:  80%|████████  | 8/10 [00:10<00:02,  1.18s/it]Inference:  90%|█████████ | 9/10 [00:11<00:01,  1.16s/it]Inference: 100%|██████████| 10/10 [00:11<00:00,  1.03s/it]Inference: 100%|██████████| 10/10 [00:11<00:00,  1.20s/it]
-[Model Info] PLM type: esm2-35M | ESM size: 35M
-[Model Name] esm2-35M_lr0.0001_bs16_ep29_val_best
-[Device] cuda:1
-[Data] Loaded 4943 samples from /NAS/luyq/AMP_datasets/splits2/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 480
-[Model] Checkpoint loaded.
-[Done] Saved 4943 rows -> /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-35M_lr0.0001_bs16_ep29_val_best_test_results.csv
-[DONE] esm2-35M_lr0.0001_bs16_ep29_val_best
-
-[RUN] 16:38:40 | model: esm2-35M_lr0.0001_bs32_ep24_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-35M_lr0.0001_bs32_ep24_val_best_test_results.csv
-Inference:   0%|          | 0/10 [00:00<?, ?it/s]Inference:  10%|█         | 1/10 [00:01<00:17,  1.97s/it]Inference:  20%|██        | 2/10 [00:03<00:11,  1.47s/it]Inference:  30%|███       | 3/10 [00:04<00:09,  1.31s/it]Inference:  40%|████      | 4/10 [00:05<00:07,  1.23s/it]Inference:  50%|█████     | 5/10 [00:06<00:05,  1.19s/it]Inference:  60%|██████    | 6/10 [00:07<00:04,  1.17s/it]Inference:  70%|███████   | 7/10 [00:08<00:03,  1.15s/it]Inference:  80%|████████  | 8/10 [00:09<00:02,  1.14s/it]Inference:  90%|█████████ | 9/10 [00:10<00:01,  1.13s/it]Inference: 100%|██████████| 10/10 [00:11<00:00,  1.01s/it]Inference: 100%|██████████| 10/10 [00:11<00:00,  1.16s/it]
-[Model Info] PLM type: esm2-35M | ESM size: 35M
-[Model Name] esm2-35M_lr0.0001_bs32_ep24_val_best
-[Device] cuda:1
-[Data] Loaded 4943 samples from /NAS/luyq/AMP_datasets/splits2/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 480
-[Model] Checkpoint loaded.
-[Done] Saved 4943 rows -> /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-35M_lr0.0001_bs32_ep24_val_best_test_results.csv
-[DONE] esm2-35M_lr0.0001_bs32_ep24_val_best
-
-[RUN] 16:39:08 | model: esm2-35M_lr0.0001_bs64_ep26_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-35M_lr0.0001_bs64_ep26_val_best_test_results.csv
-Inference:   0%|          | 0/10 [00:00<?, ?it/s]Inference:  10%|█         | 1/10 [00:01<00:16,  1.84s/it]Inference:  20%|██        | 2/10 [00:02<00:10,  1.27s/it]Inference:  30%|███       | 3/10 [00:03<00:07,  1.03s/it]Inference:  40%|████      | 4/10 [00:04<00:05,  1.08it/s]Inference:  50%|█████     | 5/10 [00:04<00:04,  1.16it/s]Inference:  60%|██████    | 6/10 [00:05<00:03,  1.21it/s]Inference:  70%|███████   | 7/10 [00:06<00:02,  1.25it/s]Inference:  80%|████████  | 8/10 [00:07<00:01,  1.27it/s]Inference:  90%|█████████ | 9/10 [00:07<00:00,  1.28it/s]Inference: 100%|██████████| 10/10 [00:08<00:00,  1.43it/s]Inference: 100%|██████████| 10/10 [00:08<00:00,  1.17it/s]
-[Model Info] PLM type: esm2-35M | ESM size: 35M
-[Model Name] esm2-35M_lr0.0001_bs64_ep26_val_best
-[Device] cuda:1
-[Data] Loaded 4943 samples from /NAS/luyq/AMP_datasets/splits2/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 480
-[Model] Checkpoint loaded.
-[Done] Saved 4943 rows -> /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-35M_lr0.0001_bs64_ep26_val_best_test_results.csv
-[DONE] esm2-35M_lr0.0001_bs64_ep26_val_best
-
-[RUN] 16:39:53 | model: esm2-35M_lr0.0001_bs8_ep30_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-35M_lr0.0001_bs8_ep30_val_best_test_results.csv
-Inference:   0%|          | 0/10 [00:00<?, ?it/s]Inference:  10%|█         | 1/10 [00:01<00:14,  1.64s/it]Inference:  20%|██        | 2/10 [00:02<00:08,  1.12s/it]Inference:  30%|███       | 3/10 [00:03<00:06,  1.05it/s]Inference:  40%|████      | 4/10 [00:03<00:05,  1.14it/s]Inference:  50%|█████     | 5/10 [00:04<00:04,  1.20it/s]Inference:  60%|██████    | 6/10 [00:05<00:03,  1.24it/s]Inference:  70%|███████   | 7/10 [00:06<00:02,  1.27it/s]Inference:  80%|████████  | 8/10 [00:06<00:01,  1.29it/s]Inference:  90%|█████████ | 9/10 [00:07<00:00,  1.30it/s]Inference: 100%|██████████| 10/10 [00:08<00:00,  1.45it/s]Inference: 100%|██████████| 10/10 [00:08<00:00,  1.22it/s]
-[Model Info] PLM type: esm2-35M | ESM size: 35M
-[Model Name] esm2-35M_lr0.0001_bs8_ep30_val_best
-[Device] cuda:1
-[Data] Loaded 4943 samples from /NAS/luyq/AMP_datasets/splits2/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 480
-[Model] Checkpoint loaded.
-[Done] Saved 4943 rows -> /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-35M_lr0.0001_bs8_ep30_val_best_test_results.csv
-[DONE] esm2-35M_lr0.0001_bs8_ep30_val_best
-
-[RUN] 16:40:17 | model: esm2-35M_lr1e-05_bs16_ep24_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-35M_lr1e-05_bs16_ep24_val_best_test_results.csv
-Inference:   0%|          | 0/10 [00:00<?, ?it/s]Inference:  10%|█         | 1/10 [00:01<00:14,  1.59s/it]Inference:  20%|██        | 2/10 [00:02<00:08,  1.11s/it]Inference:  30%|███       | 3/10 [00:03<00:06,  1.06it/s]Inference:  40%|████      | 4/10 [00:03<00:05,  1.14it/s]Inference:  50%|█████     | 5/10 [00:04<00:04,  1.20it/s]Inference:  60%|██████    | 6/10 [00:05<00:03,  1.24it/s]Inference:  70%|███████   | 7/10 [00:06<00:02,  1.26it/s]Inference:  80%|████████  | 8/10 [00:06<00:01,  1.28it/s]Inference:  90%|█████████ | 9/10 [00:07<00:00,  1.29it/s]Inference: 100%|██████████| 10/10 [00:08<00:00,  1.44it/s]Inference: 100%|██████████| 10/10 [00:08<00:00,  1.22it/s]
-[Model Info] PLM type: esm2-35M | ESM size: 35M
-[Model Name] esm2-35M_lr1e-05_bs16_ep24_val_best
-[Device] cuda:1
-[Data] Loaded 4943 samples from /NAS/luyq/AMP_datasets/splits2/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 480
-[Model] Checkpoint loaded.
-[Done] Saved 4943 rows -> /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-35M_lr1e-05_bs16_ep24_val_best_test_results.csv
-[DONE] esm2-35M_lr1e-05_bs16_ep24_val_best
-
-[RUN] 16:40:41 | model: esm2-35M_lr1e-05_bs16_ep26_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-35M_lr1e-05_bs16_ep26_val_best_test_results.csv
-Inference:   0%|          | 0/10 [00:00<?, ?it/s]Inference:  10%|█         | 1/10 [00:01<00:14,  1.59s/it]Inference:  20%|██        | 2/10 [00:02<00:08,  1.10s/it]Inference:  30%|███       | 3/10 [00:03<00:06,  1.06it/s]Inference:  40%|████      | 4/10 [00:03<00:05,  1.15it/s]Inference:  50%|█████     | 5/10 [00:04<00:04,  1.20it/s]Inference:  60%|██████    | 6/10 [00:05<00:03,  1.24it/s]Inference:  70%|███████   | 7/10 [00:06<00:02,  1.26it/s]Inference:  80%|████████  | 8/10 [00:06<00:01,  1.28it/s]Inference:  90%|█████████ | 9/10 [00:07<00:00,  1.29it/s]Inference: 100%|██████████| 10/10 [00:08<00:00,  1.45it/s]Inference: 100%|██████████| 10/10 [00:08<00:00,  1.22it/s]
-[Model Info] PLM type: esm2-35M | ESM size: 35M
-[Model Name] esm2-35M_lr1e-05_bs16_ep26_val_best
-[Device] cuda:1
-[Data] Loaded 4943 samples from /NAS/luyq/AMP_datasets/splits2/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 480
-[Model] Checkpoint loaded.
-[Done] Saved 4943 rows -> /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-35M_lr1e-05_bs16_ep26_val_best_test_results.csv
-[DONE] esm2-35M_lr1e-05_bs16_ep26_val_best
-
-[RUN] 16:41:18 | model: esm2-35M_lr1e-05_bs32_ep24_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-35M_lr1e-05_bs32_ep24_val_best_test_results.csv
-Inference:   0%|          | 0/10 [00:00<?, ?it/s]Inference:  10%|█         | 1/10 [00:01<00:15,  1.68s/it]Inference:  20%|██        | 2/10 [00:02<00:09,  1.14s/it]Inference:  30%|███       | 3/10 [00:03<00:06,  1.02it/s]Inference:  40%|████      | 4/10 [00:03<00:05,  1.12it/s]Inference:  50%|█████     | 5/10 [00:04<00:04,  1.18it/s]Inference:  60%|██████    | 6/10 [00:05<00:03,  1.23it/s]Inference:  70%|███████   | 7/10 [00:06<00:02,  1.23it/s]Inference:  80%|████████  | 8/10 [00:07<00:01,  1.26it/s]Inference:  90%|█████████ | 9/10 [00:07<00:00,  1.28it/s]Inference: 100%|██████████| 10/10 [00:08<00:00,  1.44it/s]Inference: 100%|██████████| 10/10 [00:08<00:00,  1.20it/s]
-[Model Info] PLM type: esm2-35M | ESM size: 35M
-[Model Name] esm2-35M_lr1e-05_bs32_ep24_val_best
-[Device] cuda:1
-[Data] Loaded 4943 samples from /NAS/luyq/AMP_datasets/splits2/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 480
-[Model] Checkpoint loaded.
-[Done] Saved 4943 rows -> /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-35M_lr1e-05_bs32_ep24_val_best_test_results.csv
-[DONE] esm2-35M_lr1e-05_bs32_ep24_val_best
-
-[RUN] 16:41:42 | model: esm2-35M_lr1e-05_bs32_ep30_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-35M_lr1e-05_bs32_ep30_val_best_test_results.csv
-Inference:   0%|          | 0/10 [00:00<?, ?it/s]Inference:  10%|█         | 1/10 [00:01<00:14,  1.65s/it]Inference:  20%|██        | 2/10 [00:02<00:09,  1.13s/it]Inference:  30%|███       | 3/10 [00:03<00:06,  1.04it/s]Inference:  40%|████      | 4/10 [00:03<00:05,  1.13it/s]Inference:  50%|█████     | 5/10 [00:04<00:04,  1.19it/s]Inference:  60%|██████    | 6/10 [00:05<00:03,  1.23it/s]Inference:  70%|███████   | 7/10 [00:06<00:02,  1.26it/s]Inference:  80%|████████  | 8/10 [00:06<00:01,  1.27it/s]Inference:  90%|█████████ | 9/10 [00:07<00:00,  1.29it/s]Inference: 100%|██████████| 10/10 [00:08<00:00,  1.44it/s]Inference: 100%|██████████| 10/10 [00:08<00:00,  1.21it/s]
-[Model Info] PLM type: esm2-35M | ESM size: 35M
-[Model Name] esm2-35M_lr1e-05_bs32_ep30_val_best
-[Device] cuda:1
-[Data] Loaded 4943 samples from /NAS/luyq/AMP_datasets/splits2/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 480
-[Model] Checkpoint loaded.
-[Done] Saved 4943 rows -> /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-35M_lr1e-05_bs32_ep30_val_best_test_results.csv
-[DONE] esm2-35M_lr1e-05_bs32_ep30_val_best
-
-[RUN] 16:42:06 | model: esm2-35M_lr1e-05_bs64_ep27_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-35M_lr1e-05_bs64_ep27_val_best_test_results.csv
-Inference:   0%|          | 0/10 [00:00<?, ?it/s]Inference:  10%|█         | 1/10 [00:01<00:15,  1.69s/it]Inference:  20%|██        | 2/10 [00:02<00:09,  1.14s/it]Inference:  30%|███       | 3/10 [00:03<00:06,  1.03it/s]Inference:  40%|████      | 4/10 [00:03<00:05,  1.13it/s]Inference:  50%|█████     | 5/10 [00:04<00:04,  1.19it/s]Inference:  60%|██████    | 6/10 [00:05<00:03,  1.23it/s]Inference:  70%|███████   | 7/10 [00:06<00:02,  1.26it/s]Inference:  80%|████████  | 8/10 [00:07<00:01,  1.27it/s]Inference:  90%|█████████ | 9/10 [00:07<00:00,  1.28it/s]Inference: 100%|██████████| 10/10 [00:08<00:00,  1.43it/s]Inference: 100%|██████████| 10/10 [00:08<00:00,  1.21it/s]
-[Model Info] PLM type: esm2-35M | ESM size: 35M
-[Model Name] esm2-35M_lr1e-05_bs64_ep27_val_best
-[Device] cuda:1
-[Data] Loaded 4943 samples from /NAS/luyq/AMP_datasets/splits2/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 480
-[Model] Checkpoint loaded.
-[Done] Saved 4943 rows -> /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-35M_lr1e-05_bs64_ep27_val_best_test_results.csv
-[DONE] esm2-35M_lr1e-05_bs64_ep27_val_best
-
-[RUN] 16:42:53 | model: esm2-35M_lr1e-05_bs8_ep24_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-35M_lr1e-05_bs8_ep24_val_best_test_results.csv
-Inference:   0%|          | 0/10 [00:00<?, ?it/s]Inference:  10%|█         | 1/10 [00:01<00:15,  1.69s/it]Inference:  20%|██        | 2/10 [00:02<00:09,  1.14s/it]Inference:  30%|███       | 3/10 [00:03<00:06,  1.02it/s]Inference:  40%|████      | 4/10 [00:04<00:05,  1.11it/s]Inference:  50%|█████     | 5/10 [00:04<00:04,  1.18it/s]Inference:  60%|██████    | 6/10 [00:05<00:03,  1.22it/s]Inference:  70%|███████   | 7/10 [00:06<00:02,  1.25it/s]Inference:  80%|████████  | 8/10 [00:07<00:01,  1.26it/s]Inference:  90%|█████████ | 9/10 [00:07<00:00,  1.28it/s]Inference: 100%|██████████| 10/10 [00:08<00:00,  1.44it/s]Inference: 100%|██████████| 10/10 [00:08<00:00,  1.20it/s]
-[Model Info] PLM type: esm2-35M | ESM size: 35M
-[Model Name] esm2-35M_lr1e-05_bs8_ep24_val_best
-[Device] cuda:1
-[Data] Loaded 4943 samples from /NAS/luyq/AMP_datasets/splits2/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 480
-[Model] Checkpoint loaded.
-[Done] Saved 4943 rows -> /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-35M_lr1e-05_bs8_ep24_val_best_test_results.csv
-[DONE] esm2-35M_lr1e-05_bs8_ep24_val_best
-
-[RUN] 16:43:18 | model: esm2-35M_lr5e-06_bs16_ep24_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-35M_lr5e-06_bs16_ep24_val_best_test_results.csv
-Inference:   0%|          | 0/10 [00:00<?, ?it/s]Inference:  10%|█         | 1/10 [00:01<00:14,  1.59s/it]Inference:  20%|██        | 2/10 [00:02<00:08,  1.10s/it]Inference:  30%|███       | 3/10 [00:03<00:06,  1.04it/s]Inference:  40%|████      | 4/10 [00:03<00:05,  1.14it/s]Inference:  50%|█████     | 5/10 [00:04<00:04,  1.20it/s]Inference:  60%|██████    | 6/10 [00:05<00:03,  1.23it/s]Inference:  70%|███████   | 7/10 [00:06<00:02,  1.26it/s]Inference:  80%|████████  | 8/10 [00:06<00:01,  1.28it/s]Inference:  90%|█████████ | 9/10 [00:07<00:00,  1.29it/s]Inference: 100%|██████████| 10/10 [00:08<00:00,  1.44it/s]Inference: 100%|██████████| 10/10 [00:08<00:00,  1.22it/s]
-[Model Info] PLM type: esm2-35M | ESM size: 35M
-[Model Name] esm2-35M_lr5e-06_bs16_ep24_val_best
-[Device] cuda:1
-[Data] Loaded 4943 samples from /NAS/luyq/AMP_datasets/splits2/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 480
-[Model] Checkpoint loaded.
-[Done] Saved 4943 rows -> /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-35M_lr5e-06_bs16_ep24_val_best_test_results.csv
-[DONE] esm2-35M_lr5e-06_bs16_ep24_val_best
-
-[RUN] 16:43:57 | model: esm2-35M_lr5e-06_bs16_ep26_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-35M_lr5e-06_bs16_ep26_val_best_test_results.csv
-Inference:   0%|          | 0/10 [00:00<?, ?it/s]Inference:  10%|█         | 1/10 [00:01<00:14,  1.61s/it]Inference:  20%|██        | 2/10 [00:02<00:08,  1.11s/it]Inference:  30%|███       | 3/10 [00:03<00:06,  1.05it/s]Inference:  40%|████      | 4/10 [00:03<00:05,  1.15it/s]Inference:  50%|█████     | 5/10 [00:04<00:04,  1.20it/s]Inference:  60%|██████    | 6/10 [00:05<00:03,  1.24it/s]Inference:  70%|███████   | 7/10 [00:06<00:02,  1.27it/s]Inference:  80%|████████  | 8/10 [00:06<00:01,  1.29it/s]Inference:  90%|█████████ | 9/10 [00:07<00:00,  1.30it/s]Inference: 100%|██████████| 10/10 [00:08<00:00,  1.45it/s]Inference: 100%|██████████| 10/10 [00:08<00:00,  1.22it/s]
-[Model Info] PLM type: esm2-35M | ESM size: 35M
-[Model Name] esm2-35M_lr5e-06_bs16_ep26_val_best
-[Device] cuda:1
-[Data] Loaded 4943 samples from /NAS/luyq/AMP_datasets/splits2/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 480
-[Model] Checkpoint loaded.
-[Done] Saved 4943 rows -> /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-35M_lr5e-06_bs16_ep26_val_best_test_results.csv
-[DONE] esm2-35M_lr5e-06_bs16_ep26_val_best
-
-[RUN] 16:44:40 | model: esm2-35M_lr5e-06_bs32_ep30_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-35M_lr5e-06_bs32_ep30_val_best_test_results.csv
-Inference:   0%|          | 0/10 [00:00<?, ?it/s]Inference:  10%|█         | 1/10 [00:01<00:14,  1.64s/it]Inference:  20%|██        | 2/10 [00:02<00:09,  1.13s/it]Inference:  30%|███       | 3/10 [00:03<00:06,  1.04it/s]Inference:  40%|████      | 4/10 [00:03<00:05,  1.14it/s]Inference:  50%|█████     | 5/10 [00:04<00:04,  1.19it/s]Inference:  60%|██████    | 6/10 [00:05<00:03,  1.23it/s]Inference:  70%|███████   | 7/10 [00:06<00:02,  1.26it/s]Inference:  80%|████████  | 8/10 [00:06<00:01,  1.28it/s]Inference:  90%|█████████ | 9/10 [00:07<00:00,  1.29it/s]Inference: 100%|██████████| 10/10 [00:08<00:00,  1.44it/s]Inference: 100%|██████████| 10/10 [00:08<00:00,  1.21it/s]
-[Model Info] PLM type: esm2-35M | ESM size: 35M
-[Model Name] esm2-35M_lr5e-06_bs32_ep30_val_best
-[Device] cuda:1
-[Data] Loaded 4943 samples from /NAS/luyq/AMP_datasets/splits2/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 480
-[Model] Checkpoint loaded.
-[Done] Saved 4943 rows -> /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-35M_lr5e-06_bs32_ep30_val_best_test_results.csv
-[DONE] esm2-35M_lr5e-06_bs32_ep30_val_best
-
-[RUN] 16:45:19 | model: esm2-35M_lr5e-06_bs64_ep28_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-35M_lr5e-06_bs64_ep28_val_best_test_results.csv
-Inference:   0%|          | 0/10 [00:00<?, ?it/s]Inference:  10%|█         | 1/10 [00:01<00:14,  1.66s/it]Inference:  20%|██        | 2/10 [00:02<00:09,  1.13s/it]Inference:  30%|███       | 3/10 [00:03<00:06,  1.04it/s]Inference:  40%|████      | 4/10 [00:03<00:05,  1.13it/s]Inference:  50%|█████     | 5/10 [00:04<00:04,  1.19it/s]Inference:  60%|██████    | 6/10 [00:05<00:03,  1.23it/s]Inference:  70%|███████   | 7/10 [00:06<00:02,  1.26it/s]Inference:  80%|████████  | 8/10 [00:06<00:01,  1.28it/s]Inference:  90%|█████████ | 9/10 [00:07<00:00,  1.29it/s]Inference: 100%|██████████| 10/10 [00:08<00:00,  1.45it/s]Inference: 100%|██████████| 10/10 [00:08<00:00,  1.21it/s]
-[Model Info] PLM type: esm2-35M | ESM size: 35M
-[Model Name] esm2-35M_lr5e-06_bs64_ep28_val_best
-[Device] cuda:1
-[Data] Loaded 4943 samples from /NAS/luyq/AMP_datasets/splits2/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 480
-[Model] Checkpoint loaded.
-[Done] Saved 4943 rows -> /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-35M_lr5e-06_bs64_ep28_val_best_test_results.csv
-[DONE] esm2-35M_lr5e-06_bs64_ep28_val_best
-
-[RUN] 16:45:56 | model: esm2-35M_lr5e-06_bs8_ep30_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-35M_lr5e-06_bs8_ep30_val_best_test_results.csv
-Inference:   0%|          | 0/10 [00:00<?, ?it/s]Inference:  10%|█         | 1/10 [00:01<00:14,  1.61s/it]Inference:  20%|██        | 2/10 [00:02<00:08,  1.11s/it]Inference:  30%|███       | 3/10 [00:03<00:06,  1.05it/s]Inference:  40%|████      | 4/10 [00:03<00:05,  1.14it/s]Inference:  50%|█████     | 5/10 [00:04<00:04,  1.20it/s]Inference:  60%|██████    | 6/10 [00:05<00:03,  1.23it/s]Inference:  70%|███████   | 7/10 [00:06<00:02,  1.26it/s]Inference:  80%|████████  | 8/10 [00:06<00:01,  1.29it/s]Inference:  90%|█████████ | 9/10 [00:07<00:00,  1.29it/s]Inference: 100%|██████████| 10/10 [00:08<00:00,  1.42it/s]Inference: 100%|██████████| 10/10 [00:08<00:00,  1.21it/s]
-[Model Info] PLM type: esm2-35M | ESM size: 35M
-[Model Name] esm2-35M_lr5e-06_bs8_ep30_val_best
-[Device] cuda:1
-[Data] Loaded 4943 samples from /NAS/luyq/AMP_datasets/splits2/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 480
-[Model] Checkpoint loaded.
-[Done] Saved 4943 rows -> /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-35M_lr5e-06_bs8_ep30_val_best_test_results.csv
-[DONE] esm2-35M_lr5e-06_bs8_ep30_val_best
-
-[RUN] 16:46:37 | model: esm2-8M_lr0.0001_bs16_ep26_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-8M_lr0.0001_bs16_ep26_val_best_test_results.csv
-Inference:   0%|          | 0/10 [00:00<?, ?it/s]Inference:  10%|█         | 1/10 [00:01<00:10,  1.16s/it]Inference:  20%|██        | 2/10 [00:01<00:05,  1.51it/s]Inference:  30%|███       | 3/10 [00:01<00:03,  2.02it/s]Inference:  40%|████      | 4/10 [00:02<00:02,  2.36it/s]Inference:  50%|█████     | 5/10 [00:02<00:01,  2.63it/s]Inference:  60%|██████    | 6/10 [00:02<00:01,  2.82it/s]Inference:  70%|███████   | 7/10 [00:02<00:01,  3.00it/s]Inference:  80%|████████  | 8/10 [00:03<00:00,  3.08it/s]Inference:  90%|█████████ | 9/10 [00:03<00:00,  3.19it/s]Inference: 100%|██████████| 10/10 [00:03<00:00,  3.58it/s]Inference: 100%|██████████| 10/10 [00:03<00:00,  2.65it/s]
-[Model Info] PLM type: esm2-8M | ESM size: 8M
-[Model Name] esm2-8M_lr0.0001_bs16_ep26_val_best
-[Device] cuda:1
-[Data] Loaded 4943 samples from /NAS/luyq/AMP_datasets/splits2/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 320
-[Model] Missing keys (version mismatch, non-critical): ['esm.embeddings.position_embeddings.weight']
-[Model] Checkpoint loaded.
-[Done] Saved 4943 rows -> /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-8M_lr0.0001_bs16_ep26_val_best_test_results.csv
-[DONE] esm2-8M_lr0.0001_bs16_ep26_val_best
-
-[RUN] 16:47:10 | model: esm2-8M_lr0.0001_bs32_ep21_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-8M_lr0.0001_bs32_ep21_val_best_test_results.csv
-Inference:   0%|          | 0/10 [00:00<?, ?it/s]Inference:  10%|█         | 1/10 [00:01<00:10,  1.15s/it]Inference:  20%|██        | 2/10 [00:01<00:05,  1.53it/s]Inference:  30%|███       | 3/10 [00:01<00:03,  1.96it/s]Inference:  40%|████      | 4/10 [00:02<00:02,  2.35it/s]Inference:  50%|█████     | 5/10 [00:02<00:01,  2.61it/s]Inference:  60%|██████    | 6/10 [00:02<00:01,  2.83it/s]Inference:  70%|███████   | 7/10 [00:02<00:01,  2.97it/s]Inference:  80%|████████  | 8/10 [00:03<00:00,  2.96it/s]Inference:  90%|█████████ | 9/10 [00:03<00:00,  3.05it/s]Inference: 100%|██████████| 10/10 [00:03<00:00,  3.43it/s]Inference: 100%|██████████| 10/10 [00:03<00:00,  2.59it/s]
-[Model Info] PLM type: esm2-8M | ESM size: 8M
-[Model Name] esm2-8M_lr0.0001_bs32_ep21_val_best
-[Device] cuda:1
-[Data] Loaded 4943 samples from /NAS/luyq/AMP_datasets/splits2/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 320
-[Model] Missing keys (version mismatch, non-critical): ['esm.embeddings.position_embeddings.weight']
-[Model] Checkpoint loaded.
-[Done] Saved 4943 rows -> /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-8M_lr0.0001_bs32_ep21_val_best_test_results.csv
-[DONE] esm2-8M_lr0.0001_bs32_ep21_val_best
-
-[RUN] 16:47:37 | model: esm2-8M_lr0.0001_bs32_ep27_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-8M_lr0.0001_bs32_ep27_val_best_test_results.csv
-Inference:   0%|          | 0/10 [00:00<?, ?it/s]Inference:  10%|█         | 1/10 [00:01<00:11,  1.24s/it]Inference:  20%|██        | 2/10 [00:01<00:05,  1.42it/s]Inference:  30%|███       | 3/10 [00:01<00:03,  1.93it/s]Inference:  40%|████      | 4/10 [00:02<00:02,  2.30it/s]Inference:  50%|█████     | 5/10 [00:02<00:01,  2.55it/s]Inference:  60%|██████    | 6/10 [00:02<00:01,  2.79it/s]Inference:  70%|███████   | 7/10 [00:03<00:01,  2.94it/s]Inference:  80%|████████  | 8/10 [00:03<00:00,  3.06it/s]Inference:  90%|█████████ | 9/10 [00:03<00:00,  3.09it/s]Inference: 100%|██████████| 10/10 [00:03<00:00,  3.45it/s]Inference: 100%|██████████| 10/10 [00:03<00:00,  2.55it/s]
-[Model Info] PLM type: esm2-8M | ESM size: 8M
-[Model Name] esm2-8M_lr0.0001_bs32_ep27_val_best
-[Device] cuda:1
-[Data] Loaded 4943 samples from /NAS/luyq/AMP_datasets/splits2/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 320
-[Model] Missing keys (version mismatch, non-critical): ['esm.embeddings.position_embeddings.weight']
-[Model] Checkpoint loaded.
-[Done] Saved 4943 rows -> /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-8M_lr0.0001_bs32_ep27_val_best_test_results.csv
-[DONE] esm2-8M_lr0.0001_bs32_ep27_val_best
-
-[RUN] 16:47:48 | model: esm2-8M_lr0.0001_bs64_ep20_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-8M_lr0.0001_bs64_ep20_val_best_test_results.csv
-Inference:   0%|          | 0/10 [00:00<?, ?it/s]Inference:  10%|█         | 1/10 [00:02<00:21,  2.34s/it]Inference:  20%|██        | 2/10 [00:02<00:09,  1.18s/it]Inference:  30%|███       | 3/10 [00:03<00:05,  1.24it/s]Inference:  40%|████      | 4/10 [00:03<00:03,  1.62it/s]Inference:  50%|█████     | 5/10 [00:03<00:02,  1.90it/s]Inference:  60%|██████    | 6/10 [00:04<00:01,  2.09it/s]Inference:  70%|███████   | 7/10 [00:04<00:01,  2.14it/s]Inference:  80%|████████  | 8/10 [00:05<00:00,  2.12it/s]Inference:  90%|█████████ | 9/10 [00:05<00:00,  2.15it/s]Inference: 100%|██████████| 10/10 [00:05<00:00,  2.51it/s]Inference: 100%|██████████| 10/10 [00:05<00:00,  1.73it/s]
-[Model Info] PLM type: esm2-8M | ESM size: 8M
-[Model Name] esm2-8M_lr0.0001_bs64_ep20_val_best
-[Device] cuda:1
-[Data] Loaded 4943 samples from /NAS/luyq/AMP_datasets/splits2/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 320
-[Model] Missing keys (version mismatch, non-critical): ['esm.embeddings.position_embeddings.weight']
-[Model] Checkpoint loaded.
-[Done] Saved 4943 rows -> /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-8M_lr0.0001_bs64_ep20_val_best_test_results.csv
-[DONE] esm2-8M_lr0.0001_bs64_ep20_val_best
-
-[RUN] 16:48:06 | model: esm2-8M_lr0.0001_bs64_ep26_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-8M_lr0.0001_bs64_ep26_val_best_test_results.csv
-Inference:   0%|          | 0/10 [00:00<?, ?it/s]Inference:  10%|█         | 1/10 [00:01<00:12,  1.40s/it]Inference:  20%|██        | 2/10 [00:01<00:06,  1.31it/s]Inference:  30%|███       | 3/10 [00:02<00:03,  1.80it/s]Inference:  40%|████      | 4/10 [00:02<00:02,  2.21it/s]Inference:  50%|█████     | 5/10 [00:02<00:01,  2.51it/s]Inference:  60%|██████    | 6/10 [00:02<00:01,  2.70it/s]Inference:  70%|███████   | 7/10 [00:03<00:01,  2.85it/s]Inference:  80%|████████  | 8/10 [00:03<00:00,  2.96it/s]Inference:  90%|█████████ | 9/10 [00:03<00:00,  2.96it/s]Inference: 100%|██████████| 10/10 [00:04<00:00,  3.35it/s]Inference: 100%|██████████| 10/10 [00:04<00:00,  2.43it/s]
-[Model Info] PLM type: esm2-8M | ESM size: 8M
-[Model Name] esm2-8M_lr0.0001_bs64_ep26_val_best
-[Device] cuda:1
-[Data] Loaded 4943 samples from /NAS/luyq/AMP_datasets/splits2/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 320
-[Model] Missing keys (version mismatch, non-critical): ['esm.embeddings.position_embeddings.weight']
-[Model] Checkpoint loaded.
-[Done] Saved 4943 rows -> /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-8M_lr0.0001_bs64_ep26_val_best_test_results.csv
-[DONE] esm2-8M_lr0.0001_bs64_ep26_val_best
-
-[RUN] 16:48:23 | model: esm2-8M_lr1e-05_bs16_ep29_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-8M_lr1e-05_bs16_ep29_val_best_test_results.csv
-Inference:   0%|          | 0/10 [00:00<?, ?it/s]Inference:  10%|█         | 1/10 [00:01<00:11,  1.25s/it]Inference:  20%|██        | 2/10 [00:01<00:05,  1.44it/s]Inference:  30%|███       | 3/10 [00:01<00:03,  1.91it/s]Inference:  40%|████      | 4/10 [00:02<00:02,  2.31it/s]Inference:  50%|█████     | 5/10 [00:02<00:01,  2.56it/s]Inference:  60%|██████    | 6/10 [00:02<00:01,  2.79it/s]Inference:  70%|███████   | 7/10 [00:03<00:01,  2.93it/s]Inference:  80%|████████  | 8/10 [00:03<00:00,  2.95it/s]Inference:  90%|█████████ | 9/10 [00:03<00:00,  3.03it/s]Inference: 100%|██████████| 10/10 [00:03<00:00,  3.42it/s]Inference: 100%|██████████| 10/10 [00:03<00:00,  2.54it/s]
-[Model Info] PLM type: esm2-8M | ESM size: 8M
-[Model Name] esm2-8M_lr1e-05_bs16_ep29_val_best
-[Device] cuda:1
-[Data] Loaded 4943 samples from /NAS/luyq/AMP_datasets/splits2/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 320
-[Model] Missing keys (version mismatch, non-critical): ['esm.embeddings.position_embeddings.weight']
-[Model] Checkpoint loaded.
-[Done] Saved 4943 rows -> /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-8M_lr1e-05_bs16_ep29_val_best_test_results.csv
-[DONE] esm2-8M_lr1e-05_bs16_ep29_val_best
-
-[RUN] 16:48:37 | model: esm2-8M_lr1e-05_bs32_ep20_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-8M_lr1e-05_bs32_ep20_val_best_test_results.csv
-Inference:   0%|          | 0/10 [00:00<?, ?it/s]Inference:  10%|█         | 1/10 [00:01<00:10,  1.19s/it]Inference:  20%|██        | 2/10 [00:01<00:05,  1.51it/s]Inference:  30%|███       | 3/10 [00:01<00:03,  2.01it/s]Inference:  40%|████      | 4/10 [00:02<00:02,  2.34it/s]Inference:  50%|█████     | 5/10 [00:02<00:01,  2.60it/s]Inference:  60%|██████    | 6/10 [00:02<00:01,  2.79it/s]Inference:  70%|███████   | 7/10 [00:03<00:01,  2.98it/s]Inference:  80%|████████  | 8/10 [00:03<00:00,  3.09it/s]Inference:  90%|█████████ | 9/10 [00:03<00:00,  3.18it/s]Inference: 100%|██████████| 10/10 [00:03<00:00,  3.59it/s]Inference: 100%|██████████| 10/10 [00:03<00:00,  2.63it/s]
-[Model Info] PLM type: esm2-8M | ESM size: 8M
-[Model Name] esm2-8M_lr1e-05_bs32_ep20_val_best
-[Device] cuda:1
-[Data] Loaded 4943 samples from /NAS/luyq/AMP_datasets/splits2/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 320
-[Model] Missing keys (version mismatch, non-critical): ['esm.embeddings.position_embeddings.weight']
-[Model] Checkpoint loaded.
-[Done] Saved 4943 rows -> /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-8M_lr1e-05_bs32_ep20_val_best_test_results.csv
-[DONE] esm2-8M_lr1e-05_bs32_ep20_val_best
-
-[RUN] 16:48:55 | model: esm2-8M_lr1e-05_bs32_ep30_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-8M_lr1e-05_bs32_ep30_val_best_test_results.csv
-Inference:   0%|          | 0/10 [00:00<?, ?it/s]Inference:  10%|█         | 1/10 [00:01<00:10,  1.14s/it]Inference:  20%|██        | 2/10 [00:01<00:05,  1.54it/s]Inference:  30%|███       | 3/10 [00:01<00:03,  2.06it/s]Inference:  40%|████      | 4/10 [00:02<00:02,  2.41it/s]Inference:  50%|█████     | 5/10 [00:02<00:01,  2.65it/s]Inference:  60%|██████    | 6/10 [00:02<00:01,  2.88it/s]Inference:  70%|███████   | 7/10 [00:02<00:01,  2.99it/s]Inference:  80%|████████  | 8/10 [00:03<00:00,  3.11it/s]Inference:  90%|█████████ | 9/10 [00:03<00:00,  3.18it/s]Inference: 100%|██████████| 10/10 [00:03<00:00,  3.62it/s]Inference: 100%|██████████| 10/10 [00:03<00:00,  2.68it/s]
-[Model Info] PLM type: esm2-8M | ESM size: 8M
-[Model Name] esm2-8M_lr1e-05_bs32_ep30_val_best
-[Device] cuda:1
-[Data] Loaded 4943 samples from /NAS/luyq/AMP_datasets/splits2/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 320
-[Model] Missing keys (version mismatch, non-critical): ['esm.embeddings.position_embeddings.weight']
-[Model] Checkpoint loaded.
-[Done] Saved 4943 rows -> /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-8M_lr1e-05_bs32_ep30_val_best_test_results.csv
-[DONE] esm2-8M_lr1e-05_bs32_ep30_val_best
-
-[RUN] 16:49:13 | model: esm2-8M_lr1e-05_bs64_ep21_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-8M_lr1e-05_bs64_ep21_val_best_test_results.csv
-Inference:   0%|          | 0/10 [00:00<?, ?it/s]Inference:  10%|█         | 1/10 [00:01<00:10,  1.16s/it]Inference:  20%|██        | 2/10 [00:01<00:05,  1.50it/s]Inference:  30%|███       | 3/10 [00:01<00:03,  1.94it/s]Inference:  40%|████      | 4/10 [00:02<00:02,  2.30it/s]Inference:  50%|█████     | 5/10 [00:02<00:01,  2.58it/s]Inference:  60%|██████    | 6/10 [00:02<00:01,  2.77it/s]Inference:  70%|███████   | 7/10 [00:03<00:01,  2.91it/s]Inference:  80%|████████  | 8/10 [00:03<00:00,  3.00it/s]Inference:  90%|█████████ | 9/10 [00:03<00:00,  3.13it/s]Inference: 100%|██████████| 10/10 [00:03<00:00,  3.51it/s]Inference: 100%|██████████| 10/10 [00:03<00:00,  2.59it/s]
-[Model Info] PLM type: esm2-8M | ESM size: 8M
-[Model Name] esm2-8M_lr1e-05_bs64_ep21_val_best
-[Device] cuda:1
-[Data] Loaded 4943 samples from /NAS/luyq/AMP_datasets/splits2/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 320
-[Model] Missing keys (version mismatch, non-critical): ['esm.embeddings.position_embeddings.weight']
-[Model] Checkpoint loaded.
-[Done] Saved 4943 rows -> /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-8M_lr1e-05_bs64_ep21_val_best_test_results.csv
-[DONE] esm2-8M_lr1e-05_bs64_ep21_val_best
-
-[RUN] 16:49:26 | model: esm2-8M_lr1e-05_bs64_ep30_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-8M_lr1e-05_bs64_ep30_val_best_test_results.csv
-Inference:   0%|          | 0/10 [00:00<?, ?it/s]Inference:  10%|█         | 1/10 [00:01<00:10,  1.14s/it]Inference:  20%|██        | 2/10 [00:01<00:05,  1.56it/s]Inference:  30%|███       | 3/10 [00:01<00:03,  2.05it/s]Inference:  40%|████      | 4/10 [00:02<00:02,  2.43it/s]Inference:  50%|█████     | 5/10 [00:02<00:01,  2.69it/s]Inference:  60%|██████    | 6/10 [00:02<00:01,  2.71it/s]Inference:  70%|███████   | 7/10 [00:03<00:01,  2.72it/s]Inference:  80%|████████  | 8/10 [00:03<00:00,  2.73it/s]Inference:  90%|█████████ | 9/10 [00:03<00:00,  2.68it/s]Inference: 100%|██████████| 10/10 [00:04<00:00,  2.96it/s]Inference: 100%|██████████| 10/10 [00:04<00:00,  2.45it/s]
-[Model Info] PLM type: esm2-8M | ESM size: 8M
-[Model Name] esm2-8M_lr1e-05_bs64_ep30_val_best
-[Device] cuda:1
-[Data] Loaded 4943 samples from /NAS/luyq/AMP_datasets/splits2/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 320
-[Model] Missing keys (version mismatch, non-critical): ['esm.embeddings.position_embeddings.weight']
-[Model] Checkpoint loaded.
-[Done] Saved 4943 rows -> /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-8M_lr1e-05_bs64_ep30_val_best_test_results.csv
-[DONE] esm2-8M_lr1e-05_bs64_ep30_val_best
-
-[RUN] 16:49:37 | model: esm2-8M_lr5e-06_bs16_ep16_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-8M_lr5e-06_bs16_ep16_val_best_test_results.csv
-Inference:   0%|          | 0/10 [00:00<?, ?it/s]Inference:  10%|█         | 1/10 [00:01<00:11,  1.31s/it]Inference:  20%|██        | 2/10 [00:01<00:05,  1.39it/s]Inference:  30%|███       | 3/10 [00:01<00:03,  1.89it/s]Inference:  40%|████      | 4/10 [00:02<00:02,  2.25it/s]Inference:  50%|█████     | 5/10 [00:02<00:01,  2.56it/s]Inference:  60%|██████    | 6/10 [00:02<00:01,  2.76it/s]Inference:  70%|███████   | 7/10 [00:03<00:01,  2.95it/s]Inference:  80%|████████  | 8/10 [00:03<00:00,  3.06it/s]Inference:  90%|█████████ | 9/10 [00:03<00:00,  3.10it/s]Inference: 100%|██████████| 10/10 [00:03<00:00,  3.50it/s]Inference: 100%|██████████| 10/10 [00:03<00:00,  2.54it/s]
-[Model Info] PLM type: esm2-8M | ESM size: 8M
-[Model Name] esm2-8M_lr5e-06_bs16_ep16_val_best
-[Device] cuda:1
-[Data] Loaded 4943 samples from /NAS/luyq/AMP_datasets/splits2/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 320
-[Model] Missing keys (version mismatch, non-critical): ['esm.embeddings.position_embeddings.weight']
-[Model] Checkpoint loaded.
-[Done] Saved 4943 rows -> /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-8M_lr5e-06_bs16_ep16_val_best_test_results.csv
-[DONE] esm2-8M_lr5e-06_bs16_ep16_val_best
-
-[RUN] 16:49:52 | model: esm2-8M_lr5e-06_bs16_ep26_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-8M_lr5e-06_bs16_ep26_val_best_test_results.csv
-Inference:   0%|          | 0/10 [00:00<?, ?it/s]Inference:  10%|█         | 1/10 [00:01<00:10,  1.21s/it]Inference:  20%|██        | 2/10 [00:01<00:05,  1.47it/s]Inference:  30%|███       | 3/10 [00:01<00:03,  1.95it/s]Inference:  40%|████      | 4/10 [00:02<00:02,  2.33it/s]Inference:  50%|█████     | 5/10 [00:02<00:01,  2.60it/s]Inference:  60%|██████    | 6/10 [00:02<00:01,  2.83it/s]Inference:  70%|███████   | 7/10 [00:03<00:01,  2.98it/s]Inference:  80%|████████  | 8/10 [00:03<00:00,  3.10it/s]Inference:  90%|█████████ | 9/10 [00:03<00:00,  3.17it/s]Inference: 100%|██████████| 10/10 [00:03<00:00,  3.52it/s]Inference: 100%|██████████| 10/10 [00:03<00:00,  2.60it/s]
-[Model Info] PLM type: esm2-8M | ESM size: 8M
-[Model Name] esm2-8M_lr5e-06_bs16_ep26_val_best
-[Device] cuda:1
-[Data] Loaded 4943 samples from /NAS/luyq/AMP_datasets/splits2/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 320
-[Model] Missing keys (version mismatch, non-critical): ['esm.embeddings.position_embeddings.weight']
-[Model] Checkpoint loaded.
-[Done] Saved 4943 rows -> /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-8M_lr5e-06_bs16_ep26_val_best_test_results.csv
-[DONE] esm2-8M_lr5e-06_bs16_ep26_val_best
-
-[RUN] 16:50:03 | model: esm2-8M_lr5e-06_bs32_ep30_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-8M_lr5e-06_bs32_ep30_val_best_test_results.csv
-Inference:   0%|          | 0/10 [00:00<?, ?it/s]Inference:  10%|█         | 1/10 [00:01<00:10,  1.18s/it]Inference:  20%|██        | 2/10 [00:01<00:05,  1.49it/s]Inference:  30%|███       | 3/10 [00:01<00:03,  1.99it/s]Inference:  40%|████      | 4/10 [00:02<00:02,  2.34it/s]Inference:  50%|█████     | 5/10 [00:02<00:01,  2.64it/s]Inference:  60%|██████    | 6/10 [00:02<00:01,  2.85it/s]Inference:  70%|███████   | 7/10 [00:03<00:01,  2.94it/s]Inference:  80%|████████  | 8/10 [00:03<00:00,  3.03it/s]Inference:  90%|█████████ | 9/10 [00:03<00:00,  3.10it/s]Inference: 100%|██████████| 10/10 [00:03<00:00,  3.49it/s]Inference: 100%|██████████| 10/10 [00:03<00:00,  2.61it/s]
-[Model Info] PLM type: esm2-8M | ESM size: 8M
-[Model Name] esm2-8M_lr5e-06_bs32_ep30_val_best
-[Device] cuda:1
-[Data] Loaded 4943 samples from /NAS/luyq/AMP_datasets/splits2/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 320
-[Model] Missing keys (version mismatch, non-critical): ['esm.embeddings.position_embeddings.weight']
-[Model] Checkpoint loaded.
-[Done] Saved 4943 rows -> /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-8M_lr5e-06_bs32_ep30_val_best_test_results.csv
-[DONE] esm2-8M_lr5e-06_bs32_ep30_val_best
-
-[RUN] 16:50:15 | model: esm2-8M_lr5e-06_bs64_ep29_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-8M_lr5e-06_bs64_ep29_val_best_test_results.csv
-Inference:   0%|          | 0/10 [00:00<?, ?it/s]Inference:  10%|█         | 1/10 [00:01<00:10,  1.18s/it]Inference:  20%|██        | 2/10 [00:01<00:05,  1.50it/s]Inference:  30%|███       | 3/10 [00:01<00:03,  2.01it/s]Inference:  40%|████      | 4/10 [00:02<00:02,  2.39it/s]Inference:  50%|█████     | 5/10 [00:02<00:01,  2.68it/s]Inference:  60%|██████    | 6/10 [00:02<00:01,  2.87it/s]Inference:  70%|███████   | 7/10 [00:02<00:01,  2.97it/s]Inference:  80%|████████  | 8/10 [00:03<00:00,  3.10it/s]Inference:  90%|█████████ | 9/10 [00:03<00:00,  3.15it/s]Inference: 100%|██████████| 10/10 [00:03<00:00,  3.53it/s]Inference: 100%|██████████| 10/10 [00:03<00:00,  2.64it/s]
-[Model Info] PLM type: esm2-8M | ESM size: 8M
-[Model Name] esm2-8M_lr5e-06_bs64_ep29_val_best
-[Device] cuda:1
-[Data] Loaded 4943 samples from /NAS/luyq/AMP_datasets/splits2/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 320
-[Model] Missing keys (version mismatch, non-critical): ['esm.embeddings.position_embeddings.weight']
-[Model] Checkpoint loaded.
-[Done] Saved 4943 rows -> /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-8M_lr5e-06_bs64_ep29_val_best_test_results.csv
-[DONE] esm2-8M_lr5e-06_bs64_ep29_val_best
-
-[RUN] 16:50:30 | model: esm2-8M_lr5e-06_bs64_ep30_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-8M_lr5e-06_bs64_ep30_val_best_test_results.csv
-Inference:   0%|          | 0/10 [00:00<?, ?it/s]Inference:  10%|█         | 1/10 [00:01<00:11,  1.23s/it]Inference:  20%|██        | 2/10 [00:01<00:05,  1.46it/s]Inference:  30%|███       | 3/10 [00:01<00:03,  1.96it/s]Inference:  40%|████      | 4/10 [00:02<00:02,  2.33it/s]Inference:  50%|█████     | 5/10 [00:02<00:01,  2.58it/s]Inference:  60%|██████    | 6/10 [00:02<00:01,  2.83it/s]Inference:  70%|███████   | 7/10 [00:03<00:01,  2.94it/s]Inference:  80%|████████  | 8/10 [00:03<00:00,  3.08it/s]Inference:  90%|█████████ | 9/10 [00:03<00:00,  3.15it/s]Inference: 100%|██████████| 10/10 [00:03<00:00,  3.60it/s]Inference: 100%|██████████| 10/10 [00:03<00:00,  2.61it/s]
-[Model Info] PLM type: esm2-8M | ESM size: 8M
-[Model Name] esm2-8M_lr5e-06_bs64_ep30_val_best
-[Device] cuda:1
-[Data] Loaded 4943 samples from /NAS/luyq/AMP_datasets/splits2/test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 320
-[Model] Missing keys (version mismatch, non-critical): ['esm.embeddings.position_embeddings.weight']
-[Model] Checkpoint loaded.
-[Done] Saved 4943 rows -> /home/luyq/PLM_AMP_Regression/test/splits2_test/esm2-8M_lr5e-06_bs64_ep30_val_best_test_results.csv
-[DONE] esm2-8M_lr5e-06_bs64_ep30_val_best
-
->>> [splits2] models on splits2/external_test.csv
-
-[RUN] 16:50:43 | model: esm2-35M_lr0.0001_bs16_ep24_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/external_test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/external_test/esm2-35M_lr0.0001_bs16_ep24_val_best_test_results.csv
-Inference:   0%|          | 0/2 [00:00<?, ?it/s]Inference:  50%|█████     | 1/2 [00:01<00:01,  1.68s/it]Inference: 100%|██████████| 2/2 [00:01<00:00,  1.13it/s]
-[Model Info] PLM type: esm2-35M | ESM size: 35M
-[Model Name] esm2-35M_lr0.0001_bs16_ep24_val_best
-[Device] cuda:1
-[Data] Loaded 575 samples from /NAS/luyq/AMP_datasets/splits2/external_test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 480
-[Model] Checkpoint loaded.
-[Done] Saved 575 rows -> /home/luyq/PLM_AMP_Regression/test/external_test/esm2-35M_lr0.0001_bs16_ep24_val_best_test_results.csv
-[DONE] esm2-35M_lr0.0001_bs16_ep24_val_best
-
-[RUN] 16:50:52 | model: esm2-35M_lr0.0001_bs16_ep29_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/external_test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/external_test/esm2-35M_lr0.0001_bs16_ep29_val_best_test_results.csv
-Inference:   0%|          | 0/2 [00:00<?, ?it/s]Inference:  50%|█████     | 1/2 [00:01<00:01,  1.60s/it]Inference: 100%|██████████| 2/2 [00:01<00:00,  1.38it/s]Inference: 100%|██████████| 2/2 [00:01<00:00,  1.17it/s]
-[Model Info] PLM type: esm2-35M | ESM size: 35M
-[Model Name] esm2-35M_lr0.0001_bs16_ep29_val_best
-[Device] cuda:1
-[Data] Loaded 575 samples from /NAS/luyq/AMP_datasets/splits2/external_test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 480
-[Model] Checkpoint loaded.
-[Done] Saved 575 rows -> /home/luyq/PLM_AMP_Regression/test/external_test/esm2-35M_lr0.0001_bs16_ep29_val_best_test_results.csv
-[DONE] esm2-35M_lr0.0001_bs16_ep29_val_best
-
-[RUN] 16:51:00 | model: esm2-35M_lr0.0001_bs32_ep24_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/external_test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/external_test/esm2-35M_lr0.0001_bs32_ep24_val_best_test_results.csv
-Inference:   0%|          | 0/2 [00:00<?, ?it/s]Inference:  50%|█████     | 1/2 [00:01<00:01,  1.71s/it]Inference: 100%|██████████| 2/2 [00:01<00:00,  1.30it/s]Inference: 100%|██████████| 2/2 [00:01<00:00,  1.10it/s]
-[Model Info] PLM type: esm2-35M | ESM size: 35M
-[Model Name] esm2-35M_lr0.0001_bs32_ep24_val_best
-[Device] cuda:1
-[Data] Loaded 575 samples from /NAS/luyq/AMP_datasets/splits2/external_test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 480
-[Model] Checkpoint loaded.
-[Done] Saved 575 rows -> /home/luyq/PLM_AMP_Regression/test/external_test/esm2-35M_lr0.0001_bs32_ep24_val_best_test_results.csv
-[DONE] esm2-35M_lr0.0001_bs32_ep24_val_best
-
-[RUN] 16:51:08 | model: esm2-35M_lr0.0001_bs64_ep26_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/external_test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/external_test/esm2-35M_lr0.0001_bs64_ep26_val_best_test_results.csv
-Inference:   0%|          | 0/2 [00:00<?, ?it/s]Inference:  50%|█████     | 1/2 [00:01<00:01,  1.61s/it]Inference: 100%|██████████| 2/2 [00:01<00:00,  1.38it/s]Inference: 100%|██████████| 2/2 [00:01<00:00,  1.17it/s]
-[Model Info] PLM type: esm2-35M | ESM size: 35M
-[Model Name] esm2-35M_lr0.0001_bs64_ep26_val_best
-[Device] cuda:1
-[Data] Loaded 575 samples from /NAS/luyq/AMP_datasets/splits2/external_test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 480
-[Model] Checkpoint loaded.
-[Done] Saved 575 rows -> /home/luyq/PLM_AMP_Regression/test/external_test/esm2-35M_lr0.0001_bs64_ep26_val_best_test_results.csv
-[DONE] esm2-35M_lr0.0001_bs64_ep26_val_best
-
-[RUN] 16:51:16 | model: esm2-35M_lr0.0001_bs8_ep30_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/external_test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/external_test/esm2-35M_lr0.0001_bs8_ep30_val_best_test_results.csv
-Inference:   0%|          | 0/2 [00:00<?, ?it/s]Inference:  50%|█████     | 1/2 [00:01<00:01,  1.59s/it]Inference: 100%|██████████| 2/2 [00:01<00:00,  1.19it/s]
-[Model Info] PLM type: esm2-35M | ESM size: 35M
-[Model Name] esm2-35M_lr0.0001_bs8_ep30_val_best
-[Device] cuda:1
-[Data] Loaded 575 samples from /NAS/luyq/AMP_datasets/splits2/external_test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 480
-[Model] Checkpoint loaded.
-[Done] Saved 575 rows -> /home/luyq/PLM_AMP_Regression/test/external_test/esm2-35M_lr0.0001_bs8_ep30_val_best_test_results.csv
-[DONE] esm2-35M_lr0.0001_bs8_ep30_val_best
-
-[RUN] 16:51:25 | model: esm2-35M_lr1e-05_bs16_ep24_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/external_test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/external_test/esm2-35M_lr1e-05_bs16_ep24_val_best_test_results.csv
-Inference:   0%|          | 0/2 [00:00<?, ?it/s]Inference:  50%|█████     | 1/2 [00:01<00:01,  1.58s/it]Inference: 100%|██████████| 2/2 [00:01<00:00,  1.41it/s]Inference: 100%|██████████| 2/2 [00:01<00:00,  1.19it/s]
-[Model Info] PLM type: esm2-35M | ESM size: 35M
-[Model Name] esm2-35M_lr1e-05_bs16_ep24_val_best
-[Device] cuda:1
-[Data] Loaded 575 samples from /NAS/luyq/AMP_datasets/splits2/external_test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 480
-[Model] Checkpoint loaded.
-[Done] Saved 575 rows -> /home/luyq/PLM_AMP_Regression/test/external_test/esm2-35M_lr1e-05_bs16_ep24_val_best_test_results.csv
-[DONE] esm2-35M_lr1e-05_bs16_ep24_val_best
-
-[RUN] 16:51:33 | model: esm2-35M_lr1e-05_bs16_ep26_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/external_test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/external_test/esm2-35M_lr1e-05_bs16_ep26_val_best_test_results.csv
-Inference:   0%|          | 0/2 [00:00<?, ?it/s]Inference:  50%|█████     | 1/2 [00:01<00:01,  1.56s/it]Inference: 100%|██████████| 2/2 [00:01<00:00,  1.41it/s]Inference: 100%|██████████| 2/2 [00:01<00:00,  1.19it/s]
-[Model Info] PLM type: esm2-35M | ESM size: 35M
-[Model Name] esm2-35M_lr1e-05_bs16_ep26_val_best
-[Device] cuda:1
-[Data] Loaded 575 samples from /NAS/luyq/AMP_datasets/splits2/external_test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 480
-[Model] Checkpoint loaded.
-[Done] Saved 575 rows -> /home/luyq/PLM_AMP_Regression/test/external_test/esm2-35M_lr1e-05_bs16_ep26_val_best_test_results.csv
-[DONE] esm2-35M_lr1e-05_bs16_ep26_val_best
-
-[RUN] 16:51:41 | model: esm2-35M_lr1e-05_bs32_ep24_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/external_test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/external_test/esm2-35M_lr1e-05_bs32_ep24_val_best_test_results.csv
-Inference:   0%|          | 0/2 [00:00<?, ?it/s]Inference:  50%|█████     | 1/2 [00:01<00:01,  1.59s/it]Inference: 100%|██████████| 2/2 [00:01<00:00,  1.39it/s]Inference: 100%|██████████| 2/2 [00:01<00:00,  1.18it/s]
-[Model Info] PLM type: esm2-35M | ESM size: 35M
-[Model Name] esm2-35M_lr1e-05_bs32_ep24_val_best
-[Device] cuda:1
-[Data] Loaded 575 samples from /NAS/luyq/AMP_datasets/splits2/external_test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 480
-[Model] Checkpoint loaded.
-[Done] Saved 575 rows -> /home/luyq/PLM_AMP_Regression/test/external_test/esm2-35M_lr1e-05_bs32_ep24_val_best_test_results.csv
-[DONE] esm2-35M_lr1e-05_bs32_ep24_val_best
-
-[RUN] 16:51:49 | model: esm2-35M_lr1e-05_bs32_ep30_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/external_test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/external_test/esm2-35M_lr1e-05_bs32_ep30_val_best_test_results.csv
-Inference:   0%|          | 0/2 [00:00<?, ?it/s]Inference:  50%|█████     | 1/2 [00:01<00:01,  1.60s/it]Inference: 100%|██████████| 2/2 [00:01<00:00,  1.38it/s]Inference: 100%|██████████| 2/2 [00:01<00:00,  1.17it/s]
-[Model Info] PLM type: esm2-35M | ESM size: 35M
-[Model Name] esm2-35M_lr1e-05_bs32_ep30_val_best
-[Device] cuda:1
-[Data] Loaded 575 samples from /NAS/luyq/AMP_datasets/splits2/external_test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 480
-[Model] Checkpoint loaded.
-[Done] Saved 575 rows -> /home/luyq/PLM_AMP_Regression/test/external_test/esm2-35M_lr1e-05_bs32_ep30_val_best_test_results.csv
-[DONE] esm2-35M_lr1e-05_bs32_ep30_val_best
-
-[RUN] 16:51:57 | model: esm2-35M_lr1e-05_bs64_ep27_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/external_test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/external_test/esm2-35M_lr1e-05_bs64_ep27_val_best_test_results.csv
-Inference:   0%|          | 0/2 [00:00<?, ?it/s]Inference:  50%|█████     | 1/2 [00:01<00:01,  1.60s/it]Inference: 100%|██████████| 2/2 [00:01<00:00,  1.18it/s]
-[Model Info] PLM type: esm2-35M | ESM size: 35M
-[Model Name] esm2-35M_lr1e-05_bs64_ep27_val_best
-[Device] cuda:1
-[Data] Loaded 575 samples from /NAS/luyq/AMP_datasets/splits2/external_test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 480
-[Model] Checkpoint loaded.
-[Done] Saved 575 rows -> /home/luyq/PLM_AMP_Regression/test/external_test/esm2-35M_lr1e-05_bs64_ep27_val_best_test_results.csv
-[DONE] esm2-35M_lr1e-05_bs64_ep27_val_best
-
-[RUN] 16:52:05 | model: esm2-35M_lr1e-05_bs8_ep24_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/external_test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/external_test/esm2-35M_lr1e-05_bs8_ep24_val_best_test_results.csv
-Inference:   0%|          | 0/2 [00:00<?, ?it/s]Inference:  50%|█████     | 1/2 [00:01<00:01,  1.55s/it]Inference: 100%|██████████| 2/2 [00:01<00:00,  1.42it/s]Inference: 100%|██████████| 2/2 [00:01<00:00,  1.20it/s]
-[Model Info] PLM type: esm2-35M | ESM size: 35M
-[Model Name] esm2-35M_lr1e-05_bs8_ep24_val_best
-[Device] cuda:1
-[Data] Loaded 575 samples from /NAS/luyq/AMP_datasets/splits2/external_test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 480
-[Model] Checkpoint loaded.
-[Done] Saved 575 rows -> /home/luyq/PLM_AMP_Regression/test/external_test/esm2-35M_lr1e-05_bs8_ep24_val_best_test_results.csv
-[DONE] esm2-35M_lr1e-05_bs8_ep24_val_best
-
-[RUN] 16:52:14 | model: esm2-35M_lr5e-06_bs16_ep24_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/external_test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/external_test/esm2-35M_lr5e-06_bs16_ep24_val_best_test_results.csv
-Inference:   0%|          | 0/2 [00:00<?, ?it/s]Inference:  50%|█████     | 1/2 [00:01<00:01,  1.58s/it]Inference: 100%|██████████| 2/2 [00:01<00:00,  1.40it/s]Inference: 100%|██████████| 2/2 [00:01<00:00,  1.19it/s]
-[Model Info] PLM type: esm2-35M | ESM size: 35M
-[Model Name] esm2-35M_lr5e-06_bs16_ep24_val_best
-[Device] cuda:1
-[Data] Loaded 575 samples from /NAS/luyq/AMP_datasets/splits2/external_test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 480
-[Model] Checkpoint loaded.
-[Done] Saved 575 rows -> /home/luyq/PLM_AMP_Regression/test/external_test/esm2-35M_lr5e-06_bs16_ep24_val_best_test_results.csv
-[DONE] esm2-35M_lr5e-06_bs16_ep24_val_best
-
-[RUN] 16:52:22 | model: esm2-35M_lr5e-06_bs16_ep26_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/external_test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/external_test/esm2-35M_lr5e-06_bs16_ep26_val_best_test_results.csv
-Inference:   0%|          | 0/2 [00:00<?, ?it/s]Inference:  50%|█████     | 1/2 [00:01<00:01,  1.60s/it]Inference: 100%|██████████| 2/2 [00:01<00:00,  1.39it/s]Inference: 100%|██████████| 2/2 [00:01<00:00,  1.17it/s]
-[Model Info] PLM type: esm2-35M | ESM size: 35M
-[Model Name] esm2-35M_lr5e-06_bs16_ep26_val_best
-[Device] cuda:1
-[Data] Loaded 575 samples from /NAS/luyq/AMP_datasets/splits2/external_test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 480
-[Model] Checkpoint loaded.
-[Done] Saved 575 rows -> /home/luyq/PLM_AMP_Regression/test/external_test/esm2-35M_lr5e-06_bs16_ep26_val_best_test_results.csv
-[DONE] esm2-35M_lr5e-06_bs16_ep26_val_best
-
-[RUN] 16:52:30 | model: esm2-35M_lr5e-06_bs32_ep30_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/external_test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/external_test/esm2-35M_lr5e-06_bs32_ep30_val_best_test_results.csv
-Inference:   0%|          | 0/2 [00:00<?, ?it/s]Inference:  50%|█████     | 1/2 [00:01<00:01,  1.54s/it]Inference: 100%|██████████| 2/2 [00:01<00:00,  1.43it/s]Inference: 100%|██████████| 2/2 [00:01<00:00,  1.21it/s]
-[Model Info] PLM type: esm2-35M | ESM size: 35M
-[Model Name] esm2-35M_lr5e-06_bs32_ep30_val_best
-[Device] cuda:1
-[Data] Loaded 575 samples from /NAS/luyq/AMP_datasets/splits2/external_test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 480
-[Model] Checkpoint loaded.
-[Done] Saved 575 rows -> /home/luyq/PLM_AMP_Regression/test/external_test/esm2-35M_lr5e-06_bs32_ep30_val_best_test_results.csv
-[DONE] esm2-35M_lr5e-06_bs32_ep30_val_best
-
-[RUN] 16:52:38 | model: esm2-35M_lr5e-06_bs64_ep28_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/external_test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/external_test/esm2-35M_lr5e-06_bs64_ep28_val_best_test_results.csv
-Inference:   0%|          | 0/2 [00:00<?, ?it/s]Inference:  50%|█████     | 1/2 [00:01<00:01,  1.93s/it]Inference: 100%|██████████| 2/2 [00:02<00:00,  1.16it/s]Inference: 100%|██████████| 2/2 [00:02<00:00,  1.02s/it]
-[Model Info] PLM type: esm2-35M | ESM size: 35M
-[Model Name] esm2-35M_lr5e-06_bs64_ep28_val_best
-[Device] cuda:1
-[Data] Loaded 575 samples from /NAS/luyq/AMP_datasets/splits2/external_test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 480
-[Model] Checkpoint loaded.
-[Done] Saved 575 rows -> /home/luyq/PLM_AMP_Regression/test/external_test/esm2-35M_lr5e-06_bs64_ep28_val_best_test_results.csv
-[DONE] esm2-35M_lr5e-06_bs64_ep28_val_best
-
-[RUN] 16:52:46 | model: esm2-35M_lr5e-06_bs8_ep30_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/external_test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/external_test/esm2-35M_lr5e-06_bs8_ep30_val_best_test_results.csv
-Inference:   0%|          | 0/2 [00:00<?, ?it/s]Inference:  50%|█████     | 1/2 [00:01<00:01,  1.59s/it]Inference: 100%|██████████| 2/2 [00:01<00:00,  1.40it/s]Inference: 100%|██████████| 2/2 [00:01<00:00,  1.18it/s]
-[Model Info] PLM type: esm2-35M | ESM size: 35M
-[Model Name] esm2-35M_lr5e-06_bs8_ep30_val_best
-[Device] cuda:1
-[Data] Loaded 575 samples from /NAS/luyq/AMP_datasets/splits2/external_test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 480
-[Model] Checkpoint loaded.
-[Done] Saved 575 rows -> /home/luyq/PLM_AMP_Regression/test/external_test/esm2-35M_lr5e-06_bs8_ep30_val_best_test_results.csv
-[DONE] esm2-35M_lr5e-06_bs8_ep30_val_best
-
-[RUN] 16:52:55 | model: esm2-8M_lr0.0001_bs16_ep26_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/external_test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/external_test/esm2-8M_lr0.0001_bs16_ep26_val_best_test_results.csv
-Inference:   0%|          | 0/2 [00:00<?, ?it/s]Inference:  50%|█████     | 1/2 [00:01<00:01,  1.21s/it]Inference: 100%|██████████| 2/2 [00:01<00:00,  1.60it/s]
-[Model Info] PLM type: esm2-8M | ESM size: 8M
-[Model Name] esm2-8M_lr0.0001_bs16_ep26_val_best
-[Device] cuda:1
-[Data] Loaded 575 samples from /NAS/luyq/AMP_datasets/splits2/external_test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 320
-[Model] Missing keys (version mismatch, non-critical): ['esm.embeddings.position_embeddings.weight']
-[Model] Checkpoint loaded.
-[Done] Saved 575 rows -> /home/luyq/PLM_AMP_Regression/test/external_test/esm2-8M_lr0.0001_bs16_ep26_val_best_test_results.csv
-[DONE] esm2-8M_lr0.0001_bs16_ep26_val_best
-
-[RUN] 16:53:01 | model: esm2-8M_lr0.0001_bs32_ep21_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/external_test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/external_test/esm2-8M_lr0.0001_bs32_ep21_val_best_test_results.csv
-Inference:   0%|          | 0/2 [00:00<?, ?it/s]Inference:  50%|█████     | 1/2 [00:01<00:01,  1.16s/it]Inference: 100%|██████████| 2/2 [00:01<00:00,  1.66it/s]
-[Model Info] PLM type: esm2-8M | ESM size: 8M
-[Model Name] esm2-8M_lr0.0001_bs32_ep21_val_best
-[Device] cuda:1
-[Data] Loaded 575 samples from /NAS/luyq/AMP_datasets/splits2/external_test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 320
-[Model] Missing keys (version mismatch, non-critical): ['esm.embeddings.position_embeddings.weight']
-[Model] Checkpoint loaded.
-[Done] Saved 575 rows -> /home/luyq/PLM_AMP_Regression/test/external_test/esm2-8M_lr0.0001_bs32_ep21_val_best_test_results.csv
-[DONE] esm2-8M_lr0.0001_bs32_ep21_val_best
-
-[RUN] 16:53:07 | model: esm2-8M_lr0.0001_bs32_ep27_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/external_test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/external_test/esm2-8M_lr0.0001_bs32_ep27_val_best_test_results.csv
-Inference:   0%|          | 0/2 [00:00<?, ?it/s]Inference:  50%|█████     | 1/2 [00:01<00:01,  1.13s/it]Inference: 100%|██████████| 2/2 [00:01<00:00,  1.70it/s]
-[Model Info] PLM type: esm2-8M | ESM size: 8M
-[Model Name] esm2-8M_lr0.0001_bs32_ep27_val_best
-[Device] cuda:1
-[Data] Loaded 575 samples from /NAS/luyq/AMP_datasets/splits2/external_test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 320
-[Model] Missing keys (version mismatch, non-critical): ['esm.embeddings.position_embeddings.weight']
-[Model] Checkpoint loaded.
-[Done] Saved 575 rows -> /home/luyq/PLM_AMP_Regression/test/external_test/esm2-8M_lr0.0001_bs32_ep27_val_best_test_results.csv
-[DONE] esm2-8M_lr0.0001_bs32_ep27_val_best
-
-[RUN] 16:53:14 | model: esm2-8M_lr0.0001_bs64_ep20_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/external_test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/external_test/esm2-8M_lr0.0001_bs64_ep20_val_best_test_results.csv
-Inference:   0%|          | 0/2 [00:00<?, ?it/s]Inference:  50%|█████     | 1/2 [00:01<00:01,  1.21s/it]Inference: 100%|██████████| 2/2 [00:01<00:00,  1.59it/s]
-[Model Info] PLM type: esm2-8M | ESM size: 8M
-[Model Name] esm2-8M_lr0.0001_bs64_ep20_val_best
-[Device] cuda:1
-[Data] Loaded 575 samples from /NAS/luyq/AMP_datasets/splits2/external_test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 320
-[Model] Missing keys (version mismatch, non-critical): ['esm.embeddings.position_embeddings.weight']
-[Model] Checkpoint loaded.
-[Done] Saved 575 rows -> /home/luyq/PLM_AMP_Regression/test/external_test/esm2-8M_lr0.0001_bs64_ep20_val_best_test_results.csv
-[DONE] esm2-8M_lr0.0001_bs64_ep20_val_best
-
-[RUN] 16:53:20 | model: esm2-8M_lr0.0001_bs64_ep26_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/external_test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/external_test/esm2-8M_lr0.0001_bs64_ep26_val_best_test_results.csv
-Inference:   0%|          | 0/2 [00:00<?, ?it/s]Inference:  50%|█████     | 1/2 [00:01<00:01,  1.16s/it]Inference: 100%|██████████| 2/2 [00:01<00:00,  1.65it/s]
-[Model Info] PLM type: esm2-8M | ESM size: 8M
-[Model Name] esm2-8M_lr0.0001_bs64_ep26_val_best
-[Device] cuda:1
-[Data] Loaded 575 samples from /NAS/luyq/AMP_datasets/splits2/external_test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 320
-[Model] Missing keys (version mismatch, non-critical): ['esm.embeddings.position_embeddings.weight']
-[Model] Checkpoint loaded.
-[Done] Saved 575 rows -> /home/luyq/PLM_AMP_Regression/test/external_test/esm2-8M_lr0.0001_bs64_ep26_val_best_test_results.csv
-[DONE] esm2-8M_lr0.0001_bs64_ep26_val_best
-
-[RUN] 16:53:27 | model: esm2-8M_lr1e-05_bs16_ep29_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/external_test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/external_test/esm2-8M_lr1e-05_bs16_ep29_val_best_test_results.csv
-Inference:   0%|          | 0/2 [00:00<?, ?it/s]Inference:  50%|█████     | 1/2 [00:01<00:01,  1.12s/it]Inference: 100%|██████████| 2/2 [00:01<00:00,  1.71it/s]
-[Model Info] PLM type: esm2-8M | ESM size: 8M
-[Model Name] esm2-8M_lr1e-05_bs16_ep29_val_best
-[Device] cuda:1
-[Data] Loaded 575 samples from /NAS/luyq/AMP_datasets/splits2/external_test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 320
-[Model] Missing keys (version mismatch, non-critical): ['esm.embeddings.position_embeddings.weight']
-[Model] Checkpoint loaded.
-[Done] Saved 575 rows -> /home/luyq/PLM_AMP_Regression/test/external_test/esm2-8M_lr1e-05_bs16_ep29_val_best_test_results.csv
-[DONE] esm2-8M_lr1e-05_bs16_ep29_val_best
-
-[RUN] 16:53:34 | model: esm2-8M_lr1e-05_bs32_ep20_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/external_test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/external_test/esm2-8M_lr1e-05_bs32_ep20_val_best_test_results.csv
-Inference:   0%|          | 0/2 [00:00<?, ?it/s]Inference:  50%|█████     | 1/2 [00:01<00:01,  1.12s/it]Inference: 100%|██████████| 2/2 [00:01<00:00,  1.71it/s]
-[Model Info] PLM type: esm2-8M | ESM size: 8M
-[Model Name] esm2-8M_lr1e-05_bs32_ep20_val_best
-[Device] cuda:1
-[Data] Loaded 575 samples from /NAS/luyq/AMP_datasets/splits2/external_test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 320
-[Model] Missing keys (version mismatch, non-critical): ['esm.embeddings.position_embeddings.weight']
-[Model] Checkpoint loaded.
-[Done] Saved 575 rows -> /home/luyq/PLM_AMP_Regression/test/external_test/esm2-8M_lr1e-05_bs32_ep20_val_best_test_results.csv
-[DONE] esm2-8M_lr1e-05_bs32_ep20_val_best
-
-[RUN] 16:53:40 | model: esm2-8M_lr1e-05_bs32_ep30_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/external_test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/external_test/esm2-8M_lr1e-05_bs32_ep30_val_best_test_results.csv
-Inference:   0%|          | 0/2 [00:00<?, ?it/s]Inference:  50%|█████     | 1/2 [00:01<00:01,  1.08s/it]Inference: 100%|██████████| 2/2 [00:01<00:00,  1.77it/s]
-[Model Info] PLM type: esm2-8M | ESM size: 8M
-[Model Name] esm2-8M_lr1e-05_bs32_ep30_val_best
-[Device] cuda:1
-[Data] Loaded 575 samples from /NAS/luyq/AMP_datasets/splits2/external_test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 320
-[Model] Missing keys (version mismatch, non-critical): ['esm.embeddings.position_embeddings.weight']
-[Model] Checkpoint loaded.
-[Done] Saved 575 rows -> /home/luyq/PLM_AMP_Regression/test/external_test/esm2-8M_lr1e-05_bs32_ep30_val_best_test_results.csv
-[DONE] esm2-8M_lr1e-05_bs32_ep30_val_best
-
-[RUN] 16:53:47 | model: esm2-8M_lr1e-05_bs64_ep21_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/external_test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/external_test/esm2-8M_lr1e-05_bs64_ep21_val_best_test_results.csv
-Inference:   0%|          | 0/2 [00:00<?, ?it/s]Inference:  50%|█████     | 1/2 [00:01<00:01,  1.14s/it]Inference: 100%|██████████| 2/2 [00:01<00:00,  1.69it/s]
-[Model Info] PLM type: esm2-8M | ESM size: 8M
-[Model Name] esm2-8M_lr1e-05_bs64_ep21_val_best
-[Device] cuda:1
-[Data] Loaded 575 samples from /NAS/luyq/AMP_datasets/splits2/external_test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 320
-[Model] Missing keys (version mismatch, non-critical): ['esm.embeddings.position_embeddings.weight']
-[Model] Checkpoint loaded.
-[Done] Saved 575 rows -> /home/luyq/PLM_AMP_Regression/test/external_test/esm2-8M_lr1e-05_bs64_ep21_val_best_test_results.csv
-[DONE] esm2-8M_lr1e-05_bs64_ep21_val_best
-
-[RUN] 16:53:53 | model: esm2-8M_lr1e-05_bs64_ep30_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/external_test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/external_test/esm2-8M_lr1e-05_bs64_ep30_val_best_test_results.csv
-Inference:   0%|          | 0/2 [00:00<?, ?it/s]Inference:  50%|█████     | 1/2 [00:01<00:01,  1.21s/it]Inference: 100%|██████████| 2/2 [00:01<00:00,  1.59it/s]
-[Model Info] PLM type: esm2-8M | ESM size: 8M
-[Model Name] esm2-8M_lr1e-05_bs64_ep30_val_best
-[Device] cuda:1
-[Data] Loaded 575 samples from /NAS/luyq/AMP_datasets/splits2/external_test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 320
-[Model] Missing keys (version mismatch, non-critical): ['esm.embeddings.position_embeddings.weight']
-[Model] Checkpoint loaded.
-[Done] Saved 575 rows -> /home/luyq/PLM_AMP_Regression/test/external_test/esm2-8M_lr1e-05_bs64_ep30_val_best_test_results.csv
-[DONE] esm2-8M_lr1e-05_bs64_ep30_val_best
-
-[RUN] 16:54:00 | model: esm2-8M_lr5e-06_bs16_ep16_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/external_test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/external_test/esm2-8M_lr5e-06_bs16_ep16_val_best_test_results.csv
-Inference:   0%|          | 0/2 [00:00<?, ?it/s]Inference:  50%|█████     | 1/2 [00:01<00:01,  1.12s/it]Inference: 100%|██████████| 2/2 [00:01<00:00,  1.71it/s]
-[Model Info] PLM type: esm2-8M | ESM size: 8M
-[Model Name] esm2-8M_lr5e-06_bs16_ep16_val_best
-[Device] cuda:1
-[Data] Loaded 575 samples from /NAS/luyq/AMP_datasets/splits2/external_test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 320
-[Model] Missing keys (version mismatch, non-critical): ['esm.embeddings.position_embeddings.weight']
-[Model] Checkpoint loaded.
-[Done] Saved 575 rows -> /home/luyq/PLM_AMP_Regression/test/external_test/esm2-8M_lr5e-06_bs16_ep16_val_best_test_results.csv
-[DONE] esm2-8M_lr5e-06_bs16_ep16_val_best
-
-[RUN] 16:54:06 | model: esm2-8M_lr5e-06_bs16_ep26_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/external_test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/external_test/esm2-8M_lr5e-06_bs16_ep26_val_best_test_results.csv
-Inference:   0%|          | 0/2 [00:00<?, ?it/s]Inference:  50%|█████     | 1/2 [00:01<00:01,  1.14s/it]Inference: 100%|██████████| 2/2 [00:01<00:00,  1.68it/s]
-[Model Info] PLM type: esm2-8M | ESM size: 8M
-[Model Name] esm2-8M_lr5e-06_bs16_ep26_val_best
-[Device] cuda:1
-[Data] Loaded 575 samples from /NAS/luyq/AMP_datasets/splits2/external_test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 320
-[Model] Missing keys (version mismatch, non-critical): ['esm.embeddings.position_embeddings.weight']
-[Model] Checkpoint loaded.
-[Done] Saved 575 rows -> /home/luyq/PLM_AMP_Regression/test/external_test/esm2-8M_lr5e-06_bs16_ep26_val_best_test_results.csv
-[DONE] esm2-8M_lr5e-06_bs16_ep26_val_best
-
-[RUN] 16:54:12 | model: esm2-8M_lr5e-06_bs32_ep30_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/external_test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/external_test/esm2-8M_lr5e-06_bs32_ep30_val_best_test_results.csv
-Inference:   0%|          | 0/2 [00:00<?, ?it/s]Inference:  50%|█████     | 1/2 [00:01<00:01,  1.16s/it]Inference: 100%|██████████| 2/2 [00:01<00:00,  1.66it/s]
-[Model Info] PLM type: esm2-8M | ESM size: 8M
-[Model Name] esm2-8M_lr5e-06_bs32_ep30_val_best
-[Device] cuda:1
-[Data] Loaded 575 samples from /NAS/luyq/AMP_datasets/splits2/external_test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 320
-[Model] Missing keys (version mismatch, non-critical): ['esm.embeddings.position_embeddings.weight']
-[Model] Checkpoint loaded.
-[Done] Saved 575 rows -> /home/luyq/PLM_AMP_Regression/test/external_test/esm2-8M_lr5e-06_bs32_ep30_val_best_test_results.csv
-[DONE] esm2-8M_lr5e-06_bs32_ep30_val_best
-
-[RUN] 16:54:19 | model: esm2-8M_lr5e-06_bs64_ep29_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/external_test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/external_test/esm2-8M_lr5e-06_bs64_ep29_val_best_test_results.csv
-Inference:   0%|          | 0/2 [00:00<?, ?it/s]Inference:  50%|█████     | 1/2 [00:01<00:01,  1.16s/it]Inference: 100%|██████████| 2/2 [00:01<00:00,  1.66it/s]
-[Model Info] PLM type: esm2-8M | ESM size: 8M
-[Model Name] esm2-8M_lr5e-06_bs64_ep29_val_best
-[Device] cuda:1
-[Data] Loaded 575 samples from /NAS/luyq/AMP_datasets/splits2/external_test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 320
-[Model] Missing keys (version mismatch, non-critical): ['esm.embeddings.position_embeddings.weight']
-[Model] Checkpoint loaded.
-[Done] Saved 575 rows -> /home/luyq/PLM_AMP_Regression/test/external_test/esm2-8M_lr5e-06_bs64_ep29_val_best_test_results.csv
-[DONE] esm2-8M_lr5e-06_bs64_ep29_val_best
-
-[RUN] 16:54:25 | model: esm2-8M_lr5e-06_bs64_ep30_val_best
-       test : /NAS/luyq/AMP_datasets/splits2/external_test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/external_test/esm2-8M_lr5e-06_bs64_ep30_val_best_test_results.csv
-Inference:   0%|          | 0/2 [00:00<?, ?it/s]Inference:  50%|█████     | 1/2 [00:01<00:01,  1.21s/it]Inference: 100%|██████████| 2/2 [00:01<00:00,  1.59it/s]
-[Model Info] PLM type: esm2-8M | ESM size: 8M
-[Model Name] esm2-8M_lr5e-06_bs64_ep30_val_best
-[Device] cuda:1
-[Data] Loaded 575 samples from /NAS/luyq/AMP_datasets/splits2/external_test.csv
-[Tokenizer] Loading...
-[Model] Loading checkpoint...
-mean 320
-[Model] Missing keys (version mismatch, non-critical): ['esm.embeddings.position_embeddings.weight']
-[Model] Checkpoint loaded.
-[Done] Saved 575 rows -> /home/luyq/PLM_AMP_Regression/test/external_test/esm2-8M_lr5e-06_bs64_ep30_val_best_test_results.csv
-[DONE] esm2-8M_lr5e-06_bs64_ep30_val_best
-
-============================================================
-All done: Tue 31 Mar 2026 04:54:32 PM CST
-splits1_test : 31 files
-splits2_test : 31 files
-external_test: 31 files
-============================================================
