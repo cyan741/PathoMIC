@@ -17,10 +17,10 @@ WANDB_API_KEY="wandb_v1_3v4DziKBvowCJWknYtXcckroFxm_38b4iPm3nlzEIMJWFgmyBLWllmJ8
 bs=64
 lr=5e-06
 python train.py \
-    --resume ${RESUME_DIR}/${plm}_lr${lr}_bs${bs}_ep50_val_best.pth \
+    --resume ${RESUME_DIR}/${plm}_lr${lr}_bs${bs}_ep78_val_best.pth \
     --data_path ${DATA_DIR} \
     --finetune_plm True\
-    --epochs 80 --batch_size ${bs} --lr ${lr} --device 3 \
+    --epochs 200 --batch_size ${bs} --lr ${lr} --device 3 \
     --save_dir ${SAVE_DIR} \
     --metrics_name ${plm}_lr${lr}_bs${bs}.csv \
     --use_wandb  \
@@ -28,4 +28,4 @@ python train.py \
     --wandb_mode "online" \
     --plm ${plm} \
     --use_scheduler --warmup_ratio 0.1 --min_lr_ratio 0.05 \
-    --early_stopping --early_stop_patience 10 --es_min_epoch 20 > ${LOG_DIR}/${plm}_lr${lr}_bs${bs}_resume.log 2>&1 
+    --early_stopping --early_stop_patience 10 --es_min_epoch 90 > ${LOG_DIR}/${plm}_lr${lr}_bs${bs}_resume.log 2>&1 
