@@ -1,8 +1,18 @@
 import torch
 import torch.nn as nn
 from PLM_head import MLP, SpeciesAdapter
+from gnn_module import build_species_encoder_from_graph
 # from tape import ProteinBertModel, TAPETokenizer
 from transformers import AutoModel, AutoTokenizer, AlbertTokenizer
+
+
+# Allowed values for ESM2(species_mode=...).
+# - 'none'    : no species channel (peptide_emb only).
+# - 'adapter' : legacy non-linear adapter on a pre-computed 768-d species
+#               vector (original baseline in this repo).
+# - 'gnn'     : taxonomy GNN channel, returns a per-batch [B, gnn_out_dim] vec.
+# - 'both'    : both 'adapter' and 'gnn' channels concatenated with peptide_emb.
+SPECIES_MODES = ("none", "adapter", "gnn", "both")
 
 
 """
@@ -167,17 +177,37 @@ class ProtAlBert(nn.Module):
 '''
 ESM2 family
 '''
-class ESM2(nn.Module): 
+class ESM2(nn.Module):
+    """ESM2 + optional species side-channel.
+
+    Backwards-compatible wrt. ``use_species`` (legacy bool flag for the
+    PubMedBERT-adapter baseline). The new ``species_mode`` argument supersedes
+    it and supports four configurations (see ``SPECIES_MODES``).
+    """
+
     def __init__(self,
                  head_type='3MLP',
                  plm_output='mean',
                  finetune_plm=True,
                  esm_size='8M',
+                 # ----- legacy adapter knobs (kept for compatibility) -----
                  use_species=False,
                  species_in_dim=768,
                  species_out_dim=128,
                  species_bottleneck=128,
-                 species_dropout=0.1):
+                 species_dropout=0.1,
+                 # ----- new species-mode dispatcher -----
+                 species_mode=None,
+                 # ----- GNN species-channel knobs -----
+                 taxo_graph_path=None,
+                 gnn_hidden=128,
+                 gnn_out_dim=64,
+                 gnn_layers=2,
+                 gnn_type='gcn',
+                 gnn_heads=4,
+                 gnn_dropout=0.1,
+                 gnn_fusion='leaf',
+                 gnn_freeze_init=True):
         super(ESM2, self).__init__()
         if esm_size == '8M':
             self.checkpoint = esm2_8m_checkpoint
@@ -196,63 +226,113 @@ class ESM2(nn.Module):
             self.hidden_size = 2560
         else:
             raise ValueError(f"Wrong size of ESM2: {esm_size}")
-        # self.esm = AutoModel.from_pretrained(self.checkpoint)
         self.esm = AutoModel.from_pretrained(self.checkpoint, cache_dir=cache_dir)
         self.head_type = head_type
         self.plm_output = plm_output
         self.finetune_plm = finetune_plm
-        self.use_species = use_species
-        print(self.plm_output, self.hidden_size, "use_species=", use_species)
+
+        # Resolve species_mode. If unset, fall back to the legacy bool so that
+        # existing CLI invocations (--use_species) still work unchanged.
+        if species_mode is None:
+            species_mode = "adapter" if use_species else "none"
+        if species_mode not in SPECIES_MODES:
+            raise ValueError(f"species_mode must be one of {SPECIES_MODES}, got {species_mode!r}")
+        self.species_mode = species_mode
+        self.use_species = species_mode != "none"   # kept for backward compat
+        print(self.plm_output, self.hidden_size, "species_mode=", species_mode)
 
         # Freeze the parameters of the PLM if finetune_plm is False
         if not finetune_plm:
             for param in self.esm.parameters():
                 param.requires_grad = False
 
-        # Species adapter: 768 -> species_out_dim with non-linear GELU activations
-        if self.use_species:
+        # ----- species channels --------------------------------------------------
+        # 'adapter': legacy 768-d -> species_out_dim non-linear adapter.
+        if species_mode in ("adapter", "both"):
             self.species_adapter = SpeciesAdapter(
                 in_dim=species_in_dim,
                 bottleneck=species_bottleneck,
                 out_dim=species_out_dim,
                 dropout=species_dropout,
             )
-            mlp_in = self.hidden_size + species_out_dim
         else:
             self.species_adapter = None
-            mlp_in = self.hidden_size
 
-        # Regression head.
-        # Last layer has NO activation (defined inside MLP: loop `break`s on last
-        # layer) so the scalar output is not truncated to a positive range —
-        # essential for MIC values that can be negative after log-transform.
+        # 'gnn': taxonomy-DAG GNN -> [B, gnn_out_dim].
+        if species_mode in ("gnn", "both"):
+            if taxo_graph_path is None:
+                raise ValueError(
+                    "species_mode='%s' requires taxo_graph_path to be provided "
+                    "(produced by scripts/build_taxonomy_graph.py)." % species_mode
+                )
+            self.species_gnn = build_species_encoder_from_graph(
+                taxo_graph_path,
+                hidden=gnn_hidden,
+                out_dim=gnn_out_dim,
+                num_layers=gnn_layers,
+                gnn_type=gnn_type,
+                heads=gnn_heads,
+                dropout=gnn_dropout,
+                fusion=gnn_fusion,
+                freeze_init=gnn_freeze_init,
+            )
+        else:
+            self.species_gnn = None
+        # cached for forward ergonomics
+        self.gnn_out_dim = gnn_out_dim
+        self.species_out_dim = species_out_dim
+
+        # ----- compute the input dim of the regression head ---------------------
+        mlp_in = self.hidden_size
+        if species_mode in ("adapter", "both"):
+            mlp_in += species_out_dim
+        if species_mode in ("gnn", "both"):
+            mlp_in += gnn_out_dim
+
+        # Last layer has NO activation (the MLP class breaks before adding one)
+        # so the scalar output is unrestricted -- essential for log-MIC values
+        # that can be negative.
         if head_type == '3MLP':
-            self.projection = MLP(mlp_in, [256, 64, 1])    ## 3 layers, final output dim = 1
+            self.projection = MLP(mlp_in, [256, 64, 1])
         elif head_type == '5MLP':
-            self.projection = MLP(mlp_in, [1024, 512, 128, 32, 1])  ## 5 layers
+            self.projection = MLP(mlp_in, [1024, 512, 128, 32, 1])
+        else:
+            raise ValueError(f"Unknown head_type: {head_type}")
 
-    def forward(self, input_ids, species_emb=None):
+    def forward(self, input_ids, species_emb=None, species_ids=None, species_names=None):
         """
-        input_ids  : LongTensor [B, L]
-        species_emb: FloatTensor [B, species_in_dim] or None
+        input_ids     : LongTensor [B, L]
+        species_emb   : FloatTensor [B, species_in_dim] -- 'adapter' / 'both' modes
+        species_ids   : LongTensor [B] of species rows in the GNN graph,
+                        OR a Python list of species name strings -- 'gnn' / 'both' modes
+        species_names : alias for ``species_ids`` for readability when passing names.
         """
         outputs = self.esm(input_ids)
         if self.plm_output == 'mean':
             seq_rep = outputs[0].mean(dim=1)        # [B, hidden_size]
-        elif self.plm_output == 'cls':              # take first token
+        elif self.plm_output == 'cls':
             seq_rep = outputs[0][:, 0]              # [B, hidden_size]
         else:
             raise ValueError(f"Unknown plm_output: {self.plm_output}")
 
-        if self.use_species:
-            if species_emb is None:
-                raise ValueError("use_species=True but species_emb is None.")
-            species_rep = self.species_adapter(species_emb)        # [B, species_out_dim]
-            fused = torch.cat([seq_rep, species_rep], dim=-1)      # [B, hidden + spec]
-        else:
-            fused = seq_rep
+        feats = [seq_rep]
 
-        out = self.projection(fused)                               # [B, 1]
+        if self.species_mode in ("adapter", "both"):
+            if species_emb is None:
+                raise ValueError(f"species_mode={self.species_mode!r} but species_emb is None.")
+            feats.append(self.species_adapter(species_emb))             # [B, species_out_dim]
+
+        if self.species_mode in ("gnn", "both"):
+            sp_in = species_ids if species_ids is not None else species_names
+            if sp_in is None:
+                raise ValueError(
+                    f"species_mode={self.species_mode!r} but neither species_ids nor "
+                    f"species_names was provided."
+                )
+            feats.append(self.species_gnn(sp_in))                       # [B, gnn_out_dim]
+
+        fused = feats[0] if len(feats) == 1 else torch.cat(feats, dim=-1)
+        out = self.projection(fused)
         return out.view(-1, out.size(-1))
 
 

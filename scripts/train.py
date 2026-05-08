@@ -83,36 +83,58 @@ def build_lr_scheduler(optimizer: torch.optim.Optimizer,
 
     return LambdaLR(optimizer, lr_lambda)
 
-def _unpack_batch(batch, device, use_species):
-    """Return (seq_list, species_emb_or_None, mic_values[B,1])."""
-    if use_species:
+def _unpack_batch(batch, device, species_mode):
+    """Decode the variable-arity batch returned by ``MIC_Dataset``.
+
+    Returns: (seq_list, species_emb_or_None, species_ids_or_None, mic_values[B,1]).
+    """
+    species_emb = None
+    species_ids = None
+    if species_mode == "none":
+        seq_list, mic_values = batch
+    elif species_mode == "adapter":
         seq_list, species_emb, mic_values = batch
         species_emb = species_emb.to(device, non_blocking=True)
+    elif species_mode == "gnn":
+        seq_list, species_ids, mic_values = batch
+        species_ids = species_ids.to(device, non_blocking=True)
+    elif species_mode == "both":
+        seq_list, species_emb, species_ids, mic_values = batch
+        species_emb = species_emb.to(device, non_blocking=True)
+        species_ids = species_ids.to(device, non_blocking=True)
     else:
-        seq_list, mic_values = batch
-        species_emb = None
+        raise ValueError(f"Unknown species_mode: {species_mode!r}")
     mic_values = mic_values.unsqueeze(1).to(device, non_blocking=True)
-    return seq_list, species_emb, mic_values
+    return seq_list, species_emb, species_ids, mic_values
+
+
+def _model_forward(model, input_ids, species_emb, species_ids, species_mode):
+    """Dispatch to ``ESM2.forward`` with the right keyword args per mode."""
+    if species_mode == "none":
+        return model(input_ids)
+    if species_mode == "adapter":
+        return model(input_ids, species_emb=species_emb)
+    if species_mode == "gnn":
+        return model(input_ids, species_ids=species_ids)
+    # both
+    return model(input_ids, species_emb=species_emb, species_ids=species_ids)
 
 
 def train_epoch(epoch, model, train_loader, tokenizer, criterion, optimizer,
-                device, use_species=False, scheduler=None):
-    # training for one epoch
+                device, species_mode="none", scheduler=None):
     model.train()
-    # parameters to monitor
     train_loss = []
     train_epoch_time = 0.0
     pbar = tqdm(train_loader)
     pbar.set_description(f"GPU{device} Train epoch-{epoch}")
     print("\n","*" * 30, "Epoch", epoch, "training start...","*" * 30,"\n")
     for batch in pbar:
-        seq_list, species_emb, mic_values = _unpack_batch(batch, device, use_species)
-        input_ids = seq2token(seq_list, tokenizer, device)  # tensor shape: [batch_size, seq_len]
+        seq_list, species_emb, species_ids, mic_values = _unpack_batch(batch, device, species_mode)
+        input_ids = seq2token(seq_list, tokenizer, device)
         t1 = time.time()
-        outputs = model(input_ids, species_emb=species_emb) if use_species else model(input_ids)
+        outputs = _model_forward(model, input_ids, species_emb, species_ids, species_mode)
         loss = criterion(outputs, mic_values)
         train_epoch_time += time.time() - t1
-
 
         train_loss.append(loss.item())
         optimizer.zero_grad()
@@ -128,11 +150,10 @@ def train_epoch(epoch, model, train_loader, tokenizer, criterion, optimizer,
     print(f"Epoch {epoch} Train MSE Loss: {ave_loss:.4f}, "
           f"Time: {train_epoch_time:.4f}s, "
           f"LR(end): {optimizer.param_groups[0]['lr']:.2e}")
-
     return ave_loss, train_loss
 
-def validate_epoch(epoch, model, val_loader, tokenizer, criterion, device, use_species=False):
-    # validation for one epoch
+
+def validate_epoch(epoch, model, val_loader, tokenizer, criterion, device, species_mode="none"):
     model.eval()
     val_loss = []
     pbar = tqdm(val_loader)
@@ -141,16 +162,76 @@ def validate_epoch(epoch, model, val_loader, tokenizer, criterion, device, use_s
 
     with torch.no_grad():
         for batch in pbar:
-            seq_list, species_emb, mic_values = _unpack_batch(batch, device, use_species)
-            input_ids = seq2token(seq_list, tokenizer, device)  # tensor shape: [batch_size, seq_len]
-            outputs = model(input_ids, species_emb=species_emb) if use_species else model(input_ids)
+            seq_list, species_emb, species_ids, mic_values = _unpack_batch(batch, device, species_mode)
+            input_ids = seq2token(seq_list, tokenizer, device)
+            outputs = _model_forward(model, input_ids, species_emb, species_ids, species_mode)
             loss = criterion(outputs, mic_values)
             val_loss.append(loss.item())
 
     ave_loss = sum(val_loss) / len(val_loss)
     print(f"Epoch {epoch} Val MSE Loss: {ave_loss:.4f}")
-
     return ave_loss, val_loss
+
+
+def bucketed_test_eval(model, test_loader, tokenizer, criterion, device,
+                       species_mode, train_csv_path,
+                       buckets=((0, 5), (5, 20), (20, 100), (100, float("inf")))):
+    """Run inference on the test loader and return per-species-count-bucket MSE.
+
+    The bucketing is computed from the training set's ``Target_Species``
+    frequency (the same training set the model was trained on). This is the
+    metric the plan calls for to validate the long-tail story.
+    """
+    train_df = pd.read_csv(train_csv_path)
+    sp_count = train_df["Target_Species"].astype(str).value_counts().to_dict()
+
+    model.eval()
+    per_sample = []   # (species_name, abs_err_squared)
+    with torch.no_grad():
+        for batch in tqdm(test_loader, desc="bucketed test"):
+            seq_list, species_emb, species_ids, mic_values = _unpack_batch(batch, device, species_mode)
+            input_ids = seq2token(seq_list, tokenizer, device)
+            outputs = _model_forward(model, input_ids, species_emb, species_ids, species_mode)
+            sq = (outputs - mic_values).pow(2).squeeze(-1).detach().cpu().tolist()
+            # Recover per-row species name. We rely on the dataset stashing it
+            # in test_loader.dataset.species_names (only set when species_mode != 'none').
+            ds = test_loader.dataset
+            if ds.species_names is not None:
+                start = len(per_sample)
+                names = ds.species_names[start : start + len(sq)]
+            else:
+                names = ["__unknown__"] * len(sq)
+            for n, s in zip(names, sq):
+                per_sample.append((n, s))
+
+    overall_mse = sum(s for _, s in per_sample) / max(1, len(per_sample))
+
+    bucket_stats = []
+    for lo, hi in buckets:
+        sums = 0.0; cnt = 0; uniq_sp = set()
+        for name, s in per_sample:
+            n_train = sp_count.get(name, 0)
+            if lo <= n_train < hi:
+                sums += s; cnt += 1; uniq_sp.add(name)
+        mse = (sums / cnt) if cnt > 0 else float("nan")
+        bucket_stats.append({
+            "train_count_bucket": f"[{lo},{hi})",
+            "n_test_samples": cnt,
+            "n_unique_species": len(uniq_sp),
+            "mse": mse,
+        })
+
+    print("\n" + "=" * 72)
+    print(f"BUCKETED TEST EVAL  (overall MSE = {overall_mse:.4f}, N={len(per_sample)})")
+    print("=" * 72)
+    print(f"{'train-count-bucket':<22}{'#test_samples':>16}{'#unique_sp':>14}{'mse':>14}")
+    for b in bucket_stats:
+        mse_str = f"{b['mse']:.4f}" if not (b["mse"] != b["mse"]) else "n/a"
+        print(f"{b['train_count_bucket']:<22}{b['n_test_samples']:>16}{b['n_unique_species']:>14}{mse_str:>14}")
+    print("=" * 72)
+
+    return {"overall_mse": overall_mse, "buckets": bucket_stats}
+
 
 def main():
     # parameters
@@ -168,15 +249,45 @@ def main():
     parser.add_argument("--plm_output", type=str, default="mean")
     parser.add_argument("--finetune_plm", type=bool, default=True)
 
-    # species embedding options
+    # ----- species channel ----------------------------------------------------
+    # The new --species_mode flag dispatches to one of four channels:
+    #   none     : peptide-only baseline (no species info)
+    #   adapter  : legacy 768-d PubMedBERT vector + non-linear adapter
+    #   gnn      : taxonomy-DAG GNN (this PR)
+    #   both     : adapter + gnn concatenated (Plan C in the design doc)
+    # ``--use_species`` is kept for backwards compatibility: when set, it maps
+    # to species_mode='adapter' (overridden if --species_mode is given explicitly).
     parser.add_argument("--use_species", action="store_true",
-                        help="Inject species embedding via a non-linear adapter.")
+                        help="[deprecated] same as --species_mode adapter.")
+    parser.add_argument("--species_mode", type=str, default=None,
+                        choices=["none", "adapter", "gnn", "both"],
+                        help="How to inject species information; supersedes --use_species.")
     parser.add_argument("--species_emb_path", type=str,
-                        default="/home/luyq/AMP_datasets/species_embeddings.pkl")
+                        default="/NAS/luyq/AMP_datasets/species_embeddings.pkl")
     parser.add_argument("--species_emb_dim", type=int, default=768)
     parser.add_argument("--species_out_dim", type=int, default=128)
     parser.add_argument("--species_bottleneck", type=int, default=128)
     parser.add_argument("--species_dropout", type=float, default=0.1)
+
+    # ----- taxonomy GNN channel ----------------------------------------------
+    parser.add_argument("--taxo_graph_path", type=str,
+                        default="/NAS/luyq/AMP_datasets/taxonomy_graph.pt",
+                        help="Path to the .pt file produced by build_taxonomy_graph.py.")
+    parser.add_argument("--gnn_hidden", type=int, default=128,
+                        help="GNN hidden width (recommended 64-128).")
+    parser.add_argument("--gnn_out_dim", type=int, default=64,
+                        help="Final per-species channel width concatenated with peptide_emb.")
+    parser.add_argument("--gnn_layers", type=int, default=2,
+                        help="Number of GCN/GAT message-passing layers.")
+    parser.add_argument("--gnn_type", type=str, default="gcn", choices=["gcn", "gat"],
+                        help="Graph conv variant.")
+    parser.add_argument("--gnn_heads", type=int, default=4,
+                        help="GAT only: number of attention heads per layer.")
+    parser.add_argument("--gnn_dropout", type=float, default=0.1)
+    parser.add_argument("--gnn_fusion", type=str, default="leaf", choices=["leaf", "hier"],
+                        help="leaf=F1 (species-only); hier=F2 (species+genus+family).")
+    parser.add_argument("--gnn_freeze_init", type=int, default=1, choices=[0, 1],
+                        help="Freeze the 768-d PubMedBERT init features (1) or fine-tune (0).")
 
     parser.add_argument("--batch_size", type=int, default=32)
     parser.add_argument("--lr", type=float, default=1e-5,
@@ -221,6 +332,11 @@ def main():
     parser.add_argument("--wandb_mode", type=str, choices=["online", "offline", "disabled"], default="online")
  
     args = parser.parse_args()
+
+    # Resolve species_mode: explicit CLI arg wins; otherwise fall back to the
+    # legacy --use_species bool (True -> 'adapter', False -> 'none').
+    if args.species_mode is None:
+        args.species_mode = "adapter" if args.use_species else "none"
     print(args)
     set_seed(args.seed)
 
@@ -234,8 +350,10 @@ def main():
         batch_size=args.batch_size,
         num_workers=4,
         seed=args.seed,
-        species_emb_path=args.species_emb_path if args.use_species else None,
+        species_mode=args.species_mode,
+        species_emb_path=args.species_emb_path if args.species_mode in ("adapter", "both") else None,
         species_emb_dim=args.species_emb_dim,
+        taxo_graph_path=args.taxo_graph_path if args.species_mode in ("gnn", "both") else None,
     )
     # load model and tokenizer
     print("Loading model...")
@@ -244,11 +362,20 @@ def main():
         head_type=args.head_type,
         finetune_plm=args.finetune_plm,
         esm_size=args.plm.split('-')[-1],
-        use_species=args.use_species,
+        species_mode=args.species_mode,
         species_in_dim=args.species_emb_dim,
         species_out_dim=args.species_out_dim,
         species_bottleneck=args.species_bottleneck,
         species_dropout=args.species_dropout,
+        taxo_graph_path=args.taxo_graph_path if args.species_mode in ("gnn", "both") else None,
+        gnn_hidden=args.gnn_hidden,
+        gnn_out_dim=args.gnn_out_dim,
+        gnn_layers=args.gnn_layers,
+        gnn_type=args.gnn_type,
+        gnn_heads=args.gnn_heads,
+        gnn_dropout=args.gnn_dropout,
+        gnn_fusion=args.gnn_fusion,
+        gnn_freeze_init=bool(args.gnn_freeze_init),
     )
     if torch.cuda.is_available():
         device = torch.device("cuda:" + args.device)
@@ -379,11 +506,11 @@ def main():
     for epoch in range(start_epoch, args.epochs+1):
         avg_train_loss, train_loss = train_epoch(
             epoch, model, train_loader, tokenizer, criterion, optimizer, device,
-            use_species=args.use_species, scheduler=scheduler)
+            species_mode=args.species_mode, scheduler=scheduler)
         # --- 验证 ---
         avg_val_loss, val_loss = validate_epoch(
             epoch, model, val_loader, tokenizer, criterion, device,
-            use_species=args.use_species)
+            species_mode=args.species_mode)
         print(f"Epoch {epoch} Complete. Train MSE: {avg_train_loss:.4f} | Val MSE: {avg_val_loss:.4f}")
 
         cur_lr = optimizer.param_groups[0]["lr"]
@@ -448,8 +575,24 @@ def main():
     print("\n","*"*30, "Testing model...", "*"*30,"\n")
     avg_test_loss, test_loss = validate_epoch(
         epoch, model, test_loader, tokenizer, criterion, device,
-        use_species=args.use_species)
+        species_mode=args.species_mode)
     print(f"Test MSE Loss: {avg_test_loss:.4f}")
+
+    # ------------------------------------------------------------------
+    # Long-tail diagnostic: per-species-count bucketed test MSE.
+    # Bucketing is by the species's frequency in the *training* CSV,
+    # which is the right denominator for evaluating long-tail behaviour.
+    # ------------------------------------------------------------------
+    bucket_report = None
+    if args.species_mode != "none":
+        try:
+            bucket_report = bucketed_test_eval(
+                model, test_loader, tokenizer, criterion, device,
+                species_mode=args.species_mode,
+                train_csv_path=os.path.join(args.data_path, "train.csv"),
+            )
+        except Exception as exc:
+            print(f"[warn] bucketed eval failed: {exc}")
 
     metrics_df = pd.DataFrame(metrics_rows)
     metrics_df["best_val_loss"] = best_val_loss
@@ -467,7 +610,15 @@ def main():
     metrics_df.to_csv(metrics_path, index=False)
     
     if args.use_wandb:
-        wandb.log({"test_mse": avg_test_loss, "best_val_mse": best_val_loss})
+        log_payload = {"test_mse": avg_test_loss, "best_val_mse": best_val_loss}
+        if bucket_report is not None:
+            log_payload["test_mse_overall"] = bucket_report["overall_mse"]
+            for b in bucket_report["buckets"]:
+                # use a wandb-friendly key; '<' gets stripped to keep panels clean
+                key = "test_mse_bucket_" + b["train_count_bucket"].replace("[","").replace(")","").replace(",","_to_")
+                log_payload[key] = b["mse"]
+                log_payload[key + "_count"] = b["n_test_samples"]
+        wandb.log(log_payload)
         wandb.finish()
 
 if __name__ == "__main__":
