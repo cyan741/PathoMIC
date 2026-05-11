@@ -30,24 +30,77 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from scipy.ndimage import convolve1d, gaussian_filter1d
+from scipy.signal.windows import triang
+
+
+def get_lds_kernel_window(kernel: str = "gaussian", ks: int = 5,
+                          sigma: float = 2.0) -> np.ndarray:
+    """Construct LDS kernel window aligned with the original DIR implementation."""
+    if kernel not in {"gaussian", "triang", "laplace"}:
+        raise ValueError(f"Unknown LDS kernel: {kernel!r}")
+    if ks <= 0 or ks % 2 == 0:
+        raise ValueError(f"ks must be a positive odd number, got {ks}")
+    if sigma <= 0:
+        raise ValueError(f"sigma must be > 0, got {sigma}")
+
+    half_ks = (ks - 1) // 2
+    if kernel == "gaussian":
+        base_kernel = np.zeros(ks, dtype=np.float32)
+        base_kernel[half_ks] = 1.0
+        kernel_window = gaussian_filter1d(base_kernel, sigma=sigma)
+        kernel_window = kernel_window / np.max(kernel_window)
+    elif kernel == "triang":
+        kernel_window = triang(ks).astype(np.float32)
+    else:
+        support = np.arange(-half_ks, half_ks + 1, dtype=np.float32)
+        kernel_window = np.exp(-np.abs(support) / sigma) / (2.0 * sigma)
+        kernel_window = kernel_window / np.max(kernel_window)
+
+    return np.asarray(kernel_window, dtype=np.float32)
 
 
 # ---------------------------------------------------------------------------
 # Helper: build LDS weights from the training labels and a number of bins.
 # ---------------------------------------------------------------------------
-def compute_lds_weights(y: np.ndarray, num_bins: int = 50,
-                        sigma: float = 2.0) -> tuple[np.ndarray, np.ndarray]:
+def compute_lds_weights(
+    y: np.ndarray,
+    num_bins: int = 50,
+    reweight: str = "sqrt_inv",
+    lds_kernel: str = "gaussian",
+    lds_ks: int = 5,
+    sigma: float = 2.0,
+    eps: float = 1e-8,
+) -> tuple[np.ndarray, np.ndarray]:
     """Return (bin_edges, weight_per_bin) for Label Distribution Smoothing.
 
-    weight_per_bin[i] = 1 / smoothed_density[i], normalised to mean 1.
+    Aligned with `imbalanced-regression`:
+      hist -> (sqrt_inv / inverse / none) -> convolve1d(mode='constant')
+      -> inverse -> normalize to mean 1.
     """
-    from scipy.ndimage import gaussian_filter1d
+    if num_bins <= 1:
+        raise ValueError(f"num_bins must be > 1, got {num_bins}")
+    if reweight not in {"none", "sqrt_inv", "inverse"}:
+        raise ValueError(f"Unknown reweight mode: {reweight!r}")
+    if eps <= 0:
+        raise ValueError(f"eps must be > 0, got {eps}")
+
+    y = np.asarray(y, dtype=np.float32)
     counts, bin_edges = np.histogram(y, bins=num_bins)
-    smoothed = gaussian_filter1d(counts.astype(np.float32), sigma=sigma)
-    smoothed = np.clip(smoothed, 1e-3, None)
+    value_lst = counts.astype(np.float32)
+
+    if reweight == "sqrt_inv":
+        value_lst = np.sqrt(value_lst)
+    elif reweight == "inverse":
+        value_lst = np.clip(value_lst, 5.0, 1000.0)
+
+    kernel_window = get_lds_kernel_window(kernel=lds_kernel, ks=lds_ks, sigma=sigma)
+    smoothed = convolve1d(value_lst, weights=kernel_window, mode="constant")
+    smoothed = np.clip(smoothed, eps, None)
+
     inv = 1.0 / smoothed
-    inv = inv / inv.mean()                                # normalise to mean 1
-    return bin_edges, inv.astype(np.float32)
+    inv = inv / max(float(np.mean(inv)), eps)
+    return bin_edges.astype(np.float32), inv.astype(np.float32)
 
 
 def assign_bin(y: np.ndarray, bin_edges: np.ndarray) -> np.ndarray:

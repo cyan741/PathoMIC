@@ -243,6 +243,9 @@ def data_loader(data_path, batch_size, num_workers, seed,
                 # ----- loss meta options -----
                 loss_type: str = "mse",
                 lds_num_bins: int = 50,
+                lds_reweight: str = "sqrt_inv",
+                lds_kernel: str = "gaussian",
+                lds_ks: int = 5,
                 lds_sigma: float = 2.0,
                 dro_group_by: str = "bucket",
                 dro_bucket_bounds: Tuple[float, ...] = DEFAULT_BUCKET_BOUNDS):
@@ -287,10 +290,17 @@ def data_loader(data_path, batch_size, num_workers, seed,
         if loss_type.lower() == "lds":
             bin_edges, bin_weight = compute_lds_weights(
                 train_df["Median_MIC"].values,
-                num_bins=lds_num_bins, sigma=lds_sigma,
+                num_bins=lds_num_bins,
+                reweight=lds_reweight,
+                lds_kernel=lds_kernel,
+                lds_ks=lds_ks,
+                sigma=lds_sigma,
             )
-            print(f"[data_loader] LDS: {lds_num_bins} bins, sigma={lds_sigma}, "
-                  f"weight range=({bin_weight.min():.3f}, {bin_weight.max():.3f})")
+            print(
+                f"[data_loader] LDS: bins={lds_num_bins}, reweight={lds_reweight}, "
+                f"kernel={lds_kernel}, ks={lds_ks}, sigma={lds_sigma}, "
+                f"weight range=({bin_weight.min():.3f}, {bin_weight.max():.3f})"
+            )
         elif loss_type.lower() == "group_dro":
             sp_count = train_df["Target_Species"].astype(str).value_counts().to_dict()
             if dro_group_by == "bucket":

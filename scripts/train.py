@@ -351,6 +351,11 @@ def main():
     parser.add_argument("--loss_smooth_l1_beta", type=float, default=1.0)
     parser.add_argument("--loss_lds_base", type=str, default="huber",
                         choices=["mse", "huber", "smooth_l1"])
+    parser.add_argument("--loss_lds_reweight", type=str, default="sqrt_inv",
+                        choices=["sqrt_inv", "inverse", "none"])
+    parser.add_argument("--loss_lds_kernel", type=str, default="gaussian",
+                        choices=["gaussian", "triang", "laplace"])
+    parser.add_argument("--loss_lds_ks", type=int, default=5)
     parser.add_argument("--loss_lds_sigma", type=float, default=2.0)
     parser.add_argument("--loss_lds_num_bins", type=int, default=50)
     parser.add_argument("--loss_bmc_noise", type=float, default=1.0)
@@ -431,6 +436,9 @@ def main():
         taxo_graph_path=args.taxo_graph_path if args.species_mode in ("gnn", "both") else None,
         loss_type=args.loss_type,
         lds_num_bins=args.loss_lds_num_bins,
+        lds_reweight=args.loss_lds_reweight,
+        lds_kernel=args.loss_lds_kernel,
+        lds_ks=args.loss_lds_ks,
         lds_sigma=args.loss_lds_sigma,
         dro_group_by=args.loss_dro_group_by,
     )
