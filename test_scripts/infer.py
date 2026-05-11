@@ -103,9 +103,6 @@ def detect_species_config(state_dict: dict) -> dict:
 
     # ---------- GNN sub-config ----------
     if has_gnn:
-        # Hidden / output projection dimensions.
-        # input_proj.weight: [hidden, in_dim]
-        # output_proj.weight: [out_dim, hidden]
         gnn_hidden  = int(state_dict["species_gnn.gnn.input_proj.weight"].shape[0])
         gnn_out_dim = int(state_dict["species_gnn.gnn.output_proj.weight"].shape[0])
 
@@ -117,18 +114,37 @@ def detect_species_config(state_dict: dict) -> dict:
         gnn_layers = (max(layer_idxs) + 1) if layer_idxs else 1
 
         # GAT vs GCN: GAT layers register `att_src` / `att_dst` parameters.
-        is_gat   = any(k.endswith("att_src") for k in state_dict
-                       if k.startswith("species_gnn.gnn.layers."))
+        is_gat   = any(k.endswith("att_src") and k.startswith("species_gnn.gnn.layers.")
+                       for k in state_dict)
         gnn_type = "gat" if is_gat else "gcn"
 
-        # GAT heads come from the att_src tensor shape [1, heads, hidden].
         gnn_heads = 4
         if is_gat:
-            att_src = state_dict["species_gnn.gnn.layers.0.att_src"]
-            gnn_heads = int(att_src.shape[1])
+            gnn_heads = int(state_dict["species_gnn.gnn.layers.0.att_src"].shape[1])
 
-        # Hier vs leaf fusion: hier creates `absent_emb` and `hier_proj`.
-        gnn_fusion = "hier" if "species_gnn.absent_emb" in state_dict else "leaf"
+        # Fusion variant detection
+        if "species_gnn.attn.in_proj_weight" in state_dict or \
+           "species_gnn.attn.out_proj.weight" in state_dict:
+            gnn_fusion = "hier_attn"
+        elif "species_gnn.hier_proj.weight" in state_dict:
+            gnn_fusion = "hier"
+        else:
+            gnn_fusion = "leaf"
+
+        # Number of hier_levels (relevant for hier and hier_attn)
+        gnn_hier_levels_n = None
+        if "species_gnn.absent_emb" in state_dict:
+            gnn_hier_levels_n = int(state_dict["species_gnn.absent_emb"].shape[0])
+
+        # LoRA detection
+        use_lora_init = "species_gnn.gnn.lora_A" in state_dict
+        lora_rank = (int(state_dict["species_gnn.gnn.lora_A"].shape[1])
+                     if use_lora_init else 16)
+
+        # Residual/LayerNorm detection
+        use_layernorm = any(k.startswith("species_gnn.gnn.norms.") for k in state_dict)
+        # Residual is graph-only (no extra params), so we can't detect it from state_dict.
+        # We default to False; user must explicitly set if needed (rare for inference).
 
         cfg.update(
             gnn_hidden = gnn_hidden,
@@ -137,7 +153,26 @@ def detect_species_config(state_dict: dict) -> dict:
             gnn_type   = gnn_type,
             gnn_heads  = gnn_heads,
             gnn_fusion = gnn_fusion,
+            use_lora_init = use_lora_init,
+            lora_rank  = lora_rank,
+            gnn_layernorm = use_layernorm,
         )
+        if gnn_hier_levels_n is not None:
+            cfg["gnn_hier_levels_n"] = gnn_hier_levels_n
+
+    # ---------- ESM<->GNN fusion strategy detection -------------------------
+    # Anything besides simple concat creates `fusion.*` parameters.
+    if any(k.startswith("fusion.") for k in state_dict):
+        if "fusion.gate_proj.weight" in state_dict:
+            cfg["fusion_strategy"] = "gated"
+        elif "fusion.gamma_proj.weight" in state_dict:
+            cfg["fusion_strategy"] = "film"
+        elif "fusion.attn.in_proj_weight" in state_dict:
+            cfg["fusion_strategy"] = "cross_attn"
+        elif "fusion.proj_e.weight" in state_dict:
+            cfg["fusion_strategy"] = "bilinear"
+    else:
+        cfg["fusion_strategy"] = "concat"
 
     return cfg
 
@@ -219,6 +254,14 @@ def run_inference(model_path: str,
 
     print("[Tokenizer] Loading...")
     tokenizer = load_tokenizer(plm_type)
+
+    # Resolve hier_levels by length when present (default ordering = first-N levels
+    # closest to leaf; matches train.py default of species,genus,family for N=3).
+    DEFAULT_LEVELS_FROM_LEAF = ("species", "genus", "family", "order",
+                                 "class", "phylum", "kingdom", "domain")
+    n_hier = species_cfg.pop("gnn_hier_levels_n", None)
+    if n_hier is not None:
+        species_cfg["gnn_hier_levels"] = DEFAULT_LEVELS_FROM_LEAF[:n_hier]
 
     model_kwargs = dict(
         plm_output='mean',

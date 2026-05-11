@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 from PLM_head import MLP, SpeciesAdapter
 from gnn_module import build_species_encoder_from_graph
+from fusion_modules import build_fusion
 # from tape import ProteinBertModel, TAPETokenizer
 from transformers import AutoModel, AutoTokenizer, AlbertTokenizer
 
@@ -207,7 +208,14 @@ class ESM2(nn.Module):
                  gnn_heads=4,
                  gnn_dropout=0.1,
                  gnn_fusion='leaf',
-                 gnn_freeze_init=True):
+                 gnn_hier_levels=('species', 'genus', 'family'),
+                 gnn_freeze_init=True,
+                 use_lora_init=False,
+                 lora_rank=16,
+                 gnn_residual=False,
+                 gnn_layernorm=False,
+                 # ----- ESM<->GNN fusion strategy (Stage 3) -----
+                 fusion_strategy='concat'):
         super(ESM2, self).__init__()
         if esm_size == '8M':
             self.checkpoint = esm2_8m_checkpoint
@@ -274,20 +282,45 @@ class ESM2(nn.Module):
                 heads=gnn_heads,
                 dropout=gnn_dropout,
                 fusion=gnn_fusion,
+                hier_levels=gnn_hier_levels,
                 freeze_init=gnn_freeze_init,
+                use_lora_init=use_lora_init,
+                lora_rank=lora_rank,
+                use_residual=gnn_residual,
+                use_layernorm=gnn_layernorm,
             )
         else:
             self.species_gnn = None
         # cached for forward ergonomics
         self.gnn_out_dim = gnn_out_dim
         self.species_out_dim = species_out_dim
+        self.fusion_strategy = fusion_strategy
+
+        # ----- ESM<->GNN fusion module (Stage 3) -----
+        # Only relevant when species_mode includes 'gnn'. For adapter-only or
+        # 'both', the adapter still uses simple concat (legacy behaviour).
+        if species_mode in ("gnn", "both") and fusion_strategy != "concat":
+            self.fusion = build_fusion(
+                fusion_strategy,
+                esm_dim=self.hidden_size,
+                gnn_out_dim=gnn_out_dim,
+                dropout=gnn_dropout,
+            )
+        else:
+            self.fusion = None
 
         # ----- compute the input dim of the regression head ---------------------
-        mlp_in = self.hidden_size
-        if species_mode in ("adapter", "both"):
-            mlp_in += species_out_dim
-        if species_mode in ("gnn", "both"):
-            mlp_in += gnn_out_dim
+        if species_mode in ("gnn", "both") and self.fusion is not None:
+            # Non-concat fusions output a fixed-width vector (= esm_dim).
+            mlp_in = self.fusion.out_dim
+            if species_mode == "both":
+                mlp_in += species_out_dim
+        else:
+            mlp_in = self.hidden_size
+            if species_mode in ("adapter", "both"):
+                mlp_in += species_out_dim
+            if species_mode in ("gnn", "both"):
+                mlp_in += gnn_out_dim
 
         # Last layer has NO activation (the MLP class breaks before adding one)
         # so the scalar output is unrestricted -- essential for log-MIC values
@@ -307,7 +340,10 @@ class ESM2(nn.Module):
                         OR a Python list of species name strings -- 'gnn' / 'both' modes
         species_names : alias for ``species_ids`` for readability when passing names.
         """
+        # cross_attn fusion needs token-level output; for the rest, mean/cls is enough
+        need_tokens = (self.fusion is not None) and (self.fusion_strategy == "cross_attn")
         outputs = self.esm(input_ids)
+        seq_tokens = outputs[0] if need_tokens else None         # [B, L, hidden_size]
         if self.plm_output == 'mean':
             seq_rep = outputs[0].mean(dim=1)        # [B, hidden_size]
         elif self.plm_output == 'cls':
@@ -315,13 +351,15 @@ class ESM2(nn.Module):
         else:
             raise ValueError(f"Unknown plm_output: {self.plm_output}")
 
-        feats = [seq_rep]
-
+        # ----- adapter branch (legacy) -----
+        adapter_emb = None
         if self.species_mode in ("adapter", "both"):
             if species_emb is None:
                 raise ValueError(f"species_mode={self.species_mode!r} but species_emb is None.")
-            feats.append(self.species_adapter(species_emb))             # [B, species_out_dim]
+            adapter_emb = self.species_adapter(species_emb)             # [B, species_out_dim]
 
+        # ----- GNN branch -----
+        gnn_emb = None
         if self.species_mode in ("gnn", "both"):
             sp_in = species_ids if species_ids is not None else species_names
             if sp_in is None:
@@ -329,9 +367,23 @@ class ESM2(nn.Module):
                     f"species_mode={self.species_mode!r} but neither species_ids nor "
                     f"species_names was provided."
                 )
-            feats.append(self.species_gnn(sp_in))                       # [B, gnn_out_dim]
+            gnn_emb = self.species_gnn(sp_in)                           # [B, gnn_out_dim]
 
-        fused = feats[0] if len(feats) == 1 else torch.cat(feats, dim=-1)
+        # ----- fuse ESM + GNN -----
+        if gnn_emb is not None and self.fusion is not None:
+            seq_fused = self.fusion(seq_rep, gnn_emb, seq_tokens=seq_tokens)
+            if adapter_emb is not None:
+                fused = torch.cat([seq_fused, adapter_emb], dim=-1)
+            else:
+                fused = seq_fused
+        else:
+            feats = [seq_rep]
+            if adapter_emb is not None:
+                feats.append(adapter_emb)
+            if gnn_emb is not None:
+                feats.append(gnn_emb)
+            fused = feats[0] if len(feats) == 1 else torch.cat(feats, dim=-1)
+
         out = self.projection(fused)
         return out.view(-1, out.size(-1))
 

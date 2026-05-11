@@ -9,6 +9,7 @@ import numpy as np
 import argparse
 from plm_models import ESM2, load_tokenizer
 from data_loader import data_loader, seq2token
+from losses import build_loss
 from torch import nn
 from torch.optim.lr_scheduler import LambdaLR
 import time
@@ -83,13 +84,33 @@ def build_lr_scheduler(optimizer: torch.optim.Optimizer,
 
     return LambdaLR(optimizer, lr_lambda)
 
-def _unpack_batch(batch, device, species_mode):
+def _unpack_batch(batch, device, species_mode, has_meta=False):
     """Decode the variable-arity batch returned by ``MIC_Dataset``.
 
-    Returns: (seq_list, species_emb_or_None, species_ids_or_None, mic_values[B,1]).
+    Returns:
+        (seq_list, species_emb_or_None, species_ids_or_None, mic_values[B,1], meta_dict_or_None)
     """
     species_emb = None
     species_ids = None
+    meta = None
+
+    expected = {
+        "none": 2, "adapter": 3, "gnn": 3, "both": 4,
+    }[species_mode]
+    if has_meta:
+        expected += 1
+
+    if len(batch) != expected:
+        raise ValueError(
+            f"Batch tuple length {len(batch)} does not match species_mode={species_mode!r} "
+            f"with has_meta={has_meta} (expected {expected})."
+        )
+
+    if has_meta:
+        meta = batch[-1]
+        meta = {k: v.to(device, non_blocking=True) for k, v in meta.items()}
+        batch = batch[:-1]
+
     if species_mode == "none":
         seq_list, mic_values = batch
     elif species_mode == "adapter":
@@ -98,14 +119,12 @@ def _unpack_batch(batch, device, species_mode):
     elif species_mode == "gnn":
         seq_list, species_ids, mic_values = batch
         species_ids = species_ids.to(device, non_blocking=True)
-    elif species_mode == "both":
+    else:  # both
         seq_list, species_emb, species_ids, mic_values = batch
         species_emb = species_emb.to(device, non_blocking=True)
         species_ids = species_ids.to(device, non_blocking=True)
-    else:
-        raise ValueError(f"Unknown species_mode: {species_mode!r}")
     mic_values = mic_values.unsqueeze(1).to(device, non_blocking=True)
-    return seq_list, species_emb, species_ids, mic_values
+    return seq_list, species_emb, species_ids, mic_values, meta
 
 
 def _model_forward(model, input_ids, species_emb, species_ids, species_mode):
@@ -120,20 +139,40 @@ def _model_forward(model, input_ids, species_emb, species_ids, species_mode):
     return model(input_ids, species_emb=species_emb, species_ids=species_ids)
 
 
+def _build_loss_meta(meta, loss_meta_global, loss_type):
+    """Merge per-batch meta with global loss meta (bin_weight, etc.)."""
+    if meta is None:
+        return None
+    out = dict(meta)
+    if loss_type == "lds" and loss_meta_global.get("bin_weight") is not None:
+        out["bin_weight"] = loss_meta_global["bin_weight"].to(meta["bin_idx"].device)
+    if loss_type == "group_dro":
+        if loss_meta_global.get("dro_group_by") == "species":
+            out["group_id"] = meta["species_group_id"]
+        else:
+            out["group_id"] = meta["bucket_id"]
+    return out
+
+
 def train_epoch(epoch, model, train_loader, tokenizer, criterion, optimizer,
-                device, species_mode="none", scheduler=None):
+                device, species_mode="none", scheduler=None,
+                loss_type="mse", loss_meta_global=None):
     model.train()
     train_loss = []
     train_epoch_time = 0.0
+    has_meta = loss_meta_global is not None and loss_meta_global.get("needs_meta", False)
     pbar = tqdm(train_loader)
     pbar.set_description(f"GPU{device} Train epoch-{epoch}")
     print("\n","*" * 30, "Epoch", epoch, "training start...","*" * 30,"\n")
     for batch in pbar:
-        seq_list, species_emb, species_ids, mic_values = _unpack_batch(batch, device, species_mode)
+        seq_list, species_emb, species_ids, mic_values, meta = _unpack_batch(
+            batch, device, species_mode, has_meta=has_meta)
         input_ids = seq2token(seq_list, tokenizer, device)
         t1 = time.time()
         outputs = _model_forward(model, input_ids, species_emb, species_ids, species_mode)
-        loss = criterion(outputs, mic_values)
+        loss_meta = _build_loss_meta(meta, loss_meta_global or {}, loss_type)
+        loss = criterion(outputs, mic_values, meta=loss_meta) if loss_meta is not None \
+               else criterion(outputs, mic_values, meta=None)
         train_epoch_time += time.time() - t1
 
         train_loss.append(loss.item())
@@ -147,25 +186,29 @@ def train_epoch(epoch, model, train_loader, tokenizer, criterion, optimizer,
         pbar.set_postfix(loss=f"{loss.item():.4f}", lr=f"{cur_lr:.2e}")
 
     ave_loss = sum(train_loss) / len(train_loss)
-    print(f"Epoch {epoch} Train MSE Loss: {ave_loss:.4f}, "
+    print(f"Epoch {epoch} Train Loss: {ave_loss:.4f}, "
           f"Time: {train_epoch_time:.4f}s, "
           f"LR(end): {optimizer.param_groups[0]['lr']:.2e}")
     return ave_loss, train_loss
 
 
-def validate_epoch(epoch, model, val_loader, tokenizer, criterion, device, species_mode="none"):
+def validate_epoch(epoch, model, val_loader, tokenizer, criterion, device,
+                   species_mode="none", has_meta=False, loss_type="mse",
+                   loss_meta_global=None):
+    """Validation always uses MSE (the official metric), regardless of training loss."""
     model.eval()
     val_loss = []
     pbar = tqdm(val_loader)
     pbar.set_description(f"GPU{device} Val epoch-{epoch}")
     print("\n","*" * 30, "Epoch", epoch, "validation start...","*" * 30,"\n")
-
+    mse_eval = nn.MSELoss()
     with torch.no_grad():
         for batch in pbar:
-            seq_list, species_emb, species_ids, mic_values = _unpack_batch(batch, device, species_mode)
+            seq_list, species_emb, species_ids, mic_values, _meta = _unpack_batch(
+                batch, device, species_mode, has_meta=has_meta)
             input_ids = seq2token(seq_list, tokenizer, device)
             outputs = _model_forward(model, input_ids, species_emb, species_ids, species_mode)
-            loss = criterion(outputs, mic_values)
+            loss = mse_eval(outputs, mic_values)
             val_loss.append(loss.item())
 
     ave_loss = sum(val_loss) / len(val_loss)
@@ -175,13 +218,9 @@ def validate_epoch(epoch, model, val_loader, tokenizer, criterion, device, speci
 
 def bucketed_test_eval(model, test_loader, tokenizer, criterion, device,
                        species_mode, train_csv_path,
+                       has_meta=False,
                        buckets=((0, 5), (5, 20), (20, 100), (100, float("inf")))):
-    """Run inference on the test loader and return per-species-count-bucket MSE.
-
-    The bucketing is computed from the training set's ``Target_Species``
-    frequency (the same training set the model was trained on). This is the
-    metric the plan calls for to validate the long-tail story.
-    """
+    """Run inference on the test loader and return per-species-count-bucket MSE."""
     train_df = pd.read_csv(train_csv_path)
     sp_count = train_df["Target_Species"].astype(str).value_counts().to_dict()
 
@@ -189,7 +228,8 @@ def bucketed_test_eval(model, test_loader, tokenizer, criterion, device,
     per_sample = []   # (species_name, abs_err_squared)
     with torch.no_grad():
         for batch in tqdm(test_loader, desc="bucketed test"):
-            seq_list, species_emb, species_ids, mic_values = _unpack_batch(batch, device, species_mode)
+            seq_list, species_emb, species_ids, mic_values, _meta = _unpack_batch(
+                batch, device, species_mode, has_meta=has_meta)
             input_ids = seq2token(seq_list, tokenizer, device)
             outputs = _model_forward(model, input_ids, species_emb, species_ids, species_mode)
             sq = (outputs - mic_values).pow(2).squeeze(-1).detach().cpu().tolist()
@@ -284,10 +324,45 @@ def main():
     parser.add_argument("--gnn_heads", type=int, default=4,
                         help="GAT only: number of attention heads per layer.")
     parser.add_argument("--gnn_dropout", type=float, default=0.1)
-    parser.add_argument("--gnn_fusion", type=str, default="leaf", choices=["leaf", "hier"],
-                        help="leaf=F1 (species-only); hier=F2 (species+genus+family).")
+    parser.add_argument("--gnn_fusion", type=str, default="leaf",
+                        choices=["leaf", "hier", "hier_attn"],
+                        help="leaf=F1; hier=F2 (configurable levels); hier_attn=attention pool.")
+    parser.add_argument("--gnn_hier_levels", type=str, default="species,genus,family",
+                        help="Comma-separated taxonomic levels for hier/hier_attn fusion.")
     parser.add_argument("--gnn_freeze_init", type=int, default=1, choices=[0, 1],
                         help="Freeze the 768-d PubMedBERT init features (1) or fine-tune (0).")
+    parser.add_argument("--use_lora_init", action="store_true",
+                        help="Add a low-rank residual on top of frozen init features.")
+    parser.add_argument("--lora_rank", type=int, default=16)
+    parser.add_argument("--gnn_residual", action="store_true",
+                        help="Skip connection inside each GCN layer.")
+    parser.add_argument("--gnn_layernorm", action="store_true",
+                        help="Apply LayerNorm between GCN layers.")
+    parser.add_argument("--fusion_strategy", type=str, default="concat",
+                        choices=["concat", "gated", "film", "cross_attn", "bilinear"],
+                        help="How to combine ESM peptide embedding with the GNN species emb.")
+    parser.add_argument("--gnn_lr_mult", type=float, default=1.0,
+                        help="Multiplier on the base lr applied ONLY to the GNN+fusion params.")
+    parser.add_argument("--weight_decay", type=float, default=0.0)
+    # ----- Loss type ----------------------------------------------------------
+    parser.add_argument("--loss_type", type=str, default="mse",
+                        choices=["mse", "huber", "smooth_l1", "lds", "bmc", "focal_r", "group_dro"])
+    parser.add_argument("--loss_huber_delta", type=float, default=1.0)
+    parser.add_argument("--loss_smooth_l1_beta", type=float, default=1.0)
+    parser.add_argument("--loss_lds_base", type=str, default="huber",
+                        choices=["mse", "huber", "smooth_l1"])
+    parser.add_argument("--loss_lds_sigma", type=float, default=2.0)
+    parser.add_argument("--loss_lds_num_bins", type=int, default=50)
+    parser.add_argument("--loss_bmc_noise", type=float, default=1.0)
+    parser.add_argument("--loss_bmc_learn_noise", type=int, default=1, choices=[0, 1])
+    parser.add_argument("--loss_focal_gamma", type=float, default=2.0)
+    parser.add_argument("--loss_focal_base", type=str, default="mse",
+                        choices=["mse", "huber", "smooth_l1"])
+    parser.add_argument("--loss_dro_eta", type=float, default=0.01)
+    parser.add_argument("--loss_dro_base", type=str, default="mse",
+                        choices=["mse", "huber", "smooth_l1"])
+    parser.add_argument("--loss_dro_group_by", type=str, default="bucket",
+                        choices=["bucket", "species"])
 
     parser.add_argument("--batch_size", type=int, default=32)
     parser.add_argument("--lr", type=float, default=1e-5,
@@ -354,9 +429,16 @@ def main():
         species_emb_path=args.species_emb_path if args.species_mode in ("adapter", "both") else None,
         species_emb_dim=args.species_emb_dim,
         taxo_graph_path=args.taxo_graph_path if args.species_mode in ("gnn", "both") else None,
+        loss_type=args.loss_type,
+        lds_num_bins=args.loss_lds_num_bins,
+        lds_sigma=args.loss_lds_sigma,
+        dro_group_by=args.loss_dro_group_by,
     )
+    loss_meta_global = getattr(train_loader, "loss_meta", {"needs_meta": False})
+    has_meta = loss_meta_global.get("needs_meta", False)
     # load model and tokenizer
     print("Loading model...")
+    hier_levels_tuple = tuple(s.strip() for s in args.gnn_hier_levels.split(",") if s.strip())
     model = ESM2(
         plm_output=args.plm_output,
         head_type=args.head_type,
@@ -375,7 +457,13 @@ def main():
         gnn_heads=args.gnn_heads,
         gnn_dropout=args.gnn_dropout,
         gnn_fusion=args.gnn_fusion,
+        gnn_hier_levels=hier_levels_tuple,
         gnn_freeze_init=bool(args.gnn_freeze_init),
+        use_lora_init=args.use_lora_init,
+        lora_rank=args.lora_rank,
+        gnn_residual=args.gnn_residual,
+        gnn_layernorm=args.gnn_layernorm,
+        fusion_strategy=args.fusion_strategy,
     )
     if torch.cuda.is_available():
         device = torch.device("cuda:" + args.device)
@@ -410,8 +498,49 @@ def main():
     metrics_rows = []
 
 
-    criterion = nn.MSELoss()    # MSE loss for regression
-    optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr)
+    # ----- Loss --------------------------------------------------------------
+    loss_kwargs = dict(
+        huber_delta=args.loss_huber_delta,
+        smooth_l1_beta=args.loss_smooth_l1_beta,
+        lds_base=args.loss_lds_base,
+        bmc_noise=args.loss_bmc_noise,
+        bmc_learn_noise=bool(args.loss_bmc_learn_noise),
+        focal_gamma=args.loss_focal_gamma,
+        focal_base=args.loss_focal_base,
+        dro_eta=args.loss_dro_eta,
+        dro_base=args.loss_dro_base,
+    )
+    if args.loss_type == "group_dro":
+        loss_kwargs["dro_num_groups"] = loss_meta_global["dro_num_groups"]
+    criterion = build_loss(args.loss_type, **loss_kwargs).to(device)
+    print(f"[Loss] type={args.loss_type} kwargs={loss_kwargs}")
+
+    # ----- Optimizer with optional GNN-specific lr_mult ----------------------
+    if args.gnn_lr_mult != 1.0 and args.species_mode in ("gnn", "both"):
+        gnn_params, esm_params = [], []
+        for n, p in model.named_parameters():
+            if not p.requires_grad:
+                continue
+            if (n.startswith("species_gnn") or n.startswith("fusion")
+                or n.startswith("species_adapter") or n.startswith("projection")):
+                gnn_params.append(p)
+            else:
+                esm_params.append(p)
+        optimizer = torch.optim.AdamW(
+            [
+                {"params": esm_params, "lr": args.lr,
+                 "weight_decay": args.weight_decay},
+                {"params": gnn_params, "lr": args.lr * args.gnn_lr_mult,
+                 "weight_decay": args.weight_decay},
+            ]
+        )
+        print(f"[Optimizer] AdamW with split lr: ESM lr={args.lr:.2e}, "
+              f"GNN/head lr={args.lr * args.gnn_lr_mult:.2e}, wd={args.weight_decay}")
+    else:
+        optimizer = torch.optim.AdamW(
+            model.parameters(), lr=args.lr, weight_decay=args.weight_decay,
+        )
+        print(f"[Optimizer] AdamW lr={args.lr:.2e}, wd={args.weight_decay}")
 
     # ------------------------------------------------------------------
     # Resume: load model / optimizer / best-tracking from a checkpoint.
@@ -506,11 +635,13 @@ def main():
     for epoch in range(start_epoch, args.epochs+1):
         avg_train_loss, train_loss = train_epoch(
             epoch, model, train_loader, tokenizer, criterion, optimizer, device,
-            species_mode=args.species_mode, scheduler=scheduler)
+            species_mode=args.species_mode, scheduler=scheduler,
+            loss_type=args.loss_type, loss_meta_global=loss_meta_global)
         # --- 验证 ---
         avg_val_loss, val_loss = validate_epoch(
             epoch, model, val_loader, tokenizer, criterion, device,
-            species_mode=args.species_mode)
+            species_mode=args.species_mode, has_meta=has_meta,
+            loss_type=args.loss_type, loss_meta_global=loss_meta_global)
         print(f"Epoch {epoch} Complete. Train MSE: {avg_train_loss:.4f} | Val MSE: {avg_val_loss:.4f}")
 
         cur_lr = optimizer.param_groups[0]["lr"]
@@ -575,7 +706,8 @@ def main():
     print("\n","*"*30, "Testing model...", "*"*30,"\n")
     avg_test_loss, test_loss = validate_epoch(
         epoch, model, test_loader, tokenizer, criterion, device,
-        species_mode=args.species_mode)
+        species_mode=args.species_mode, has_meta=has_meta,
+        loss_type=args.loss_type, loss_meta_global=loss_meta_global)
     print(f"Test MSE Loss: {avg_test_loss:.4f}")
 
     # ------------------------------------------------------------------
@@ -590,6 +722,7 @@ def main():
                 model, test_loader, tokenizer, criterion, device,
                 species_mode=args.species_mode,
                 train_csv_path=os.path.join(args.data_path, "train.csv"),
+                has_meta=has_meta,
             )
         except Exception as exc:
             print(f"[warn] bucketed eval failed: {exc}")

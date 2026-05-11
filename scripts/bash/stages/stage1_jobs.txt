@@ -1,0 +1,22 @@
+# Stage 1 - hier depth + attention pooling (6 runs)
+# Format: <job_id>|<bash command>
+#
+# Common config (matches v1.5 baseline; only the fusion / hier_levels vary):
+#   esm2-150M, GCN, layers=2, hidden=128, out=64, dropout=0.1
+#   bs=32, lr=1e-5, MSE, scheduler+early-stop (max 50 ep)
+#
+# Output: /NAS/luyq/PLM_AMP_Regression/gnn_runs_v2/stage1/<tag>/
+#
+# h3 (= v1.5) is reused from existing results, no run needed.
+
+h5_splits1|cd /root/PLM_AMP_Regression/scripts && /opt/conda/envs/esm-AMP/bin/python train.py --data_path /NAS/luyq/AMP_datasets/splits1 --plm esm2-150M --finetune_plm True --species_mode gnn --taxo_graph_path /NAS/luyq/AMP_datasets/taxonomy_graph.pt --gnn_hidden 128 --gnn_out_dim 64 --gnn_layers 2 --gnn_type gcn --gnn_fusion hier --gnn_hier_levels "species,genus,family,order,class" --batch_size 32 --lr 1e-5 --epochs 50 --use_scheduler --warmup_ratio 0.1 --min_lr_ratio 0.05 --early_stopping --early_stop_patience 10 --es_min_epoch 20 --save_dir /NAS/luyq/PLM_AMP_Regression/gnn_runs_v2/stage1/h5_splits1 --metrics_name h5_splits1.csv --device 0
+
+h5_splits2|cd /root/PLM_AMP_Regression/scripts && /opt/conda/envs/esm-AMP/bin/python train.py --data_path /NAS/luyq/AMP_datasets/splits2 --plm esm2-150M --finetune_plm True --species_mode gnn --taxo_graph_path /NAS/luyq/AMP_datasets/taxonomy_graph.pt --gnn_hidden 128 --gnn_out_dim 64 --gnn_layers 2 --gnn_type gcn --gnn_fusion hier --gnn_hier_levels "species,genus,family,order,class" --batch_size 32 --lr 1e-5 --epochs 50 --use_scheduler --warmup_ratio 0.1 --min_lr_ratio 0.05 --early_stopping --early_stop_patience 10 --es_min_epoch 20 --save_dir /NAS/luyq/PLM_AMP_Regression/gnn_runs_v2/stage1/h5_splits2 --metrics_name h5_splits2.csv --device 0
+
+h7_splits1|cd /root/PLM_AMP_Regression/scripts && /opt/conda/envs/esm-AMP/bin/python train.py --data_path /NAS/luyq/AMP_datasets/splits1 --plm esm2-150M --finetune_plm True --species_mode gnn --taxo_graph_path /NAS/luyq/AMP_datasets/taxonomy_graph.pt --gnn_hidden 128 --gnn_out_dim 64 --gnn_layers 2 --gnn_type gcn --gnn_fusion hier --gnn_hier_levels "species,genus,family,order,class,phylum,kingdom" --batch_size 32 --lr 1e-5 --epochs 50 --use_scheduler --warmup_ratio 0.1 --min_lr_ratio 0.05 --early_stopping --early_stop_patience 10 --es_min_epoch 20 --save_dir /NAS/luyq/PLM_AMP_Regression/gnn_runs_v2/stage1/h7_splits1 --metrics_name h7_splits1.csv --device 0
+
+h7_splits2|cd /root/PLM_AMP_Regression/scripts && /opt/conda/envs/esm-AMP/bin/python train.py --data_path /NAS/luyq/AMP_datasets/splits2 --plm esm2-150M --finetune_plm True --species_mode gnn --taxo_graph_path /NAS/luyq/AMP_datasets/taxonomy_graph.pt --gnn_hidden 128 --gnn_out_dim 64 --gnn_layers 2 --gnn_type gcn --gnn_fusion hier --gnn_hier_levels "species,genus,family,order,class,phylum,kingdom" --batch_size 32 --lr 1e-5 --epochs 50 --use_scheduler --warmup_ratio 0.1 --min_lr_ratio 0.05 --early_stopping --early_stop_patience 10 --es_min_epoch 20 --save_dir /NAS/luyq/PLM_AMP_Regression/gnn_runs_v2/stage1/h7_splits2 --metrics_name h7_splits2.csv --device 0
+
+hier_attn_splits1|cd /root/PLM_AMP_Regression/scripts && /opt/conda/envs/esm-AMP/bin/python train.py --data_path /NAS/luyq/AMP_datasets/splits1 --plm esm2-150M --finetune_plm True --species_mode gnn --taxo_graph_path /NAS/luyq/AMP_datasets/taxonomy_graph.pt --gnn_hidden 128 --gnn_out_dim 64 --gnn_layers 2 --gnn_type gcn --gnn_fusion hier_attn --gnn_hier_levels "domain,kingdom,phylum,class,order,family,genus,species" --batch_size 32 --lr 1e-5 --epochs 50 --use_scheduler --warmup_ratio 0.1 --min_lr_ratio 0.05 --early_stopping --early_stop_patience 10 --es_min_epoch 20 --save_dir /NAS/luyq/PLM_AMP_Regression/gnn_runs_v2/stage1/hier_attn_splits1 --metrics_name hier_attn_splits1.csv --device 0
+
+hier_attn_splits2|cd /root/PLM_AMP_Regression/scripts && /opt/conda/envs/esm-AMP/bin/python train.py --data_path /NAS/luyq/AMP_datasets/splits2 --plm esm2-150M --finetune_plm True --species_mode gnn --taxo_graph_path /NAS/luyq/AMP_datasets/taxonomy_graph.pt --gnn_hidden 128 --gnn_out_dim 64 --gnn_layers 2 --gnn_type gcn --gnn_fusion hier_attn --gnn_hier_levels "domain,kingdom,phylum,class,order,family,genus,species" --batch_size 32 --lr 1e-5 --epochs 50 --use_scheduler --warmup_ratio 0.1 --min_lr_ratio 0.05 --early_stopping --early_stop_patience 10 --es_min_epoch 20 --save_dir /NAS/luyq/PLM_AMP_Regression/gnn_runs_v2/stage1/hier_attn_splits2 --metrics_name hier_attn_splits2.csv --device 0

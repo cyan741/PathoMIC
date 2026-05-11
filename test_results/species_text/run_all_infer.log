@@ -1,73 +1,0 @@
-============================================================
-Batch inference started: Wed 22 Apr 2026 11:52:40 AM CST
-============================================================
-
->>> [splits1] models on splits1/test.csv
-
-[RUN] 11:52:40 | model: esm2-8M_lr0.0001_bs16_ep20_val_best
-       test : /NAS/luyq/AMP_datasets/splits1/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/species_text/splits1_test/esm2-8M_lr0.0001_bs16_ep20_val_best_test_results.csv
-Inference:   0%|          | 0/9 [00:00<?, ?it/s]Inference:  11%|█         | 1/9 [00:01<00:09,  1.22s/it]Inference:  22%|██▏       | 2/9 [00:01<00:04,  1.44it/s]Inference:  33%|███▎      | 3/9 [00:01<00:03,  1.91it/s]Inference:  44%|████▍     | 4/9 [00:02<00:02,  2.24it/s]Inference:  56%|█████▌    | 5/9 [00:02<00:01,  2.49it/s]Inference:  67%|██████▋   | 6/9 [00:02<00:01,  2.66it/s]Inference:  78%|███████▊  | 7/9 [00:03<00:00,  2.80it/s]Inference:  89%|████████▉ | 8/9 [00:03<00:00,  2.88it/s]Inference: 100%|██████████| 9/9 [00:03<00:00,  3.69it/s]Inference: 100%|██████████| 9/9 [00:03<00:00,  2.51it/s]
-[Model Info] PLM type: esm2-8M | ESM size: 8M
-[Model Name] esm2-8M_lr0.0001_bs16_ep20_val_best
-[Device] cuda:4
-[Model] Loading checkpoint...
-[Model] Vanilla model (no species adapter).
-[Data] Loaded 4257 samples from /NAS/luyq/AMP_datasets/splits1/test.csv
-[Tokenizer] Loading...
-mean 320 use_species= False
-[Model] Checkpoint loaded.
-[Done] Saved 4257 rows -> /home/luyq/PLM_AMP_Regression/test/species_text/splits1_test/esm2-8M_lr0.0001_bs16_ep20_val_best_test_results.csv
-[DONE] esm2-8M_lr0.0001_bs16_ep20_val_best
-
-[RUN] 11:53:07 | model: esm2-8M_lr0.0001_bs32_ep23_val_best
-       test : /NAS/luyq/AMP_datasets/splits1/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/species_text/splits1_test/esm2-8M_lr0.0001_bs32_ep23_val_best_test_results.csv
-Inference:   0%|          | 0/9 [00:00<?, ?it/s]Inference:  11%|█         | 1/9 [00:01<00:08,  1.09s/it]Inference:  22%|██▏       | 2/9 [00:01<00:04,  1.59it/s]Inference:  33%|███▎      | 3/9 [00:01<00:02,  2.07it/s]Inference:  44%|████▍     | 4/9 [00:02<00:02,  2.42it/s]Inference:  56%|█████▌    | 5/9 [00:02<00:01,  2.67it/s]Inference:  67%|██████▋   | 6/9 [00:02<00:01,  2.84it/s]Inference:  78%|███████▊  | 7/9 [00:02<00:00,  2.97it/s]Inference:  89%|████████▉ | 8/9 [00:03<00:00,  3.06it/s]Inference: 100%|██████████| 9/9 [00:03<00:00,  3.90it/s]Inference: 100%|██████████| 9/9 [00:03<00:00,  2.70it/s]
-[Model Info] PLM type: esm2-8M | ESM size: 8M
-[Model Name] esm2-8M_lr0.0001_bs32_ep23_val_best
-[Device] cuda:4
-[Model] Loading checkpoint...
-[Model] Vanilla model (no species adapter).
-[Data] Loaded 4257 samples from /NAS/luyq/AMP_datasets/splits1/test.csv
-[Tokenizer] Loading...
-mean 320 use_species= False
-[Model] Checkpoint loaded.
-[Done] Saved 4257 rows -> /home/luyq/PLM_AMP_Regression/test/species_text/splits1_test/esm2-8M_lr0.0001_bs32_ep23_val_best_test_results.csv
-[DONE] esm2-8M_lr0.0001_bs32_ep23_val_best
-
-[RUN] 11:53:30 | model: esm2-8M_lr0.0001_bs64_ep33_val_best
-       test : /NAS/luyq/AMP_datasets/splits1/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/species_text/splits1_test/esm2-8M_lr0.0001_bs64_ep33_val_best_test_results.csv
-Inference:   0%|          | 0/9 [00:00<?, ?it/s]Inference:  11%|█         | 1/9 [00:01<00:09,  1.13s/it]Inference:  22%|██▏       | 2/9 [00:01<00:04,  1.55it/s]Inference:  33%|███▎      | 3/9 [00:01<00:02,  2.04it/s]Inference:  44%|████▍     | 4/9 [00:02<00:02,  2.40it/s]Inference:  56%|█████▌    | 5/9 [00:02<00:01,  2.65it/s]Inference:  67%|██████▋   | 6/9 [00:02<00:01,  2.84it/s]Inference:  78%|███████▊  | 7/9 [00:02<00:00,  2.95it/s]Inference:  89%|████████▉ | 8/9 [00:03<00:00,  3.05it/s]Inference: 100%|██████████| 9/9 [00:03<00:00,  3.90it/s]Inference: 100%|██████████| 9/9 [00:03<00:00,  2.67it/s]
-[Model Info] PLM type: esm2-8M | ESM size: 8M
-[Model Name] esm2-8M_lr0.0001_bs64_ep33_val_best
-[Device] cuda:4
-[Model] Loading checkpoint...
-[Model] Vanilla model (no species adapter).
-[Data] Loaded 4257 samples from /NAS/luyq/AMP_datasets/splits1/test.csv
-[Tokenizer] Loading...
-mean 320 use_species= False
-[Model] Checkpoint loaded.
-[Done] Saved 4257 rows -> /home/luyq/PLM_AMP_Regression/test/species_text/splits1_test/esm2-8M_lr0.0001_bs64_ep33_val_best_test_results.csv
-[DONE] esm2-8M_lr0.0001_bs64_ep33_val_best
-
-[RUN] 11:53:39 | model: esm2-8M_lr1e-05_bs16_ep44_val_best
-       test : /NAS/luyq/AMP_datasets/splits1/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/species_text/splits1_test/esm2-8M_lr1e-05_bs16_ep44_val_best_test_results.csv
-Inference:   0%|          | 0/9 [00:00<?, ?it/s]Inference:  11%|█         | 1/9 [00:01<00:08,  1.06s/it]Inference:  22%|██▏       | 2/9 [00:01<00:04,  1.62it/s]Inference:  33%|███▎      | 3/9 [00:01<00:02,  2.11it/s]Inference:  44%|████▍     | 4/9 [00:01<00:01,  2.51it/s]Inference:  56%|█████▌    | 5/9 [00:02<00:01,  3.13it/s]Inference:  67%|██████▋   | 6/9 [00:02<00:00,  3.62it/s]Inference:  78%|███████▊  | 7/9 [00:02<00:00,  4.09it/s]Inference:  89%|████████▉ | 8/9 [00:02<00:00,  3.78it/s]Inference: 100%|██████████| 9/9 [00:02<00:00,  4.69it/s]Inference: 100%|██████████| 9/9 [00:02<00:00,  3.09it/s]
-[Model Info] PLM type: esm2-8M | ESM size: 8M
-[Model Name] esm2-8M_lr1e-05_bs16_ep44_val_best
-[Device] cuda:4
-[Model] Loading checkpoint...
-[Model] Vanilla model (no species adapter).
-[Data] Loaded 4257 samples from /NAS/luyq/AMP_datasets/splits1/test.csv
-[Tokenizer] Loading...
-mean 320 use_species= False
-[Model] Checkpoint loaded.
-[Done] Saved 4257 rows -> /home/luyq/PLM_AMP_Regression/test/species_text/splits1_test/esm2-8M_lr1e-05_bs16_ep44_val_best_test_results.csv
-[DONE] esm2-8M_lr1e-05_bs16_ep44_val_best
-
-[RUN] 11:54:02 | model: esm2-8M_lr1e-05_bs32_ep21_val_best
-       test : /NAS/luyq/AMP_datasets/splits1/test.csv
-       out  : /home/luyq/PLM_AMP_Regression/test/species_text/splits1_test/esm2-8M_lr1e-05_bs32_ep21_val_best_test_results.csv
