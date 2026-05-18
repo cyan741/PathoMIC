@@ -8,8 +8,6 @@ import os
 from typing import List, Optional, Dict, Tuple
 from torch.utils.data import Dataset, DataLoader
 
-
-
 def load_species_embeddings(pkl_path: str) -> Dict[str, torch.Tensor]:
     """Load the species embedding pkl (list of dicts) -> {pathogen -> Tensor}."""
     with open(pkl_path, "rb") as f:
@@ -114,12 +112,6 @@ class MIC_Dataset(Dataset):
                 )
 
         # ---- meta --------------------------------------------------------
-        self.bin_edges = bin_edges
-        self._bin_idx = (
-            torch.tensor(assign_bin(mic_df["Median_MIC"].values, bin_edges),
-                         dtype=torch.long)
-            if (return_meta and bin_edges is not None) else None
-        )
         self.bucket_lookup = bucket_lookup
         self.sp_to_group_id = sp_to_group_id
         if return_meta and bucket_lookup is not None:
@@ -143,8 +135,6 @@ class MIC_Dataset(Dataset):
 
     def _get_meta(self, idx) -> Dict[str, torch.Tensor]:
         meta = {}
-        if self._bin_idx is not None:
-            meta["bin_idx"] = self._bin_idx[idx]
         if self._bucket_id is not None:
             meta["bucket_id"] = self._bucket_id[idx]
         if self._species_group_id is not None:
@@ -244,6 +234,9 @@ def data_loader(data_path, batch_size, num_workers, seed,
                 dro_bucket_bounds: Tuple[float, ...] = DEFAULT_BUCKET_BOUNDS):
     """Build (train_loader, val_loader, test_loader).
 
+    If ``loss_type`` is ``group_dro``, we precompute bucket / species group ids
+    on the TRAIN dataframe and embed them in the Dataset so they round-trip
+    through the DataLoader properly.
     """
     train_df = pd.read_csv(os.path.join(data_path, "train.csv"))
     val_df   = pd.read_csv(os.path.join(data_path, "val.csv"))
@@ -269,44 +262,41 @@ def data_loader(data_path, batch_size, num_workers, seed,
               f"from {taxo_graph_path}")
 
     # ---------- decide which meta we need --------------------------------
-    needs_meta = loss_type.lower() in ("group_dro")
-    bin_edges = None
-    bin_weight = None
+    needs_meta = loss_type.lower() == "group_dro"
     bucket_lookup = None
     sp_to_group_id = None
     dro_num_groups = None
     dro_group_counts = None
 
     if needs_meta:
-        if loss_type.lower() == "group_dro":
-            sp_count = train_df["Target_Species"].astype(str).value_counts().to_dict()
-            if dro_group_by == "bucket":
-                bucket_lookup = {n: species_bucket_id(n, sp_count, dro_bucket_bounds)
-                                 for n in sp_count.keys()}
-                # Also include species in val/test that may not be in train.
-                for df in (val_df, test_df):
-                    for n in df["Target_Species"].astype(str).unique():
-                        bucket_lookup.setdefault(n, species_bucket_id(n, sp_count, dro_bucket_bounds))
-                dro_num_groups = num_buckets(dro_bucket_bounds)
-                train_bucket_ids = np.asarray(
-                    [bucket_lookup[str(n)] for n in train_df["Target_Species"].astype(str).tolist()],
-                    dtype=np.int64,
-                )
-                dro_group_counts = np.bincount(train_bucket_ids, minlength=dro_num_groups).astype(np.float32)
-                print(f"[data_loader] GroupDRO ({dro_group_by}): "
-                      f"{dro_num_groups} buckets, bounds={dro_bucket_bounds}")
-            elif dro_group_by == "species":
-                # Each species is its own group.
-                all_species = set(train_df["Target_Species"].astype(str).unique())
-                sp_to_group_id = {n: i for i, n in enumerate(sorted(all_species))}
-                # val/test species not in train: assign to group 0 (will get 0 weight).
-                dro_num_groups = len(sp_to_group_id)
-                dro_group_counts = np.zeros(dro_num_groups, dtype=np.float32)
-                for name, cnt in sp_count.items():
-                    dro_group_counts[sp_to_group_id[name]] = float(cnt)
-                print(f"[data_loader] GroupDRO ({dro_group_by}): {dro_num_groups} species groups")
-            else:
-                raise ValueError(f"Unknown dro_group_by: {dro_group_by!r}")
+        sp_count = train_df["Target_Species"].astype(str).value_counts().to_dict()
+        if dro_group_by == "bucket":
+            bucket_lookup = {n: species_bucket_id(n, sp_count, dro_bucket_bounds)
+                             for n in sp_count.keys()}
+            # Also include species in val/test that may not be in train.
+            for df in (val_df, test_df):
+                for n in df["Target_Species"].astype(str).unique():
+                    bucket_lookup.setdefault(n, species_bucket_id(n, sp_count, dro_bucket_bounds))
+            dro_num_groups = num_buckets(dro_bucket_bounds)
+            train_bucket_ids = np.asarray(
+                [bucket_lookup[str(n)] for n in train_df["Target_Species"].astype(str).tolist()],
+                dtype=np.int64,
+            )
+            dro_group_counts = np.bincount(train_bucket_ids, minlength=dro_num_groups).astype(np.float32)
+            print(f"[data_loader] GroupDRO ({dro_group_by}): "
+                  f"{dro_num_groups} buckets, bounds={dro_bucket_bounds}")
+        elif dro_group_by == "species":
+            # Each species is its own group.
+            all_species = set(train_df["Target_Species"].astype(str).unique())
+            sp_to_group_id = {n: i for i, n in enumerate(sorted(all_species))}
+            # val/test species not in train: assign to group 0 (will get 0 weight).
+            dro_num_groups = len(sp_to_group_id)
+            dro_group_counts = np.zeros(dro_num_groups, dtype=np.float32)
+            for name, cnt in sp_count.items():
+                dro_group_counts[sp_to_group_id[name]] = float(cnt)
+            print(f"[data_loader] GroupDRO ({dro_group_by}): {dro_num_groups} species groups")
+        else:
+            raise ValueError(f"Unknown dro_group_by: {dro_group_by!r}")
 
     common_kwargs = dict(
         species_mode=species_mode,
@@ -314,7 +304,6 @@ def data_loader(data_path, batch_size, num_workers, seed,
         species_emb_dim=species_emb_dim,
         species_to_node_id=species_to_node_id,
         return_meta=needs_meta,
-        bin_edges=bin_edges,
         bucket_lookup=bucket_lookup,
         sp_to_group_id=sp_to_group_id,
     )
@@ -343,8 +332,6 @@ def data_loader(data_path, batch_size, num_workers, seed,
     # Stash global loss meta on the train_loader for the trainer to pick up.
     train_loader.loss_meta = {
         "needs_meta": needs_meta,
-        "bin_edges": bin_edges,
-        "bin_weight": (torch.tensor(bin_weight) if bin_weight is not None else None),
         "dro_num_groups": dro_num_groups,
         "dro_group_counts": (torch.tensor(dro_group_counts) if dro_group_counts is not None else None),
         "dro_group_by": dro_group_by,

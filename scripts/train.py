@@ -142,7 +142,7 @@ def _model_forward(model, input_ids, species_emb, species_ids, species_mode):
 
 
 def _build_loss_meta(meta, loss_meta_global, loss_type):
-    """Merge per-batch meta with global loss meta (bin_weight, etc.)."""
+    """Merge per-batch meta with global loss meta (e.g. group_id for GroupDRO)."""
     if meta is None:
         return None
     out = dict(meta)
@@ -471,7 +471,7 @@ def main():
     train_loader, val_loader, test_loader = data_loader(
         data_path,
         batch_size=args.batch_size,
-        num_workers=8,
+        num_workers=4,
         seed=args.seed,
         species_mode=args.species_mode,
         species_emb_path=args.species_emb_path if args.species_mode in ("adapter", "both") else None,
