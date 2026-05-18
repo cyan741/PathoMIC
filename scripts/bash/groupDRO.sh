@@ -20,8 +20,9 @@ BS=${BS:-32}
 LR=${LR:-1e-5}
 
 run_one() {
-    local split="$2"; local fusion="$3"; local gtype="$4"; local loss_dro_base="$5"
-    local wd="$6"
+    # Args: split fusion gnn_type loss_dro_base weight_decay
+    local split="$1"; local fusion="$2"; local gtype="$3"; local loss_dro_base="$4"
+    local wd="$5"
     local data="/NAS/luyq/AMP_datasets/${split}"
     local sub="${loss_dro_base}_wd${wd}_${split}"
     local ckp="${CKP_BASE}/${split}/${sub}"

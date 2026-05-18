@@ -8,7 +8,6 @@ import os
 from typing import List, Optional, Dict, Tuple
 from torch.utils.data import Dataset, DataLoader
 
-from losses import compute_lds_weights, assign_bin
 
 
 def load_species_embeddings(pkl_path: str) -> Dict[str, torch.Tensor]:
@@ -68,7 +67,6 @@ class MIC_Dataset(Dataset):
         unknown_species_node_id: int = -1,
         # ----- loss meta -------------------------------------------------
         return_meta: bool = False,
-        bin_edges: Optional[np.ndarray] = None,         # for LDS
         bucket_lookup: Optional[Dict[str, int]] = None, # for GroupDRO ``bucket`` mode
         sp_to_group_id: Optional[Dict[str, int]] = None # for GroupDRO ``species`` mode
     ):
@@ -242,18 +240,10 @@ def data_loader(data_path, batch_size, num_workers, seed,
                 taxo_graph_path: Optional[str] = None,
                 # ----- loss meta options -----
                 loss_type: str = "mse",
-                lds_num_bins: int = 50,
-                lds_reweight: str = "sqrt_inv",
-                lds_kernel: str = "gaussian",
-                lds_ks: int = 5,
-                lds_sigma: float = 2.0,
                 dro_group_by: str = "bucket",
                 dro_bucket_bounds: Tuple[float, ...] = DEFAULT_BUCKET_BOUNDS):
     """Build (train_loader, val_loader, test_loader).
 
-    If ``loss_type`` requires per-sample meta (lds, group_dro), we precompute
-    bin assignments / bucket ids on the TRAIN dataframe and embed them in the
-    Dataset so they round-trip through DataLoader properly.
     """
     train_df = pd.read_csv(os.path.join(data_path, "train.csv"))
     val_df   = pd.read_csv(os.path.join(data_path, "val.csv"))
@@ -279,7 +269,7 @@ def data_loader(data_path, batch_size, num_workers, seed,
               f"from {taxo_graph_path}")
 
     # ---------- decide which meta we need --------------------------------
-    needs_meta = loss_type.lower() in ("lds", "group_dro")
+    needs_meta = loss_type.lower() in ("group_dro")
     bin_edges = None
     bin_weight = None
     bucket_lookup = None
@@ -288,21 +278,7 @@ def data_loader(data_path, batch_size, num_workers, seed,
     dro_group_counts = None
 
     if needs_meta:
-        if loss_type.lower() == "lds":
-            bin_edges, bin_weight = compute_lds_weights(
-                train_df["Median_MIC"].values,
-                num_bins=lds_num_bins,
-                reweight=lds_reweight,
-                lds_kernel=lds_kernel,
-                lds_ks=lds_ks,
-                sigma=lds_sigma,
-            )
-            print(
-                f"[data_loader] LDS: bins={lds_num_bins}, reweight={lds_reweight}, "
-                f"kernel={lds_kernel}, ks={lds_ks}, sigma={lds_sigma}, "
-                f"weight range=({bin_weight.min():.3f}, {bin_weight.max():.3f})"
-            )
-        elif loss_type.lower() == "group_dro":
+        if loss_type.lower() == "group_dro":
             sp_count = train_df["Target_Species"].astype(str).value_counts().to_dict()
             if dro_group_by == "bucket":
                 bucket_lookup = {n: species_bucket_id(n, sp_count, dro_bucket_bounds)

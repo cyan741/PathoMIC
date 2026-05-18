@@ -471,7 +471,7 @@ def main():
     train_loader, val_loader, test_loader = data_loader(
         data_path,
         batch_size=args.batch_size,
-        num_workers=4,
+        num_workers=8,
         seed=args.seed,
         species_mode=args.species_mode,
         species_emb_path=args.species_emb_path if args.species_mode in ("adapter", "both") else None,
