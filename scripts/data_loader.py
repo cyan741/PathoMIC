@@ -285,6 +285,7 @@ def data_loader(data_path, batch_size, num_workers, seed,
     bucket_lookup = None
     sp_to_group_id = None
     dro_num_groups = None
+    dro_group_counts = None
 
     if needs_meta:
         if loss_type.lower() == "lds":
@@ -311,6 +312,11 @@ def data_loader(data_path, batch_size, num_workers, seed,
                     for n in df["Target_Species"].astype(str).unique():
                         bucket_lookup.setdefault(n, species_bucket_id(n, sp_count, dro_bucket_bounds))
                 dro_num_groups = num_buckets(dro_bucket_bounds)
+                train_bucket_ids = np.asarray(
+                    [bucket_lookup[str(n)] for n in train_df["Target_Species"].astype(str).tolist()],
+                    dtype=np.int64,
+                )
+                dro_group_counts = np.bincount(train_bucket_ids, minlength=dro_num_groups).astype(np.float32)
                 print(f"[data_loader] GroupDRO ({dro_group_by}): "
                       f"{dro_num_groups} buckets, bounds={dro_bucket_bounds}")
             elif dro_group_by == "species":
@@ -319,6 +325,9 @@ def data_loader(data_path, batch_size, num_workers, seed,
                 sp_to_group_id = {n: i for i, n in enumerate(sorted(all_species))}
                 # val/test species not in train: assign to group 0 (will get 0 weight).
                 dro_num_groups = len(sp_to_group_id)
+                dro_group_counts = np.zeros(dro_num_groups, dtype=np.float32)
+                for name, cnt in sp_count.items():
+                    dro_group_counts[sp_to_group_id[name]] = float(cnt)
                 print(f"[data_loader] GroupDRO ({dro_group_by}): {dro_num_groups} species groups")
             else:
                 raise ValueError(f"Unknown dro_group_by: {dro_group_by!r}")
@@ -361,6 +370,7 @@ def data_loader(data_path, batch_size, num_workers, seed,
         "bin_edges": bin_edges,
         "bin_weight": (torch.tensor(bin_weight) if bin_weight is not None else None),
         "dro_num_groups": dro_num_groups,
+        "dro_group_counts": (torch.tensor(dro_group_counts) if dro_group_counts is not None else None),
         "dro_group_by": dro_group_by,
     }
     return train_loader, val_loader, test_loader

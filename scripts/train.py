@@ -35,7 +35,8 @@ def save_checkpoint(model,
                     scheduler=None,
                     epoch: int = None,
                     best_val_loss: float = None,
-                    best_ep: int = None) -> None:
+                    best_ep: int = None,
+                    criterion: nn.Module = None) -> None:
     '''
     Save model / optimizer / (optional) scheduler / epoch state to output_path.
 
@@ -51,6 +52,7 @@ def save_checkpoint(model,
         'epoch': epoch,
         'best_val_loss': best_val_loss,
         'best_ep': best_ep,
+        'criterion_state_dict': criterion.state_dict() if criterion is not None else None,
     }
     torch.save(checkpoint, output_path)
 
@@ -144,14 +146,48 @@ def _build_loss_meta(meta, loss_meta_global, loss_type):
     if meta is None:
         return None
     out = dict(meta)
-    if loss_type == "lds" and loss_meta_global.get("bin_weight") is not None:
-        out["bin_weight"] = loss_meta_global["bin_weight"].to(meta["bin_idx"].device)
     if loss_type == "group_dro":
         if loss_meta_global.get("dro_group_by") == "species":
             out["group_id"] = meta["species_group_id"]
         else:
             out["group_id"] = meta["bucket_id"]
     return out
+
+
+def _parse_dro_adj(adj_spec, num_groups):
+    """Parse --loss_dro_adj into a FloatTensor[num_groups] or None.
+
+    Accepts:
+      "" / "none"            -> None
+      "0.1"                  -> repeat scalar to all groups
+      "0.0,0.1,0.2,0.3"      -> explicit per-group vector
+    """
+    if adj_spec is None:
+        return None
+    s = str(adj_spec).strip().lower()
+    if s in ("", "none"):
+        return None
+    vals = [float(x.strip()) for x in str(adj_spec).split(",") if x.strip() != ""]
+    if len(vals) == 1:
+        vals = vals * int(num_groups)
+    if len(vals) != int(num_groups):
+        raise ValueError(
+            f"--loss_dro_adj expects 1 value or {num_groups} comma-separated values, got {len(vals)}"
+        )
+    return torch.tensor(vals, dtype=torch.float32)
+
+
+class _FileLogger:
+    def __init__(self, path: str):
+        self.path = path
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+
+    def write(self, text: str) -> None:
+        with open(self.path, "a", encoding="utf-8") as f:
+            f.write(text)
+
+    def flush(self) -> None:
+        return
 
 
 def train_epoch(epoch, model, train_loader, tokenizer, criterion, optimizer,
@@ -161,6 +197,8 @@ def train_epoch(epoch, model, train_loader, tokenizer, criterion, optimizer,
     train_loss = []
     train_epoch_time = 0.0
     has_meta = loss_meta_global is not None and loss_meta_global.get("needs_meta", False)
+    if loss_type == "group_dro" and hasattr(criterion, "reset_stats"):
+        criterion.reset_stats()
     pbar = tqdm(train_loader)
     pbar.set_description(f"GPU{device} Train epoch-{epoch}")
     print("\n","*" * 30, "Epoch", epoch, "training start...","*" * 30,"\n")
@@ -346,18 +384,9 @@ def main():
     parser.add_argument("--weight_decay", type=float, default=0.0)
     # ----- Loss type ----------------------------------------------------------
     parser.add_argument("--loss_type", type=str, default="mse",
-                        choices=["mse", "huber", "smooth_l1", "lds", "bmc", "focal_r", "group_dro"])
+                        choices=["mse", "huber", "smooth_l1", "bmc", "focal_r", "group_dro"])
     parser.add_argument("--loss_huber_delta", type=float, default=1.0)
     parser.add_argument("--loss_smooth_l1_beta", type=float, default=1.0)
-    parser.add_argument("--loss_lds_base", type=str, default="huber",
-                        choices=["mse", "huber", "smooth_l1"])
-    parser.add_argument("--loss_lds_reweight", type=str, default="sqrt_inv",
-                        choices=["sqrt_inv", "inverse", "none"])
-    parser.add_argument("--loss_lds_kernel", type=str, default="gaussian",
-                        choices=["gaussian", "triang", "laplace"])
-    parser.add_argument("--loss_lds_ks", type=int, default=5)
-    parser.add_argument("--loss_lds_sigma", type=float, default=2.0)
-    parser.add_argument("--loss_lds_num_bins", type=int, default=50)
     parser.add_argument("--loss_bmc_noise", type=float, default=1.0)
     parser.add_argument("--loss_bmc_learn_noise", type=int, default=1, choices=[0, 1])
     parser.add_argument("--loss_focal_gamma", type=float, default=2.0)
@@ -368,6 +397,20 @@ def main():
                         choices=["mse", "huber", "smooth_l1"])
     parser.add_argument("--loss_dro_group_by", type=str, default="bucket",
                         choices=["bucket", "species"])
+    parser.add_argument("--loss_dro_gamma", type=float, default=0.1,
+                        help="EMA momentum for GroupDRO's historical group loss.")
+    parser.add_argument("--loss_dro_normalize_loss", action="store_true",
+                        help="Normalize adjusted group losses before dual update.")
+    parser.add_argument("--loss_dro_btl", action="store_true",
+                        help="Use BTL variant (alpha-constrained worst-group mixture).")
+    parser.add_argument("--loss_dro_alpha", type=float, default=0.2,
+                        help="Alpha mass for BTL GroupDRO (effective when --loss_dro_btl).")
+    parser.add_argument("--loss_dro_min_var_weight", type=float, default=0.0,
+                        help="BTL min-variance mixing weight in [0,1].")
+    parser.add_argument("--loss_dro_adj", type=str, default="",
+                        help="Group adjustment(s): single float or comma list length=#groups.")
+    parser.add_argument("--loss_dro_log_path", type=str, default="",
+                        help="If set, append GroupDRO stats to this file each epoch.")
 
     parser.add_argument("--batch_size", type=int, default=32)
     parser.add_argument("--lr", type=float, default=1e-5,
@@ -435,11 +478,6 @@ def main():
         species_emb_dim=args.species_emb_dim,
         taxo_graph_path=args.taxo_graph_path if args.species_mode in ("gnn", "both") else None,
         loss_type=args.loss_type,
-        lds_num_bins=args.loss_lds_num_bins,
-        lds_reweight=args.loss_lds_reweight,
-        lds_kernel=args.loss_lds_kernel,
-        lds_ks=args.loss_lds_ks,
-        lds_sigma=args.loss_lds_sigma,
         dro_group_by=args.loss_dro_group_by,
     )
     loss_meta_global = getattr(train_loader, "loss_meta", {"needs_meta": False})
@@ -510,16 +548,25 @@ def main():
     loss_kwargs = dict(
         huber_delta=args.loss_huber_delta,
         smooth_l1_beta=args.loss_smooth_l1_beta,
-        lds_base=args.loss_lds_base,
         bmc_noise=args.loss_bmc_noise,
         bmc_learn_noise=bool(args.loss_bmc_learn_noise),
         focal_gamma=args.loss_focal_gamma,
         focal_base=args.loss_focal_base,
         dro_eta=args.loss_dro_eta,
         dro_base=args.loss_dro_base,
+        dro_gamma=args.loss_dro_gamma,
+        dro_normalize_loss=args.loss_dro_normalize_loss,
+        dro_btl=args.loss_dro_btl,
+        dro_alpha=args.loss_dro_alpha,
+        dro_min_var_weight=args.loss_dro_min_var_weight,
     )
     if args.loss_type == "group_dro":
         loss_kwargs["dro_num_groups"] = loss_meta_global["dro_num_groups"]
+        loss_kwargs["dro_group_counts"] = loss_meta_global.get("dro_group_counts")
+        loss_kwargs["dro_adj"] = _parse_dro_adj(
+            args.loss_dro_adj,
+            loss_meta_global["dro_num_groups"],
+        )
     criterion = build_loss(args.loss_type, **loss_kwargs).to(device)
     print(f"[Loss] type={args.loss_type} kwargs={loss_kwargs}")
 
@@ -605,6 +652,7 @@ def main():
                 f"continue training."
             )
 
+
     # ------------------------------------------------------------------
     # LR scheduler: linear warmup → cosine decay (per-step update)
     # When resuming we build a FRESH scheduler covering the new [1..epochs]
@@ -640,11 +688,22 @@ def main():
     else:
         print("[LR scheduler] disabled (constant LR)")
 
+    if args.resume is not None and ckpt.get("criterion_state_dict") is not None:
+        try:
+            criterion.load_state_dict(ckpt["criterion_state_dict"], strict=False)
+            print("[Resume] Criterion state restored.")
+        except Exception as exc:
+            print(f"[Resume] Could not load criterion state ({exc}); continuing.")
+
     for epoch in range(start_epoch, args.epochs+1):
         avg_train_loss, train_loss = train_epoch(
             epoch, model, train_loader, tokenizer, criterion, optimizer, device,
             species_mode=args.species_mode, scheduler=scheduler,
             loss_type=args.loss_type, loss_meta_global=loss_meta_global)
+
+        if args.loss_type == "group_dro" and args.loss_dro_log_path and hasattr(criterion, "log_stats"):
+            logger = _FileLogger(args.loss_dro_log_path)
+            criterion.log_stats(logger, header=f"[epoch {epoch}]")
         # --- 验证 ---
         avg_val_loss, val_loss = validate_epoch(
             epoch, model, val_loader, tokenizer, criterion, device,
@@ -682,7 +741,8 @@ def main():
             save_checkpoint(model, optimizer,
                             os.path.join(ckp_path, f"{args.plm}_lr{args.lr}_bs{args.batch_size}_ep{epoch}_val_best.pth"),
                             scheduler=scheduler, epoch=epoch,
-                            best_val_loss=best_val_loss, best_ep=best_ep)
+                            best_val_loss=best_val_loss, best_ep=best_ep,
+                            criterion=criterion)
 
         # ------------------------------------------------------------------
         # Early stopping: only activates AFTER --es_min_epoch (i.e. give the
@@ -696,7 +756,8 @@ def main():
             save_checkpoint(model, optimizer,
                             os.path.join(ckp_path, f"{args.plm}_lr{args.lr}_bs{args.batch_size}_es_ep{epoch}.pth"),
                             scheduler=scheduler, epoch=epoch,
-                            best_val_loss=best_val_loss, best_ep=best_ep)
+                            best_val_loss=best_val_loss, best_ep=best_ep,
+                            criterion=criterion)
             break
         elif args.early_stopping and epoch < args.es_min_epoch and (epoch - best_ep) >= args.early_stop_patience:
             # still in warmup/peak phase – log but do NOT stop
@@ -709,7 +770,8 @@ def main():
             save_checkpoint(model, optimizer,
                             os.path.join(ckp_path, f"{args.plm}_lr{args.lr}_bs{args.batch_size}_ep{epoch}.pth"),
                             scheduler=scheduler, epoch=epoch,
-                            best_val_loss=best_val_loss, best_ep=best_ep)
+                            best_val_loss=best_val_loss, best_ep=best_ep,
+                            criterion=criterion)
     # --- 测试 ---
     print("\n","*"*30, "Testing model...", "*"*30,"\n")
     avg_test_loss, test_loss = validate_epoch(

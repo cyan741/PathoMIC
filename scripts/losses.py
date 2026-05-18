@@ -30,84 +30,6 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from scipy.ndimage import convolve1d, gaussian_filter1d
-from scipy.signal.windows import triang
-
-
-def get_lds_kernel_window(kernel: str = "gaussian", ks: int = 5,
-                          sigma: float = 2.0) -> np.ndarray:
-    """Construct LDS kernel window aligned with the original DIR implementation."""
-    if kernel not in {"gaussian", "triang", "laplace"}:
-        raise ValueError(f"Unknown LDS kernel: {kernel!r}")
-    if ks <= 0 or ks % 2 == 0:
-        raise ValueError(f"ks must be a positive odd number, got {ks}")
-    if sigma <= 0:
-        raise ValueError(f"sigma must be > 0, got {sigma}")
-
-    half_ks = (ks - 1) // 2
-    if kernel == "gaussian":
-        base_kernel = np.zeros(ks, dtype=np.float32)
-        base_kernel[half_ks] = 1.0
-        kernel_window = gaussian_filter1d(base_kernel, sigma=sigma)
-        kernel_window = kernel_window / np.max(kernel_window)
-    elif kernel == "triang":
-        kernel_window = triang(ks).astype(np.float32)
-    else:
-        support = np.arange(-half_ks, half_ks + 1, dtype=np.float32)
-        kernel_window = np.exp(-np.abs(support) / sigma) / (2.0 * sigma)
-        kernel_window = kernel_window / np.max(kernel_window)
-
-    return np.asarray(kernel_window, dtype=np.float32)
-
-
-# ---------------------------------------------------------------------------
-# Helper: build LDS weights from the training labels and a number of bins.
-# ---------------------------------------------------------------------------
-def compute_lds_weights(
-    y: np.ndarray,
-    num_bins: int = 50,
-    reweight: str = "sqrt_inv",
-    lds_kernel: str = "gaussian",
-    lds_ks: int = 5,
-    sigma: float = 2.0,
-    eps: float = 1e-8,
-) -> tuple[np.ndarray, np.ndarray]:
-    """Return (bin_edges, weight_per_bin) for Label Distribution Smoothing.
-
-    Aligned with `imbalanced-regression`:
-      hist -> (sqrt_inv / inverse / none) -> convolve1d(mode='constant')
-      -> inverse -> normalize to mean 1.
-    """
-    if num_bins <= 1:
-        raise ValueError(f"num_bins must be > 1, got {num_bins}")
-    if reweight not in {"none", "sqrt_inv", "inverse"}:
-        raise ValueError(f"Unknown reweight mode: {reweight!r}")
-    if eps <= 0:
-        raise ValueError(f"eps must be > 0, got {eps}")
-
-    y = np.asarray(y, dtype=np.float32)
-    counts, bin_edges = np.histogram(y, bins=num_bins)
-    value_lst = counts.astype(np.float32)
-
-    if reweight == "sqrt_inv":
-        value_lst = np.sqrt(value_lst)
-    elif reweight == "inverse":
-        value_lst = np.clip(value_lst, 5.0, 1000.0)
-
-    kernel_window = get_lds_kernel_window(kernel=lds_kernel, ks=lds_ks, sigma=sigma)
-    smoothed = convolve1d(value_lst, weights=kernel_window, mode="constant")
-    smoothed = np.clip(smoothed, eps, None)
-
-    inv = 1.0 / smoothed
-    inv = inv / max(float(np.mean(inv)), eps)
-    return bin_edges.astype(np.float32), inv.astype(np.float32)
-
-
-def assign_bin(y: np.ndarray, bin_edges: np.ndarray) -> np.ndarray:
-    """Map each y to its 0-indexed bin idx (clamped to valid range)."""
-    idx = np.digitize(y, bin_edges, right=False) - 1
-    idx = np.clip(idx, 0, len(bin_edges) - 2)
-    return idx.astype(np.int64)
 
 
 # ---------------------------------------------------------------------------
@@ -138,39 +60,6 @@ class SmoothL1(nn.Module):
         return F.smooth_l1_loss(y_pred, y_true, beta=self.beta)
 
 
-# ---------------------------------------------------------------------------
-class LDSWeighted(nn.Module):
-    """Wrap any per-sample base loss with LDS reweighting.
-
-    base_loss : str in {'mse', 'huber', 'smooth_l1'}
-    Per-sample weight comes from meta['bin_weight'][meta['bin_idx']] (computed
-    by the data loader once at startup).
-    """
-
-    def __init__(self, base: str = "huber", delta: float = 1.0):
-        super().__init__()
-        self.base = base
-        self.delta = delta
-
-    def _per_sample(self, y_pred, y_true):
-        diff = y_pred - y_true
-        if self.base == "mse":
-            return diff.pow(2)
-        if self.base == "huber":
-            abs_d = diff.abs()
-            quad = 0.5 * abs_d.pow(2)
-            lin  = self.delta * (abs_d - 0.5 * self.delta)
-            return torch.where(abs_d <= self.delta, quad, lin)
-        if self.base == "smooth_l1":
-            return F.smooth_l1_loss(y_pred, y_true, beta=self.delta, reduction="none")
-        raise ValueError(self.base)
-
-    def forward(self, y_pred, y_true, meta=None):
-        per = self._per_sample(y_pred, y_true).squeeze(-1)         # [B]
-        if meta is None or "bin_idx" not in meta or "bin_weight" not in meta:
-            return per.mean()
-        weights = meta["bin_weight"][meta["bin_idx"]].to(per.device)
-        return (per * weights).mean()
 
 
 # ---------------------------------------------------------------------------
@@ -247,21 +136,180 @@ class GroupDRO(nn.Module):
     """
 
     def __init__(self, num_groups: int, eta: float = 0.01,
-                 base: str = "mse", delta: float = 1.0):
+                 base: str = "mse", delta: float = 1.0,
+                 group_counts: Optional[torch.Tensor] = None,
+                 gamma: float = 0.1,
+                 normalize_loss: bool = False,
+                 btl: bool = False,
+                 alpha: Optional[float] = None,
+                 min_var_weight: float = 0.0,
+                 adj: Optional[torch.Tensor] = None):
         super().__init__()
         self.num_groups = num_groups
         self.eta = eta
         self.base = base
         self.delta = delta
-        # Adversary's distribution over groups (uniform init).
-        self.register_buffer("group_weights", torch.ones(num_groups) / num_groups)
+        self.gamma = gamma
+        self.normalize_loss = normalize_loss
+        self.btl = btl
+        self.alpha = alpha
+        self.min_var_weight = min_var_weight
+
+        # Adversary distribution over groups (uniform init).
+        self.register_buffer("group_weights", torch.ones(num_groups) / num_groups)        # 不需要梯度更新的张量
+
+        if group_counts is None:
+            group_counts = torch.ones(num_groups, dtype=torch.float32) # 维度[num_groups]
+        self.register_buffer("group_counts", group_counts.float().clamp(min=1.0))
+        self.register_buffer("group_frac", self.group_counts / self.group_counts.sum())# 维度[num_groups]
+
+        if adj is None:
+            # Optional adjustment term added to group losses before exponentiating.
+            adj = torch.zeros(num_groups, dtype=torch.float32) # 维度[num_groups]
+        if adj.numel() != num_groups:
+            raise ValueError(f"adj length ({adj.numel()}) must equal num_groups ({num_groups})")
+        self.register_buffer("adj", adj.float())
+
+        self.register_buffer("exp_avg_loss", torch.zeros(num_groups, dtype=torch.float32))
+        self.register_buffer("exp_avg_initialized", torch.zeros(num_groups, dtype=torch.bool))
+        self.register_buffer("last_group_loss", torch.zeros(num_groups, dtype=torch.float32))
+        self.register_buffer("last_group_count", torch.zeros(num_groups, dtype=torch.float32))
+
+        # Stats for monitoring (saved in state_dict).
+        self.register_buffer("processed_data_counts", torch.zeros(num_groups, dtype=torch.float32))
+        self.register_buffer("update_data_counts", torch.zeros(num_groups, dtype=torch.float32))
+        self.register_buffer("update_batch_counts", torch.zeros(num_groups, dtype=torch.float32))
+        self.register_buffer("avg_group_loss", torch.zeros(num_groups, dtype=torch.float32))
+        self.register_buffer("avg_per_sample_loss", torch.tensor(0.0, dtype=torch.float32))
+        self.register_buffer("avg_actual_loss", torch.tensor(0.0, dtype=torch.float32))
+        self.register_buffer("batch_count", torch.tensor(0.0, dtype=torch.float32))
 
     def _per_sample(self, y_pred, y_true):
         if self.base == "mse":
-            return (y_pred - y_true).pow(2).squeeze(-1)
+            return (y_pred - y_true).pow(2).squeeze(-1) # [B]
         elif self.base == "huber":
             return F.huber_loss(y_pred, y_true, delta=self.delta, reduction="none").squeeze(-1)
         return F.smooth_l1_loss(y_pred, y_true, beta=self.delta, reduction="none").squeeze(-1)
+
+    def _compute_group_avg(self, per_sample_loss, group_id):
+        group_losses = torch.zeros(self.num_groups, device=per_sample_loss.device)
+        group_counts = torch.zeros(self.num_groups, device=per_sample_loss.device)
+        group_losses.index_add_(0, group_id, per_sample_loss) # index_add_()函数是PyTorch中用于在指定维度上根据索引将值添加到张量中的函数。
+        # 在这里，group_losses是一个大小为num_groups的张量，group_id是一个大小为B的长整型张量，表示每个样本所属的组ID，而per_sample_loss是一个大小为B的张量，表示每个样本的损失值。
+        # 通过调用group_losses.index_add_(0, group_id, per_sample_loss)，我们将per_sample_loss中的每个元素根据group_id中的索引添加到group_losses的相应位置上，从而计算出每个组的总损失。
+        group_counts.index_add_(0, group_id, torch.ones_like(per_sample_loss))
+        group_loss_avg = group_losses / group_counts.clamp(min=1.0) # torch.clamp()函数是PyTorch中用于限制张量元素的函数。以避免除以零的情况发生。
+        return group_loss_avg, group_counts
+
+    def _update_exp_avg_loss(self, group_loss, group_count):
+
+        is_present = (group_count > 0)
+        prev_weight = (1.0 - self.gamma * is_present.float()) * self.exp_avg_initialized.float()
+        curr_weight = 1.0 - prev_weight
+        self.exp_avg_loss = self.exp_avg_loss * prev_weight + group_loss * curr_weight
+        self.exp_avg_initialized = self.exp_avg_initialized | is_present # 逐位或运算符，更新哪些组已经被初始化过了
+
+    def _compute_robust_loss(self, group_loss):
+        adjusted = group_loss
+        if torch.all(self.adj > 0):
+            adjusted = adjusted + self.adj / torch.sqrt(self.group_counts)
+        if self.normalize_loss:
+            adjusted = adjusted / adjusted.sum().clamp(min=1e-8)
+        with torch.no_grad():
+            self.group_weights = self.group_weights * torch.exp(self.eta * adjusted.detach()) # self.eta是更新步长，adjusted.detach()表示在计算梯度时不考虑adjusted的变化，只使用其当前值。
+            self.group_weights = self.group_weights / self.group_weights.sum().clamp(min=1e-8)
+        robust = torch.dot(group_loss, self.group_weights)
+        return robust
+
+    def _compute_robust_loss_greedy(self, group_loss, ref_loss):
+        if self.alpha is None or self.alpha <= 0:
+            raise ValueError("GroupDRO with btl=True requires alpha > 0")
+        sorted_idx = torch.argsort(ref_loss, descending=True)
+        sorted_loss = group_loss[sorted_idx]
+        sorted_frac = self.group_frac[sorted_idx]
+
+        mask = torch.cumsum(sorted_frac, dim=0) <= self.alpha
+        weights = mask.float() * sorted_frac / self.alpha
+        last_idx = int(mask.sum().item())
+        if last_idx < weights.numel():
+            weights[last_idx] = 1.0 - weights.sum()
+        weights = sorted_frac * self.min_var_weight + weights * (1.0 - self.min_var_weight)
+
+        robust = torch.dot(sorted_loss, weights)
+        _, unsort_idx = torch.sort(sorted_idx)
+        unsorted_weights = weights[unsort_idx]
+        return robust, unsorted_weights
+
+    def _compute_robust_loss_btl(self, group_loss):
+        # BTL variant: use the previous step's group loss as the reference for sorting, instead of the current loss. This is a more stable "greedy" update that doesn't require tuning eta.
+        adjusted = self.exp_avg_loss + self.adj / torch.sqrt(self.group_counts)
+        return self._compute_robust_loss_greedy(group_loss, adjusted)
+
+    def reset_stats(self):
+        self.processed_data_counts.zero_()
+        self.update_data_counts.zero_()
+        self.update_batch_counts.zero_()
+        self.avg_group_loss.zero_()
+        self.avg_per_sample_loss.zero_()
+        self.avg_actual_loss.zero_()
+        self.batch_count.zero_()
+
+    def _update_stats(self, actual_loss, group_loss, group_count, weights=None):
+        # avg group loss
+        denom = self.processed_data_counts + group_count
+        denom = denom + (denom == 0).float()
+        prev_weight = self.processed_data_counts / denom
+        curr_weight = group_count / denom
+        self.avg_group_loss = prev_weight * self.avg_group_loss + curr_weight * group_loss
+
+        # batch-wise average actual loss
+        denom = self.batch_count + 1.0
+        self.avg_actual_loss = (self.batch_count / denom) * self.avg_actual_loss + (1.0 / denom) * actual_loss
+
+        # counts
+        self.processed_data_counts = self.processed_data_counts + group_count
+        if weights is not None:
+            self.update_data_counts = self.update_data_counts + group_count * (weights > 0).float()
+            self.update_batch_counts = self.update_batch_counts + ((group_count * weights) > 0).float()
+        else:
+            self.update_data_counts = self.update_data_counts + group_count
+            self.update_batch_counts = self.update_batch_counts + (group_count > 0).float()
+        self.batch_count = self.batch_count + 1.0
+
+        group_frac = self.processed_data_counts / self.processed_data_counts.sum().clamp(min=1e-8)
+        self.avg_per_sample_loss = torch.dot(group_frac, self.avg_group_loss)
+
+    def get_stats(self):
+        stats = {
+            "avg_actual_loss": float(self.avg_actual_loss.item()),
+            "avg_per_sample_loss": float(self.avg_per_sample_loss.item()),
+        }
+        for idx in range(self.num_groups):
+            stats[f"avg_loss_group:{idx}"] = float(self.avg_group_loss[idx].item())
+            stats[f"exp_avg_loss_group:{idx}"] = float(self.exp_avg_loss[idx].item())
+            stats[f"processed_data_count_group:{idx}"] = float(self.processed_data_counts[idx].item())
+            stats[f"update_data_count_group:{idx}"] = float(self.update_data_counts[idx].item())
+            stats[f"update_batch_count_group:{idx}"] = float(self.update_batch_counts[idx].item())
+        return stats
+
+    def log_stats(self, logger, header: Optional[str] = None):
+        if logger is None:
+            return
+        if header:
+            logger.write(header + "\n")
+        logger.write(f"Average incurred loss: {self.avg_per_sample_loss.item():.4f}\n")
+        logger.write(f"Average sample loss: {self.avg_actual_loss.item():.4f}\n")
+        for group_idx in range(self.num_groups):
+            adj = self.adj[group_idx] / torch.sqrt(self.group_counts)[group_idx]
+            logger.write(
+                f"  group {group_idx} "
+                f"[n = {int(self.processed_data_counts[group_idx])}]:\t"
+                f"loss = {self.avg_group_loss[group_idx]:.4f}  "
+                f"exp loss = {self.exp_avg_loss[group_idx]:.4f}  "
+                f"adjusted loss = {(self.exp_avg_loss[group_idx] + adj):.4f}  "
+                f"adv prob = {self.group_weights[group_idx]:.4f}\n"
+            )
+        logger.flush()
 
     def forward(self, y_pred, y_true, meta=None):
         if meta is None or "group_id" not in meta:
@@ -269,21 +317,22 @@ class GroupDRO(nn.Module):
             return self._per_sample(y_pred, y_true).mean()
         per = self._per_sample(y_pred, y_true)
         group_id = meta["group_id"].to(per.device)
-        # group_loss[g] = mean of per[i] for i in group g.
-        group_losses = torch.zeros(self.num_groups, device=per.device)
-        group_counts = torch.zeros(self.num_groups, device=per.device)
-        group_losses.index_add_(0, group_id, per)
-        group_counts.index_add_(0, group_id, torch.ones_like(per))
-        group_loss_avg = group_losses / group_counts.clamp(min=1.0)
-        # Update the dual variable q (weights over groups).
+        group_loss_avg, group_counts = self._compute_group_avg(per, group_id)
+        self._update_exp_avg_loss(group_loss_avg.detach(), group_counts.detach())
+
+        if self.btl:
+            robust, weights = self._compute_robust_loss_btl(group_loss_avg)
+            with torch.no_grad():
+                self.group_weights = weights
+        else:
+            robust = self._compute_robust_loss(group_loss_avg)
+            weights = self.group_weights
+
         with torch.no_grad():
-            self.group_weights = self.group_weights * torch.exp(self.eta * group_loss_avg)
-            self.group_weights = self.group_weights / self.group_weights.sum()
-        # Mask out empty groups so they don't contribute.
-        active = (group_counts > 0).float()
-        active_w = self.group_weights * active
-        active_w = active_w / active_w.sum().clamp(min=1e-8)
-        return (active_w * group_loss_avg).sum()
+            self.last_group_loss = group_loss_avg.detach()
+            self.last_group_count = group_counts.detach()
+        self._update_stats(robust.detach(), group_loss_avg.detach(), group_counts.detach(), weights.detach())
+        return robust
 
 
 # ---------------------------------------------------------------------------
@@ -296,9 +345,6 @@ def build_loss(loss_type: str, **kwargs) -> nn.Module:
         return HuberLoss(delta=kwargs.get("huber_delta", 1.0))
     if s == "smooth_l1":
         return SmoothL1(beta=kwargs.get("smooth_l1_beta", 1.0))
-    if s == "lds":
-        return LDSWeighted(base=kwargs.get("lds_base", "huber"),
-                           delta=kwargs.get("huber_delta", 1.0))
     if s == "bmc":
         return BalancedMSE(init_noise_sigma=kwargs.get("bmc_noise", 1.0),
                            learn_noise=kwargs.get("bmc_learn_noise", True))
@@ -310,5 +356,12 @@ def build_loss(loss_type: str, **kwargs) -> nn.Module:
         return GroupDRO(num_groups=kwargs["dro_num_groups"],
                         eta=kwargs.get("dro_eta", 0.01),
                         base=kwargs.get("dro_base", "mse"),
-                        delta=kwargs.get("huber_delta", 1.0))
+                        delta=kwargs.get("huber_delta", 1.0),
+                        group_counts=kwargs.get("dro_group_counts"),
+                        gamma=kwargs.get("dro_gamma", 0.1),
+                        normalize_loss=kwargs.get("dro_normalize_loss", False),
+                        btl=kwargs.get("dro_btl", False),
+                        alpha=kwargs.get("dro_alpha", None),
+                        min_var_weight=kwargs.get("dro_min_var_weight", 0.0),
+                        adj=kwargs.get("dro_adj", None))
     raise ValueError(f"Unknown loss_type: {loss_type!r}")
