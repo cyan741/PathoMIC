@@ -311,6 +311,99 @@ def bucketed_test_eval(model, test_loader, tokenizer, criterion, device,
     return {"overall_mse": overall_mse, "buckets": bucket_stats}
 
 
+def _split_test_results_subdir(data_path: str) -> str:
+    """e.g. /NAS/.../splits1 -> splits1_test (matches test_scripts layout)."""
+    base = os.path.basename(os.path.normpath(data_path))
+    return f"{base}_test"
+
+
+def _checkpoint_basename(plm: str, lr: float, batch_size: int, epoch: int, tag: str = "") -> str:
+    """Stem shared by .pth checkpoints and *_test_results.csv files."""
+    stem = f"{plm}_lr{lr}_bs{batch_size}_ep{epoch}"
+    return f"{stem}_{tag}" if tag else stem
+
+
+def load_model_checkpoint(model, ckpt_path: str, device) -> dict:
+    """Load ``model_state_dict`` from a train.py checkpoint."""
+    if not os.path.isfile(ckpt_path):
+        raise FileNotFoundError(f"Checkpoint not found: {ckpt_path}")
+    print(f"[Checkpoint] Loading weights from {ckpt_path}")
+    ckpt = torch.load(ckpt_path, map_location=device, weights_only=False)
+    missing, unexpected = model.load_state_dict(ckpt["model_state_dict"], strict=False)
+    if missing:
+        print(f"[Checkpoint] Missing keys (non-critical): {missing[:5]}")
+    if unexpected:
+        print(f"[Checkpoint] Unexpected keys: {unexpected[:5]}")
+    return ckpt
+
+
+def predict_on_test_loader(model, test_loader, tokenizer, device,
+                           species_mode: str, has_meta: bool = False):
+    """Run forward on ``test_loader`` (shuffle=False) and return predictions in row order."""
+    model.eval()
+    preds = []
+    with torch.no_grad():
+        for batch in tqdm(test_loader, desc="test inference"):
+            seq_list, species_emb, species_ids, _mic_values, _meta = _unpack_batch(
+                batch, device, species_mode, has_meta=has_meta)
+            input_ids = seq2token(seq_list, tokenizer, device)
+            outputs = _model_forward(model, input_ids, species_emb, species_ids, species_mode)
+            preds.extend(outputs.squeeze(-1).detach().cpu().tolist())
+    return preds
+
+
+def save_test_results_csv(test_csv_path: str, predictions, output_path: str) -> str:
+    """Write original test.csv columns plus ``predict_MIC`` (log10 MIC)."""
+    df = pd.read_csv(test_csv_path)
+    if len(predictions) != len(df):
+        raise ValueError(
+            f"Prediction count ({len(predictions)}) != test rows ({len(df)}). "
+            "Check that test_loader order matches test.csv."
+        )
+    df["predict_MIC"] = predictions
+    os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
+    df.to_csv(output_path, index=False)
+    print(f"[test_results] Saved {len(df)} rows -> {output_path}")
+    return output_path
+
+
+def run_post_train_test_eval(
+    model,
+    test_loader,
+    tokenizer,
+    criterion,
+    device,
+    species_mode: str,
+    train_csv_path: str,
+    has_meta: bool,
+    label: str,
+):
+    """Test-set MSE + optional bucketed breakdown; ``label`` prefixes log lines."""
+    print("\n", "*" * 30, f"Testing model ({label})...", "*" * 30, "\n")
+    avg_test_loss, _test_loss = validate_epoch(
+        0, model, test_loader, tokenizer, criterion, device,
+        species_mode=species_mode, has_meta=has_meta,
+        loss_type="mse", loss_meta_global=None,
+    )
+    print(f"[{label}] Test MSE Loss: {avg_test_loss:.4f}")
+
+    bucket_report = None
+    if species_mode != "none":
+        try:
+            print(f"[{label}] Bucketed test eval (by training-set species frequency):")
+            bucket_report = bucketed_test_eval(
+                model, test_loader, tokenizer, criterion, device,
+                species_mode=species_mode,
+                train_csv_path=train_csv_path,
+                has_meta=has_meta,
+            )
+        except Exception as exc:
+            print(f"[{label}][warn] bucketed eval failed: {exc}")
+    else:
+        print(f"[{label}] Skipping bucketed eval (species_mode=none).")
+    return avg_test_loss, bucket_report
+
+
 def main():
     # parameters
     parser = argparse.ArgumentParser(description="""Program entry point for amp MIC regression prediction training""")
@@ -446,6 +539,12 @@ def main():
                              "(start tracking from scratch on the resumed run).")
     parser.add_argument("--save_dir", type=str, default="/NAS/luyq/PLM_AMP_Regression/ckp")
     parser.add_argument("--metrics_name", type=str, default="train_metrics.csv")
+    parser.add_argument(
+        "--test_results_dir",
+        type=str,
+        default="/root/PLM_AMP_Regression/test_results",
+        help="Root folder for auto-saved test CSVs (default: <repo>/test_results/<split>_test/csv/).",
+    )
     parser.add_argument("--device", type=str, default="0")
 
     parser.add_argument("--use_wandb", action="store_true")
@@ -471,7 +570,7 @@ def main():
     train_loader, val_loader, test_loader = data_loader(
         data_path,
         batch_size=args.batch_size,
-        num_workers=4,
+        num_workers=8,
         seed=args.seed,
         species_mode=args.species_mode,
         species_emb_path=args.species_emb_path if args.species_mode in ("adapter", "both") else None,
@@ -695,7 +794,9 @@ def main():
         except Exception as exc:
             print(f"[Resume] Could not load criterion state ({exc}); continuing.")
 
+    last_epoch = start_epoch - 1
     for epoch in range(start_epoch, args.epochs+1):
+        last_epoch = epoch
         avg_train_loss, train_loss = train_epoch(
             epoch, model, train_loader, tokenizer, criterion, optimizer, device,
             species_mode=args.species_mode, scheduler=scheduler,
@@ -772,34 +873,87 @@ def main():
                             scheduler=scheduler, epoch=epoch,
                             best_val_loss=best_val_loss, best_ep=best_ep,
                             criterion=criterion)
-    # --- 测试 ---
-    print("\n","*"*30, "Testing model...", "*"*30,"\n")
-    avg_test_loss, test_loss = validate_epoch(
-        epoch, model, test_loader, tokenizer, criterion, device,
-        species_mode=args.species_mode, has_meta=has_meta,
-        loss_type=args.loss_type, loss_meta_global=loss_meta_global)
-    print(f"Test MSE Loss: {avg_test_loss:.4f}")
 
     # ------------------------------------------------------------------
-    # Long-tail diagnostic: per-species-count bucketed test MSE.
-    # Bucketing is by the species's frequency in the *training* CSV,
-    # which is the right denominator for evaluating long-tail behaviour.
+    # Post-training evaluation on test.csv
+    #   1) val_best checkpoint (early-stop winner): MSE + bucketed + CSV
+    #   2) last-epoch checkpoint (or in-memory weights): MSE + bucketed
     # ------------------------------------------------------------------
-    bucket_report = None
-    if args.species_mode != "none":
+    train_csv_path = os.path.join(args.data_path, "train.csv")
+    test_csv_path = os.path.join(args.data_path, "test.csv")
+    test_results_root = os.makedirs(args.test_results_dir, exist_ok=True)
+    test_results_csv_dir = os.path.join(
+        test_results_root, args.plm , _split_test_results_subdir(args.data_path), "csv",
+    )
+
+    val_best_test_mse = float("nan")
+    final_test_mse = float("nan")
+    bucket_report_val_best = None
+    bucket_report_final = None
+
+    val_best_ckp = os.path.join(
+        ckp_path,
+        f"{_checkpoint_basename(args.plm, args.lr, args.batch_size, best_ep, 'val_best')}.pth",
+    )
+    if best_ep >= 1 and os.path.isfile(val_best_ckp):
+        load_model_checkpoint(model, val_best_ckp, device)
+        val_best_test_mse, bucket_report_val_best = run_post_train_test_eval(
+            model, test_loader, tokenizer, criterion, device,
+            species_mode=args.species_mode,
+            train_csv_path=train_csv_path,
+            has_meta=has_meta,
+            label=f"val_best (epoch {best_ep})",
+        )
         try:
-            bucket_report = bucketed_test_eval(
-                model, test_loader, tokenizer, criterion, device,
-                species_mode=args.species_mode,
-                train_csv_path=os.path.join(args.data_path, "train.csv"),
-                has_meta=has_meta,
+            preds = predict_on_test_loader(
+                model, test_loader, tokenizer, device,
+                species_mode=args.species_mode, has_meta=has_meta,
+            )
+            csv_name = (
+                f"{_checkpoint_basename(args.plm, args.lr, args.batch_size, best_ep, 'val_best')}"
+                f"_test_results.csv"
+            )
+            save_test_results_csv(
+                test_csv_path, preds,
+                os.path.join(test_results_csv_dir, csv_name),
             )
         except Exception as exc:
-            print(f"[warn] bucketed eval failed: {exc}")
+            print(f"[val_best][warn] Could not save test_results CSV: {exc}")
+    else:
+        print(f"[val_best] No checkpoint at {val_best_ckp}; skipping val_best test eval.")
+
+    # Last-epoch / early-stop snapshot (not necessarily val_best weights).
+    final_ckp_candidates = [
+        os.path.join(
+            ckp_path,
+            f"{args.plm}_lr{args.lr}_bs{args.batch_size}_ep{last_epoch}.pth",
+        ),
+        os.path.join(
+            ckp_path,
+            f"{args.plm}_lr{args.lr}_bs{args.batch_size}_es_ep{last_epoch}.pth",
+        ),
+    ]
+    final_ckp = next((p for p in final_ckp_candidates if os.path.isfile(p)), None)
+    if final_ckp is not None:
+        load_model_checkpoint(model, final_ckp, device)
+        final_label = f"last_epoch (epoch {last_epoch}, from disk)"
+    else:
+        print(f"[last_epoch] No saved checkpoint for epoch {last_epoch}; "
+              f"using in-memory weights from the training loop.")
+        final_label = f"last_epoch (epoch {last_epoch}, in-memory)"
+
+    final_test_mse, bucket_report_final = run_post_train_test_eval(
+        model, test_loader, tokenizer, criterion, device,
+        species_mode=args.species_mode,
+        train_csv_path=train_csv_path,
+        has_meta=has_meta,
+        label=final_label,
+    )
 
     metrics_df = pd.DataFrame(metrics_rows)
     metrics_df["best_val_loss"] = best_val_loss
-    metrics_df["final_test_loss"] = avg_test_loss
+    metrics_df["val_best_test_mse"] = val_best_test_mse
+    metrics_df["final_test_mse"] = final_test_mse
 
     # If resuming, append to an existing metrics file instead of overwriting.
     metrics_path = os.path.join(args.save_dir, args.metrics_name)
@@ -813,12 +967,24 @@ def main():
     metrics_df.to_csv(metrics_path, index=False)
     
     if args.use_wandb:
-        log_payload = {"test_mse": avg_test_loss, "best_val_mse": best_val_loss}
-        if bucket_report is not None:
-            log_payload["test_mse_overall"] = bucket_report["overall_mse"]
-            for b in bucket_report["buckets"]:
-                # use a wandb-friendly key; '<' gets stripped to keep panels clean
-                key = "test_mse_bucket_" + b["train_count_bucket"].replace("[","").replace(")","").replace(",","_to_")
+        log_payload = {
+            "best_val_mse": best_val_loss,
+            "val_best_test_mse": val_best_test_mse,
+            "final_test_mse": final_test_mse,
+            "test_mse": val_best_test_mse,  # legacy alias
+        }
+        for prefix, report in (
+            ("val_best", bucket_report_val_best),
+            ("final", bucket_report_final),
+        ):
+            if report is None:
+                continue
+            log_payload[f"{prefix}_test_mse_overall"] = report["overall_mse"]
+            for b in report["buckets"]:
+                key = (
+                    f"{prefix}_test_mse_bucket_"
+                    + b["train_count_bucket"].replace("[", "").replace(")", "").replace(",", "_to_")
+                )
                 log_payload[key] = b["mse"]
                 log_payload[key + "_count"] = b["n_test_samples"]
         wandb.log(log_payload)
