@@ -5,15 +5,12 @@ All losses share a uniform interface so the training loop can stay agnostic:
     loss_fn(y_pred, y_true, meta=None) -> scalar tensor
 
 where ``meta`` is an optional dict used by losses that need extra info:
-    meta['bin_idx']    : LongTensor [B]   bin id for LDS (precomputed by data_loader)
-    meta['bin_weight'] : FloatTensor [num_bins]   1/p_LDS(y) per bin
     meta['group_id']   : LongTensor [B]   group id for GroupDRO (e.g. species or bucket)
 
 Implemented losses:
     - MSE                            (baseline)
     - HuberLoss(delta)               (robust)
     - SmoothL1Loss(beta)             (robust)
-    - LDSWeighted(base, sigma=2.0)   (long-tail; reweights MSE/Huber by inverse smoothed label freq)
     - BalancedMSE / BMC              (long-tail, batch-level normalization)
     - FocalR(gamma=2.0)              (long-tail; reweight by error magnitude)
     - GroupDRO(num_groups, eta=0.01) (OOD / worst-group; needs meta['group_id'])

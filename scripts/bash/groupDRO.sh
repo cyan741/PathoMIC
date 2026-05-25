@@ -56,15 +56,15 @@ run_one() {
     echo "  done : $(date)"
 }
 
-run_one splits1 hier gcn huber 1e-4
-run_one splits1 hier gcn mse 1e-4
-run_one splits2 hier gcn huber 1e-4
-run_one splits2 hier gcn mse 1e-4
 
 run_one splits1 hier gcn huber 0
 run_one splits1 hier gcn mse 0
 run_one splits2 hier gcn huber 0
 run_one splits2 hier gcn mse 0
+run_one splits1 hier gcn mse 1e-4
+run_one splits2 hier gcn huber 1e-4
+run_one splits2 hier gcn mse 1e-4
+run_one splits1 hier gcn huber 1e-4
 
 
 
