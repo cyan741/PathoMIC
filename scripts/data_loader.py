@@ -66,7 +66,10 @@ class MIC_Dataset(Dataset):
         # ----- loss meta -------------------------------------------------
         return_meta: bool = False,
         bucket_lookup: Optional[Dict[str, int]] = None, # for GroupDRO ``bucket`` mode
-        sp_to_group_id: Optional[Dict[str, int]] = None # for GroupDRO ``species`` mode
+        sp_to_group_id: Optional[Dict[str, int]] = None, # for GroupDRO ``species`` mode
+        # ----- shuffle-species control ---------------------------------------
+        shuffle_species: bool = False,
+        shuffle_species_seed: int = 0,
     ):
         if species_mode not in ("none", "adapter", "gnn", "both"):
             raise ValueError(f"Unknown species_mode: {species_mode!r}")
@@ -88,6 +91,21 @@ class MIC_Dataset(Dataset):
             self.species_names = mic_df.Target_Species.astype(str).tolist()
         else:
             self.species_names = None
+
+        # ----- shuffle-species control --------------------------------------
+        # When `shuffle_species` is True, replace each sample's species name
+        # with a randomly permuted name from THIS SAME SPLIT (so the species
+        # set is unchanged but the (peptide -> species) pairing is destroyed).
+        # The peptide / MIC value are untouched, so the only information the
+        # species channel can carry now is noise. If the GNN really helps,
+        # MSE under this control should regress toward the vanilla baseline.
+        self.shuffle_species = bool(shuffle_species)
+        if self.shuffle_species and self.species_names is not None:
+            rng = np.random.RandomState(int(shuffle_species_seed))
+            perm = rng.permutation(len(self.species_names))
+            self.species_names = [self.species_names[i] for i in perm]
+            print(f"[MIC_Dataset] shuffle_species=True (seed={shuffle_species_seed}); "
+                  f"{len(self.species_names)} (peptide, species) pairs randomly re-shuffled.")
 
         # legacy adapter pathway
         self.species_emb_map = species_emb_map if needs_emb else None
@@ -231,7 +249,10 @@ def data_loader(data_path, batch_size, num_workers, seed,
                 # ----- loss meta options -----
                 loss_type: str = "mse",
                 dro_group_by: str = "bucket",
-                dro_bucket_bounds: Tuple[float, ...] = DEFAULT_BUCKET_BOUNDS):
+                dro_bucket_bounds: Tuple[float, ...] = DEFAULT_BUCKET_BOUNDS,
+                # ----- shuffle-species control (null-hypothesis test) ----
+                shuffle_species: bool = False,
+                shuffle_species_seed: int = 0):
     """Build (train_loader, val_loader, test_loader).
 
     If ``loss_type`` is ``group_dro``, we precompute bucket / species group ids
@@ -308,7 +329,16 @@ def data_loader(data_path, batch_size, num_workers, seed,
         sp_to_group_id=sp_to_group_id,
     )
 
-    train_dataset = MIC_Dataset(train_df, **common_kwargs)
+    # Shuffle-species control: apply ONLY to the TRAIN split so the model is
+    # trained on noisy (peptide -> species) pairings, but val/test still use
+    # the real pairings and measure how badly the noisy species channel hurts.
+    # Use distinct seeds per split derivation to avoid pathological collisions.
+    train_dataset = MIC_Dataset(
+        train_df,
+        shuffle_species=shuffle_species,
+        shuffle_species_seed=shuffle_species_seed,
+        **common_kwargs,
+    )
     val_dataset   = MIC_Dataset(val_df,   **common_kwargs)
     test_dataset  = MIC_Dataset(test_df,  **common_kwargs)
 

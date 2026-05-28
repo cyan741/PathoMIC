@@ -5,7 +5,7 @@ The forward pass takes the static 768-d initial node features built by
 over the (parent->child + reverse) edges, and returns the per-node embedding
 projected to ``out_dim``.
 
-Three fusion strategies for going from per-node embeddings to a per-species
+Four fusion strategies for going from per-node embeddings to a per-species
 batch embedding:
     fusion='leaf'     : take only the species (leaf) node embedding.
     fusion='hier'     : concat over a list of canonical-rank ancestors,
@@ -13,6 +13,17 @@ batch embedding:
                         ``hier_levels`` (default ('species','genus','family')).
     fusion='hier_attn': attention-pool over the chosen levels (let the
                         model self-weight species/genus/family/...).
+    fusion='hier_raw' : concat over the hier_levels (NO projection back to
+                        out_dim). Output width is out_dim * len(hier_levels),
+                        i.e. exposes the raw per-level embeddings to the
+                        downstream head. ``self.out_dim`` is overridden to
+                        the resulting width.
+
+Regardless of fusion mode (as long as hier_levels are valid), a separate
+``forward_levels(species_ids_or_names)`` method returns the raw
+``[B, len(hier_levels), out_dim_per_node]`` tensor (before any hier_proj /
+hier_attn / hier_raw reshape). This is what the prefix-injection path in
+``plm_models.py`` consumes to build the 3 species prefix tokens.
 
 Optional knobs (Stage 0 plan):
     use_lora_init=True : keep the 768-d PubMedBERT init *frozen* and add a
@@ -187,7 +198,7 @@ class TaxonomySpeciesEncoder(nn.Module):
         gnn_type: str = "gcn",
         heads: int = 4,
         dropout: float = 0.1,
-        fusion: Literal["leaf", "hier", "hier_attn"] = "leaf",
+        fusion: Literal["leaf", "hier", "hier_attn", "hier_raw"] = "leaf",
         hier_levels: Sequence[str] = ("species", "genus", "family"),
         freeze_init: bool = True,
         use_lora_init: bool = False,
@@ -217,13 +228,19 @@ class TaxonomySpeciesEncoder(nn.Module):
         self.register_buffer("ancestors_per_species", ancestors_per_species.long(), persistent=False)
         self.species_to_sp_idx: Dict[str, int] = dict(species_to_sp_idx)
 
-        if fusion not in ("leaf", "hier", "hier_attn"):
+        if fusion not in ("leaf", "hier", "hier_attn", "hier_raw"):
             raise ValueError(f"Unknown fusion mode: {fusion!r}")
         self.fusion = fusion
+        # self.out_dim is the width of the tensor returned by ``forward``.
+        # For ``hier_raw`` it is out_dim * len(hier_levels); for the others
+        # it equals out_dim. We also record the per-node width so that
+        # ``forward_levels`` (which returns the raw [B, L, out_dim] before any
+        # cross-level pooling) is always well-defined.
+        self.per_node_out_dim = out_dim
         self.out_dim = out_dim
 
         # Validate hier_levels and stash indices.
-        if fusion in ("hier", "hier_attn"):
+        if fusion in ("hier", "hier_attn", "hier_raw"):
             for lvl in hier_levels:
                 if lvl not in self.LEVEL_TO_IDX:
                     raise ValueError(f"Unknown taxonomic level: {lvl!r}")
@@ -237,16 +254,21 @@ class TaxonomySpeciesEncoder(nn.Module):
             if fusion == "hier":
                 self.hier_proj = nn.Linear(out_dim * len(self.hier_levels), out_dim)
                 self.attn = None
-            else:  # hier_attn
+            elif fusion == "hier_attn":
                 self.hier_proj = None
                 # MultiheadAttention over the level dim. Query is a learnable
                 # token; keys/values are the gathered per-level embeddings.
-                self.query_token = nn.Parameter(torch.zeros(1, 1, out_dim)) # 注册可学习参数
+                self.query_token = nn.Parameter(torch.zeros(1, 1, out_dim))
                 nn.init.normal_(self.query_token, std=0.02)
                 self.attn = nn.MultiheadAttention(
                     embed_dim=out_dim, num_heads=attn_heads,
                     dropout=dropout, batch_first=True,
                 )
+            else:  # hier_raw: no cross-level projection at all.
+                self.hier_proj = None
+                self.attn = None
+                # Output width that downstream modules see.
+                self.out_dim = out_dim * len(self.hier_levels)
         else:
             self.hier_levels = ()
             self.hier_levels_idx = []
@@ -287,30 +309,51 @@ class TaxonomySpeciesEncoder(nn.Module):
         return torch.stack(chunks, dim=1)                          # [B, L, out_dim]
 
     # ------------------------------------------------------------------
-    def forward(self, species_ids_or_names) -> torch.Tensor:
-        all_node_emb = self.gnn()                                  # [N, out_dim]
-
+    def _resolve_sp_idx(self, species_ids_or_names, device: torch.device) -> torch.Tensor:
         if isinstance(species_ids_or_names, torch.Tensor):
-            sp_idx = species_ids_or_names.long().to(all_node_emb.device)
-        else:
-            sp_idx = self._names_to_sp_idx(list(species_ids_or_names), all_node_emb.device)
+            return species_ids_or_names.long().to(device)
+        return self._names_to_sp_idx(list(species_ids_or_names), device)
+
+    def forward(self, species_ids_or_names) -> torch.Tensor:
+        all_node_emb = self.gnn()                                  # [N, per_node_out_dim]
+        sp_idx = self._resolve_sp_idx(species_ids_or_names, all_node_emb.device)
 
         if self.fusion == "leaf":
             leaf_node = self.ancestors_per_species[sp_idx, self.LEVEL_TO_IDX["species"]]
             return all_node_emb[leaf_node]                         # [B, out_dim]
 
-        # hier / hier_attn share level-gathering -----------------------
+        # hier / hier_attn / hier_raw all gather per-level embs first ---
         level_embs = self._gather_level_embs(all_node_emb, sp_idx)  # [B, L, out_dim]
+        B = level_embs.size(0)
 
         if self.fusion == "hier":
-            B = level_embs.size(0)
             return self.hier_proj(level_embs.reshape(B, -1))        # [B, out_dim]
 
+        if self.fusion == "hier_raw":
+            # No cross-level projection; expose the concatenated raw vector.
+            return level_embs.reshape(B, -1)                        # [B, L * out_dim]
+
         # hier_attn ----------------------------------------------------
-        B = level_embs.size(0)
         q = self.query_token.expand(B, -1, -1)                      # [B, 1, out_dim]
         out, _ = self.attn(q, level_embs, level_embs, need_weights=False)
         return out.squeeze(1)                                       # [B, out_dim]
+
+    # ------------------------------------------------------------------
+    def forward_levels(self, species_ids_or_names) -> torch.Tensor:
+        """Return the raw per-level embeddings ``[B, len(hier_levels), per_node_out_dim]``.
+
+        Bypasses ``hier_proj`` / ``hier_attn`` / ``hier_raw`` reshape. This is
+        what the prefix-injection path consumes to feed N species tokens into
+        the ESM input. Requires fusion in {hier, hier_attn, hier_raw}.
+        """
+        if self.fusion not in ("hier", "hier_attn", "hier_raw"):
+            raise RuntimeError(
+                f"forward_levels() requires fusion in {{hier, hier_attn, hier_raw}}; "
+                f"got fusion={self.fusion!r}."
+            )
+        all_node_emb = self.gnn()                                  # [N, per_node_out_dim]
+        sp_idx = self._resolve_sp_idx(species_ids_or_names, all_node_emb.device)
+        return self._gather_level_embs(all_node_emb, sp_idx)        # [B, L, per_node_out_dim]
 
 
 # ---------------------------------------------------------------------------
@@ -323,7 +366,7 @@ def build_species_encoder_from_graph(
     gnn_type: str = "gcn",
     heads: int = 4,
     dropout: float = 0.1,
-    fusion: str = "leaf",
+    fusion: str = "leaf",   # leaf | hier | hier_attn | hier_raw
     hier_levels: Sequence[str] = ("species", "genus", "family"),
     freeze_init: bool = True,
     use_lora_init: bool = False,

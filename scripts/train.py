@@ -317,10 +317,19 @@ def _split_test_results_subdir(data_path: str) -> str:
     return f"{base}_test"
 
 
-def _checkpoint_basename(plm: str, lr: float, batch_size: int, epoch: int, tag: str = "") -> str:
-    """Stem shared by .pth checkpoints and *_test_results.csv files."""
+def _checkpoint_basename(plm: str, lr: float, batch_size: int, epoch: int, tag: str = "",
+                         seed: int = None) -> str:
+    """Stem shared by .pth checkpoints and *_test_results.csv files.
+
+    If ``seed`` is given, ``_sd{seed}`` is appended at the very end so multi-
+    seed runs land in distinct files (e.g. ``..._ep16_val_best_sd42.pth``).
+    """
     stem = f"{plm}_lr{lr}_bs{batch_size}_ep{epoch}"
-    return f"{stem}_{tag}" if tag else stem
+    if tag:
+        stem = f"{stem}_{tag}"
+    if seed is not None:
+        stem = f"{stem}_sd{seed}"
+    return stem
 
 
 def load_model_checkpoint(model, ckpt_path: str, device) -> dict:
@@ -456,8 +465,9 @@ def main():
                         help="GAT only: number of attention heads per layer.")
     parser.add_argument("--gnn_dropout", type=float, default=0.1)
     parser.add_argument("--gnn_fusion", type=str, default="leaf",
-                        choices=["leaf", "hier", "hier_attn"],
-                        help="leaf=F1; hier=F2 (configurable levels); hier_attn=attention pool.")
+                        choices=["leaf", "hier", "hier_attn", "hier_raw"],
+                        help="leaf=F1; hier=F2 (configurable levels); hier_attn=attention pool; "
+                             "hier_raw=raw concat of per-level embeddings (no hier_proj).")
     parser.add_argument("--gnn_hier_levels", type=str, default="species,genus,family",
                         help="Comma-separated taxonomic levels for hier/hier_attn fusion.")
     parser.add_argument("--gnn_freeze_init", type=int, default=1, choices=[0, 1],
@@ -472,6 +482,16 @@ def main():
     parser.add_argument("--fusion_strategy", type=str, default="concat",
                         choices=["concat", "gated", "film", "cross_attn", "bilinear"],
                         help="How to combine ESM peptide embedding with the GNN species emb.")
+    parser.add_argument("--species_inject", type=str, default="post",
+                        choices=["post", "prefix"],
+                        help="post = default; GNN species_emb fused with ESM output. "
+                             "prefix = prepend N species tokens (one per hier_level) to ESM "
+                             "input embeddings; pure prefix injection, no late fusion. "
+                             "Requires --gnn_out_dim == ESM hidden width (640 for 150M).")
+    parser.add_argument("--prefix_pool", type=str, default="peptide",
+                        choices=["peptide", "all"],
+                        help="When --species_inject=prefix: pool over peptide tokens only "
+                             "('peptide') or over all tokens including the species prefix ('all').")
     parser.add_argument("--gnn_lr_mult", type=float, default=1.0,
                         help="Multiplier on the base lr applied ONLY to the GNN+fusion params.")
     parser.add_argument("--weight_decay", type=float, default=0.0)
@@ -542,10 +562,53 @@ def main():
     parser.add_argument(
         "--test_results_dir",
         type=str,
-        default="/root/PLM_AMP_Regression/test_results",
+        default="/home/luyq/PLM_AMP_Regression/test_results",
         help="Root folder for auto-saved test CSVs (default: <repo>/test_results/<split>_test/csv/).",
     )
     parser.add_argument("--device", type=str, default="0")
+
+    # ----- shuffle-species control (null hypothesis test) ------------------
+    parser.add_argument(
+        "--shuffle_species_control", type=int, default=0, choices=[0, 1],
+        help="If 1, randomly permute the (peptide -> species) pairing on the "
+             "TRAIN split before training (val/test are untouched). Used to "
+             "test whether the species channel actually carries useful signal.",
+    )
+
+    # ----- ESM-backbone tuning regime (Prefix-tuning experiments) ----------
+    parser.add_argument(
+        "--freeze_esm", type=int, default=0, choices=[0, 1],
+        help="If 1, freeze ALL ESM2 backbone parameters. Used together with "
+             "--species_inject=prefix to study prefix-only tuning.",
+    )
+    parser.add_argument(
+        "--use_lora", type=int, default=0, choices=[0, 1],
+        help="If 1, attach a LoRA adapter (via the `peft` library) to the ESM "
+             "backbone. Mutually exclusive with --freeze_esm=1 in the same run.",
+    )
+    parser.add_argument("--lora_r", type=int, default=8)
+    parser.add_argument("--lora_alpha", type=int, default=16)
+    parser.add_argument("--lora_dropout", type=float, default=0.05)
+    parser.add_argument(
+        "--lora_target", type=str, default="query,value",
+        help="Comma-separated list of nn.Linear module names within EsmLayer "
+             "to wrap with LoRA (e.g. 'query,value' for Q/V; "
+             "'query,key,value' for QKV).",
+    )
+
+    # ----- Prefix depth: shallow vs deep (per-layer KV) --------------------
+    parser.add_argument(
+        "--prefix_depth", type=str, default="shallow",
+        choices=["shallow", "deep"],
+        help="When --species_inject=prefix: 'shallow' = prepend species tokens "
+             "to the input embeddings only (current behaviour); 'deep' = inject "
+             "a learned (K,V) pair per layer, prepended to every layer's "
+             "self-attention K/V (Prefix-Tuning v2 / P-Tuning v2).",
+    )
+    parser.add_argument(
+        "--prefix_kv_hidden", type=int, default=512,
+        help="Hidden width of the per-layer prefix MLP (deep prefix only).",
+    )
 
     parser.add_argument("--use_wandb", action="store_true")
     parser.add_argument("--wandb_project", type=str, default="AMP-ESM")
@@ -578,12 +641,17 @@ def main():
         taxo_graph_path=args.taxo_graph_path if args.species_mode in ("gnn", "both") else None,
         loss_type=args.loss_type,
         dro_group_by=args.loss_dro_group_by,
+        shuffle_species=bool(args.shuffle_species_control),
+        shuffle_species_seed=args.seed,
     )
     loss_meta_global = getattr(train_loader, "loss_meta", {"needs_meta": False})
     has_meta = loss_meta_global.get("needs_meta", False)
     # load model and tokenizer
     print("Loading model...")
     hier_levels_tuple = tuple(s.strip() for s in args.gnn_hier_levels.split(",") if s.strip())
+    lora_targets_tuple = tuple(
+        s.strip() for s in args.lora_target.split(",") if s.strip()
+    )
     model = ESM2(
         plm_output=args.plm_output,
         head_type=args.head_type,
@@ -609,6 +677,16 @@ def main():
         gnn_residual=args.gnn_residual,
         gnn_layernorm=args.gnn_layernorm,
         fusion_strategy=args.fusion_strategy,
+        species_inject=args.species_inject,
+        prefix_pool=args.prefix_pool,
+        prefix_depth=args.prefix_depth,
+        prefix_kv_hidden=args.prefix_kv_hidden,
+        freeze_esm=bool(args.freeze_esm),
+        use_lora=bool(args.use_lora),
+        lora_r=args.lora_r,
+        lora_alpha=args.lora_alpha,
+        lora_dropout=args.lora_dropout,
+        lora_target=lora_targets_tuple,
     )
     if torch.cuda.is_available():
         device = torch.device("cuda:" + args.device)
@@ -669,30 +747,46 @@ def main():
     criterion = build_loss(args.loss_type, **loss_kwargs).to(device)
     print(f"[Loss] type={args.loss_type} kwargs={loss_kwargs}")
 
-    # ----- Optimizer with optional GNN-specific lr_mult ----------------------
-    if args.gnn_lr_mult != 1.0 and args.species_mode in ("gnn", "both"):
-        gnn_params, esm_params = [], []
+    # ----- Optimizer with optional split lr (backbone vs new modules) -------
+    # "new modules" = anything we add on top of the frozen / LoRA-adapted ESM
+    # backbone: the GNN, the fusion module, the legacy species adapter, the
+    # regression head, and the prefix-tuning modules (level_type_emb +
+    # prefix_kv_encoder). These get ``lr * gnn_lr_mult``; everything else
+    # (typically only LoRA adapters when --use_lora is set; the full ESM
+    # otherwise) gets the base ``lr``.
+    NEW_MODULE_PREFIXES = (
+        "species_gnn", "fusion", "species_adapter", "projection",
+        "level_type_emb", "prefix_kv_encoder",
+    )
+    split_lr = (args.gnn_lr_mult != 1.0) or bool(args.freeze_esm) or bool(args.use_lora)
+    if split_lr:
+        new_params, backbone_params = [], []
+        n_new_count = n_bb_count = 0
         for n, p in model.named_parameters():
             if not p.requires_grad:
                 continue
-            if (n.startswith("species_gnn") or n.startswith("fusion")
-                or n.startswith("species_adapter") or n.startswith("projection")):
-                gnn_params.append(p)
+            if any(n.startswith(pref) for pref in NEW_MODULE_PREFIXES):
+                new_params.append(p)
+                n_new_count += p.numel()
             else:
-                esm_params.append(p)
+                backbone_params.append(p)
+                n_bb_count += p.numel()
         optimizer = torch.optim.AdamW(
             [
-                {"params": esm_params, "lr": args.lr,
+                {"params": backbone_params, "lr": args.lr,
                  "weight_decay": args.weight_decay},
-                {"params": gnn_params, "lr": args.lr * args.gnn_lr_mult,
+                {"params": new_params, "lr": args.lr * args.gnn_lr_mult,
                  "weight_decay": args.weight_decay},
             ]
         )
-        print(f"[Optimizer] AdamW with split lr: ESM lr={args.lr:.2e}, "
-              f"GNN/head lr={args.lr * args.gnn_lr_mult:.2e}, wd={args.weight_decay}")
+        print(f"[Optimizer] AdamW with split lr: backbone lr={args.lr:.2e} "
+              f"({n_bb_count/1e6:.2f}M trainable), "
+              f"new-modules lr={args.lr * args.gnn_lr_mult:.2e} "
+              f"({n_new_count/1e6:.2f}M trainable), wd={args.weight_decay}")
     else:
         optimizer = torch.optim.AdamW(
-            model.parameters(), lr=args.lr, weight_decay=args.weight_decay,
+            filter(lambda p: p.requires_grad, model.parameters()),
+            lr=args.lr, weight_decay=args.weight_decay,
         )
         print(f"[Optimizer] AdamW lr={args.lr:.2e}, wd={args.weight_decay}")
 
@@ -834,13 +928,19 @@ def main():
         if avg_val_loss < best_val_loss:
             # 保存最佳模型
             # 如果上一个最佳模型存在且不是当前模型，则删除上一个最佳模型文件
-            prev_ckp_path = os.path.join(ckp_path, f"{args.plm}_lr{args.lr}_bs{args.batch_size}_ep{best_ep}_val_best.pth")
+            prev_ckp_path = os.path.join(
+                ckp_path,
+                f"{_checkpoint_basename(args.plm, args.lr, args.batch_size, best_ep, 'val_best', seed=args.seed)}.pth",
+            )
             if os.path.exists(prev_ckp_path) and best_ep != epoch:
-                os.remove(prev_ckp_path)    
+                os.remove(prev_ckp_path)
             best_val_loss, best_ep = avg_val_loss, epoch
             print(f"New best model found at epoch {best_ep} with Val MSE: {best_val_loss:.4f}. Saving model...")
             save_checkpoint(model, optimizer,
-                            os.path.join(ckp_path, f"{args.plm}_lr{args.lr}_bs{args.batch_size}_ep{epoch}_val_best.pth"),
+                            os.path.join(
+                                ckp_path,
+                                f"{_checkpoint_basename(args.plm, args.lr, args.batch_size, epoch, 'val_best', seed=args.seed)}.pth",
+                            ),
                             scheduler=scheduler, epoch=epoch,
                             best_val_loss=best_val_loss, best_ep=best_ep,
                             criterion=criterion)
@@ -854,8 +954,11 @@ def main():
             print(f"Early stopping at epoch {epoch} "
                   f"(no val-loss improvement for {epoch - best_ep} epochs; "
                   f"best was epoch {best_ep} with val MSE {best_val_loss:.4f}).")
+            es_stem = f"{args.plm}_lr{args.lr}_bs{args.batch_size}_es_ep{epoch}"
+            if args.seed is not None:
+                es_stem = f"{es_stem}_sd{args.seed}"
             save_checkpoint(model, optimizer,
-                            os.path.join(ckp_path, f"{args.plm}_lr{args.lr}_bs{args.batch_size}_es_ep{epoch}.pth"),
+                            os.path.join(ckp_path, f"{es_stem}.pth"),
                             scheduler=scheduler, epoch=epoch,
                             best_val_loss=best_val_loss, best_ep=best_ep,
                             criterion=criterion)
@@ -869,7 +972,10 @@ def main():
         if epoch == args.epochs:
             print(f"Training complete. Saving final model at epoch {epoch}. Best Val MSE: {best_val_loss:.4f} at epoch {best_ep}.")
             save_checkpoint(model, optimizer,
-                            os.path.join(ckp_path, f"{args.plm}_lr{args.lr}_bs{args.batch_size}_ep{epoch}.pth"),
+                            os.path.join(
+                                ckp_path,
+                                f"{_checkpoint_basename(args.plm, args.lr, args.batch_size, epoch, seed=args.seed)}.pth",
+                            ),
                             scheduler=scheduler, epoch=epoch,
                             best_val_loss=best_val_loss, best_ep=best_ep,
                             criterion=criterion)
@@ -881,10 +987,11 @@ def main():
     # ------------------------------------------------------------------
     train_csv_path = os.path.join(args.data_path, "train.csv")
     test_csv_path = os.path.join(args.data_path, "test.csv")
-    test_results_root = os.makedirs(args.test_results_dir, exist_ok=True)
+    os.makedirs(args.test_results_dir, exist_ok=True)
     test_results_csv_dir = os.path.join(
-        test_results_root, args.plm , _split_test_results_subdir(args.data_path), "csv",
+        args.test_results_dir, args.plm, _split_test_results_subdir(args.data_path), "csv",
     )
+    os.makedirs(test_results_csv_dir, exist_ok=True)
 
     val_best_test_mse = float("nan")
     final_test_mse = float("nan")
@@ -893,7 +1000,7 @@ def main():
 
     val_best_ckp = os.path.join(
         ckp_path,
-        f"{_checkpoint_basename(args.plm, args.lr, args.batch_size, best_ep, 'val_best')}.pth",
+        f"{_checkpoint_basename(args.plm, args.lr, args.batch_size, best_ep, 'val_best', seed=args.seed)}.pth",
     )
     if best_ep >= 1 and os.path.isfile(val_best_ckp):
         load_model_checkpoint(model, val_best_ckp, device)
@@ -910,7 +1017,7 @@ def main():
                 species_mode=args.species_mode, has_meta=has_meta,
             )
             csv_name = (
-                f"{_checkpoint_basename(args.plm, args.lr, args.batch_size, best_ep, 'val_best')}"
+                f"{_checkpoint_basename(args.plm, args.lr, args.batch_size, best_ep, 'val_best', seed=args.seed)}"
                 f"_test_results.csv"
             )
             save_test_results_csv(
@@ -923,14 +1030,15 @@ def main():
         print(f"[val_best] No checkpoint at {val_best_ckp}; skipping val_best test eval.")
 
     # Last-epoch / early-stop snapshot (not necessarily val_best weights).
+    _seed_suffix = f"_sd{args.seed}" if args.seed is not None else ""
     final_ckp_candidates = [
         os.path.join(
             ckp_path,
-            f"{args.plm}_lr{args.lr}_bs{args.batch_size}_ep{last_epoch}.pth",
+            f"{args.plm}_lr{args.lr}_bs{args.batch_size}_ep{last_epoch}{_seed_suffix}.pth",
         ),
         os.path.join(
             ckp_path,
-            f"{args.plm}_lr{args.lr}_bs{args.batch_size}_es_ep{last_epoch}.pth",
+            f"{args.plm}_lr{args.lr}_bs{args.batch_size}_es_ep{last_epoch}{_seed_suffix}.pth",
         ),
     ]
     final_ckp = next((p for p in final_ckp_candidates if os.path.isfile(p)), None)
