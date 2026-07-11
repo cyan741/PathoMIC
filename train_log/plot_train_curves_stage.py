@@ -40,14 +40,66 @@ def plot_one(csv_path: Path, out_png: Path, title: str | None = None) -> None:
 
 
 def main() -> None:
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--stage_dir", required=True, help="e.g. /NAS/.../gnn_runs_v2/stage1")
-    ap.add_argument("--out_dir", required=True, help="e.g. /root/.../train_log/gnn_runs_v2/stage1")
-    ap.add_argument("--pattern", default="*.csv", help="metrics csv glob inside each run dir")
+    ap = argparse.ArgumentParser(
+        description=(
+            "Plot train/val MSE curves from metrics CSVs. "
+            "Either pass --stage_dir (nested run folders) or one or more --csv (flat layout)."
+        )
+    )
+    ap.add_argument(
+        "--stage_dir",
+        default=None,
+        help="Parent dir containing subdirs per run, each with a metrics *.csv (legacy layout).",
+    )
+    ap.add_argument(
+        "--out_dir",
+        required=True,
+        help="Directory to write PNGs (created if missing).",
+    )
+    ap.add_argument(
+        "--pattern",
+        default="*.csv",
+        help="With --stage_dir: glob inside each run dir (default: first match).",
+    )
+    ap.add_argument(
+        "--csv",
+        action="append",
+        default=None,
+        dest="csvs",
+        metavar="PATH",
+        help=(
+            "Explicit metrics CSV path (repeatable). Example: HMAMP ckp splits1/splits2 "
+            "HMAMP_lr1e-5_bs32.csv. Output: <out_dir>/<csv_stem>_loss.png"
+        ),
+    )
+    ap.add_argument(
+        "--title",
+        default=None,
+        help="Optional single title when exactly one --csv is given (ignored if multiple).",
+    )
     args = ap.parse_args()
 
-    stage_dir = Path(args.stage_dir)
     out_dir = Path(args.out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    # ----- flat: one or more explicit CSV paths --------------------------------
+    if args.csvs:
+        for i, csv_str in enumerate(args.csvs):
+            csv_path = Path(csv_str).resolve()
+            if not csv_path.is_file():
+                raise FileNotFoundError(csv_path)
+            stem = csv_path.stem
+            parent_tag = csv_path.parent.name
+            title = args.title if (args.title and len(args.csvs) == 1) else f"{parent_tag} / {stem}"
+            out_png = out_dir / f"{parent_tag}_{stem}_loss.png"
+            plot_one(csv_path, out_png, title=title)
+            print(f"[ok] {csv_path} -> {out_png}")
+        return
+
+    # ----- legacy: stage_dir / <run> / *.csv -----------------------------------
+    if not args.stage_dir:
+        ap.error("Provide --stage_dir or at least one --csv.")
+    stage_dir = Path(args.stage_dir)
     if not stage_dir.exists():
         raise FileNotFoundError(stage_dir)
 

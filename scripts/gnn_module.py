@@ -44,6 +44,8 @@ import torch.nn.functional as F
 
 from torch_geometric.nn import GATConv, GCNConv
 
+from PLM_head import SpeciesAdapter
+
 
 HIER_LEVELS_FULL = ("domain", "kingdom", "phylum", "class",
                     "order",  "family",  "genus",  "species")
@@ -198,7 +200,7 @@ class TaxonomySpeciesEncoder(nn.Module):
         gnn_type: str = "gcn",
         heads: int = 4,
         dropout: float = 0.1,
-        fusion: Literal["leaf", "hier", "hier_attn", "hier_raw"] = "leaf",
+        fusion: Literal["leaf", "hier", "hier_attn", "hier_raw", "gate_hard"] = "leaf",
         hier_levels: Sequence[str] = ("species", "genus", "family"),
         freeze_init: bool = True,
         use_lora_init: bool = False,
@@ -206,6 +208,15 @@ class TaxonomySpeciesEncoder(nn.Module):
         use_residual: bool = False,
         use_layernorm: bool = False,
         attn_heads: int = 4,
+        # ----- gate_hard fusion knobs -----------------------------------
+        # Per-species train sample counts (name -> count). Species with
+        # count >= gate_count_threshold use the adapter-identical passthrough
+        # branch (no message passing, leaf init only); the rest use the GCN
+        # aggregated leaf embedding.
+        species_train_counts: Optional[Dict[str, int]] = None,
+        gate_count_threshold: int = 100,
+        adapter_bottleneck: int = 128,
+        adapter_dropout: float = 0.1,
     ):
         super().__init__()
         self.gnn = TaxonomyGNN(
@@ -228,9 +239,10 @@ class TaxonomySpeciesEncoder(nn.Module):
         self.register_buffer("ancestors_per_species", ancestors_per_species.long(), persistent=False)
         self.species_to_sp_idx: Dict[str, int] = dict(species_to_sp_idx)
 
-        if fusion not in ("leaf", "hier", "hier_attn", "hier_raw"):
+        if fusion not in ("leaf", "hier", "hier_attn", "hier_raw", "gate_hard"):
             raise ValueError(f"Unknown fusion mode: {fusion!r}")
         self.fusion = fusion
+        self.gate_count_threshold = int(gate_count_threshold)
         # self.out_dim is the width of the tensor returned by ``forward``.
         # For ``hier_raw`` it is out_dim * len(hier_levels); for the others
         # it equals out_dim. We also record the per-node width so that
@@ -276,7 +288,55 @@ class TaxonomySpeciesEncoder(nn.Module):
             self.hier_proj = None
             self.attn = None
 
+        # ----- gate_hard: adapter-identical passthrough branch --------------
+        # High-count (count >= threshold) species bypass message passing and
+        # go through a SpeciesAdapter that is architecturally identical to the
+        # 'adapter' species channel (Linear->LN->GELU->Dropout->Linear->GELU),
+        # fed the SAME 768-d PubMedBERT leaf init vector. Low-count species use
+        # the GCN-aggregated leaf embedding. Both output ``out_dim`` so the
+        # downstream head sees a fixed width.
+        if fusion == "gate_hard":
+            self.passthrough_adapter = SpeciesAdapter(
+                in_dim=in_dim,
+                bottleneck=adapter_bottleneck,
+                out_dim=out_dim,
+                dropout=adapter_dropout,
+            )
+            # Per-species passthrough mask, indexed by sp_idx (species_names order).
+            S = len(self.species_to_sp_idx)
+            mask = torch.zeros(S, dtype=torch.bool)
+            if species_train_counts is not None:
+                for name, c in species_train_counts.items():
+                    j = self.species_to_sp_idx.get(name)
+                    if j is not None and int(c) >= self.gate_count_threshold:
+                        mask[j] = True
+            self.register_buffer("passthrough_mask", mask, persistent=True)
+        else:
+            self.passthrough_adapter = None
+            self.register_buffer("passthrough_mask", None, persistent=False)
+
         self._known_species: List[str] = list(self.species_to_sp_idx.keys())
+
+    # ------------------------------------------------------------------
+    def set_species_train_counts(self, species_train_counts: Dict[str, int]) -> None:
+        """(Re)build the passthrough mask from a {species_name -> count} dict.
+
+        Used when counts are only known at train time (split-dependent) while
+        the encoder was constructed from the split-agnostic graph.
+        """
+        if self.fusion != "gate_hard":
+            raise RuntimeError("set_species_train_counts() only valid for fusion='gate_hard'.")
+        S = len(self.species_to_sp_idx)
+        mask = torch.zeros(S, dtype=torch.bool)
+        for name, c in species_train_counts.items():
+            j = self.species_to_sp_idx.get(name)
+            if j is not None and int(c) >= self.gate_count_threshold:
+                mask[j] = True
+        self.passthrough_mask = mask.to(self.passthrough_mask.device)
+        n_pass = int(mask.sum())
+        print(f"[TaxonomySpeciesEncoder] gate_hard: {n_pass}/{S} species "
+              f"passthrough (count >= {self.gate_count_threshold}), "
+              f"{S - n_pass} aggregated via GCN.")
 
     # ------------------------------------------------------------------
     def _names_to_sp_idx(self, names, device: torch.device) -> torch.Tensor:
@@ -321,6 +381,15 @@ class TaxonomySpeciesEncoder(nn.Module):
         if self.fusion == "leaf":
             leaf_node = self.ancestors_per_species[sp_idx, self.LEVEL_TO_IDX["species"]]
             return all_node_emb[leaf_node]                         # [B, out_dim]
+
+        if self.fusion == "gate_hard":
+            
+            leaf_node = self.ancestors_per_species[sp_idx, self.LEVEL_TO_IDX["species"]]
+            z_agg = all_node_emb[leaf_node]                        # [B, out_dim] (GCN)
+            leaf_init = self.gnn._resolve_init()[leaf_node]        # [B, in_dim] raw PubMedBERT
+            z_pass = self.passthrough_adapter(leaf_init)           # [B, out_dim] (adapter-identical)
+            gate = self.passthrough_mask[sp_idx].unsqueeze(-1)     # [B, 1] True=passthrough
+            return torch.where(gate, z_pass, z_agg)                # [B, out_dim]
 
         # hier / hier_attn / hier_raw all gather per-level embs first ---
         level_embs = self._gather_level_embs(all_node_emb, sp_idx)  # [B, L, out_dim]
@@ -374,6 +443,10 @@ def build_species_encoder_from_graph(
     use_residual: bool = False,
     use_layernorm: bool = False,
     attn_heads: int = 4,
+    species_train_counts: Optional[Dict[str, int]] = None,
+    gate_count_threshold: int = 100,
+    adapter_bottleneck: int = 128,
+    adapter_dropout: float = 0.1,
 ) -> TaxonomySpeciesEncoder:
     g = torch.load(graph_path, weights_only=False, map_location="cpu")
     species_to_sp_idx = {name: i for i, name in enumerate(g["species_names"])}
@@ -397,4 +470,8 @@ def build_species_encoder_from_graph(
         use_residual=use_residual,
         use_layernorm=use_layernorm,
         attn_heads=attn_heads,
+        species_train_counts=species_train_counts,
+        gate_count_threshold=gate_count_threshold,
+        adapter_bottleneck=adapter_bottleneck,
+        adapter_dropout=adapter_dropout,
     )

@@ -465,9 +465,15 @@ def main():
                         help="GAT only: number of attention heads per layer.")
     parser.add_argument("--gnn_dropout", type=float, default=0.1)
     parser.add_argument("--gnn_fusion", type=str, default="leaf",
-                        choices=["leaf", "hier", "hier_attn", "hier_raw"],
+                        choices=["leaf", "hier", "hier_attn", "hier_raw", "gate_hard"],
                         help="leaf=F1; hier=F2 (configurable levels); hier_attn=attention pool; "
-                             "hier_raw=raw concat of per-level embeddings (no hier_proj).")
+                             "hier_raw=raw concat of per-level embeddings (no hier_proj); "
+                             "gate_hard=conditional aggregation (count>=threshold species use "
+                             "an adapter-identical passthrough, rest use GCN leaf).")
+    parser.add_argument("--gnn_gate_count_threshold", type=int, default=100,
+                        help="gate_hard only: species whose TRAIN sample count is >= this value "
+                             "bypass message passing (adapter-identical passthrough on the leaf "
+                             "PubMedBERT init); the rest use the GCN-aggregated leaf embedding.")
     parser.add_argument("--gnn_hier_levels", type=str, default="species,genus,family",
                         help="Comma-separated taxonomic levels for hier/hier_attn fusion.")
     parser.add_argument("--gnn_freeze_init", type=int, default=1, choices=[0, 1],
@@ -652,6 +658,14 @@ def main():
     lora_targets_tuple = tuple(
         s.strip() for s in args.lora_target.split(",") if s.strip()
     )
+    # gate_hard fusion needs per-species TRAIN sample counts (split-dependent)
+    # to decide which species passthrough vs aggregate.
+    species_train_counts = None
+    if args.species_mode in ("gnn", "both") and args.gnn_fusion == "gate_hard":
+        _train_df = pd.read_csv(os.path.join(data_path, "train.csv"))
+        species_train_counts = (
+            _train_df["Target_Species"].astype(str).value_counts().to_dict()
+        )
     model = ESM2(
         plm_output=args.plm_output,
         head_type=args.head_type,
@@ -671,6 +685,8 @@ def main():
         gnn_dropout=args.gnn_dropout,
         gnn_fusion=args.gnn_fusion,
         gnn_hier_levels=hier_levels_tuple,
+        gnn_gate_count_threshold=args.gnn_gate_count_threshold,
+        species_train_counts=species_train_counts,
         gnn_freeze_init=bool(args.gnn_freeze_init),
         use_lora_init=args.use_lora_init,
         lora_rank=args.lora_rank,

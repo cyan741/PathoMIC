@@ -20,7 +20,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, List, Optional
 
-BASH_DIR = Path("/home/luyq/PLM_AMP_Regression/scripts/bash")
+BASH_DIR = Path(__file__).resolve().parent
 SCRIPT = BASH_DIR / "gnn_150M_prefix_tune.sh"
 CKP_BASE = Path("/NAS/luyq/PLM_AMP_Regression/gnn_runs/esm2-150M")
 LOG_BASE = CKP_BASE / "logs"
@@ -115,7 +115,7 @@ def poll(running: List[Job], event_log) -> List[Job]:
             continue
         j.returncode = rc
         elapsed = time.time() - (j.started_at or time.time())
-        msg = (f"[{time.strftime('%F %T')}] FINISH {job.name} GPU{j.gpu} "
+        msg = (f"[{time.strftime('%F %T')}] FINISH {j.name} GPU{j.gpu} "
                f"rc={rc} elapsed={elapsed/60:.1f}min")
         event_log.write(msg + "\n"); event_log.flush()
         print(msg, flush=True)

@@ -15,9 +15,10 @@
 #   GPU=0 VARIANT=P1 SEED=42 bash gnn_150M_prefix_tune.sh
 
 set -u
+_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PLM="esm2-150M"
-PY=${PY:-/home/luyq/miniconda3/envs/pytorch3.9/bin/python}
-ROOT_DIR="/home/luyq/PLM_AMP_Regression/scripts"
+PY=${PY:-/opt/conda/envs/esm-AMP/bin/python}
+ROOT_DIR="$(cd "${_SCRIPT_DIR}/.." && pwd)"
 cd "${ROOT_DIR}"
 
 CKP_BASE="/NAS/luyq/PLM_AMP_Regression/gnn_runs/${PLM}"

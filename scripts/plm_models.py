@@ -248,9 +248,14 @@ class ESM2(nn.Module):
                  gnn_type='gcn',
                  gnn_heads=4,
                  gnn_dropout=0.1,
-                 gnn_fusion='leaf',
-                 gnn_hier_levels=('species', 'genus', 'family'),
-                 gnn_freeze_init=True,
+                gnn_fusion='leaf',
+                gnn_hier_levels=('species', 'genus', 'family'),
+                # ----- gate_hard fusion (conditional aggregation) -----
+                # Species with train count >= gnn_gate_count_threshold take an
+                # adapter-identical passthrough branch; the rest use GCN.
+                gnn_gate_count_threshold=100,
+                species_train_counts=None,
+                gnn_freeze_init=True,
                  use_lora_init=False,
                  lora_rank=16,
                  gnn_residual=False,
@@ -340,6 +345,13 @@ class ESM2(nn.Module):
                     "species_mode='%s' requires taxo_graph_path to be provided "
                     "(produced by scripts/build_taxonomy_graph.py)." % species_mode
                 )
+            if gnn_fusion == "gate_hard" and gnn_out_dim != species_out_dim:
+                raise ValueError(
+                    f"gnn_fusion='gate_hard' requires gnn_out_dim ({gnn_out_dim}) == "
+                    f"species_out_dim ({species_out_dim}) so the passthrough branch "
+                    f"matches the species adapter channel width. Pass "
+                    f"--gnn_out_dim {species_out_dim}."
+                )
             self.species_gnn = build_species_encoder_from_graph(
                 taxo_graph_path,
                 hidden=gnn_hidden,
@@ -355,6 +367,10 @@ class ESM2(nn.Module):
                 lora_rank=lora_rank,
                 use_residual=gnn_residual,
                 use_layernorm=gnn_layernorm,
+                species_train_counts=species_train_counts,
+                gate_count_threshold=gnn_gate_count_threshold,
+                adapter_bottleneck=species_bottleneck,
+                adapter_dropout=species_dropout,
             )
         else:
             self.species_gnn = None
@@ -414,8 +430,8 @@ class ESM2(nn.Module):
                     prefix_kv_hidden=prefix_kv_hidden,
                 )
                 print(f"[ESM2] deep prefix-tuning enabled: "
-                      f"L={cfg.num_hidden_layers} layers × N={n_levels} tokens "
-                      f"× ({cfg.num_attention_heads}h × {self.hidden_size // cfg.num_attention_heads}d) "
+                      f"L={cfg.num_hidden_layers} layers x N={n_levels} tokens "
+                      f"x ({cfg.num_attention_heads}h x {self.hidden_size // cfg.num_attention_heads}d) "
                       f"via MLP(H={self.hidden_size} -> {prefix_kv_hidden} -> "
                       f"{cfg.num_hidden_layers*2*self.hidden_size})")
             else:
