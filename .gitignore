@@ -1,0 +1,10 @@
+# Extracted NCBI taxdump files exceed GitHub's 100 MB limit; use taxdump.tar.gz instead.
+PathoMIC/taxdump/names.dmp
+PathoMIC/taxdump/nodes.dmp
+
+# Notebook checkpoints
+**/.ipynb_checkpoints/
+
+# Python cache
+**/__pycache__/
+**/*.pyc

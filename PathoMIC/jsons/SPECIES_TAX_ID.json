@@ -1,0 +1,2082 @@
+{
+    "Stenotrophomonas maltophilia": {
+        "TAX_ID": "40324",
+        "Type": "Gram-negative"
+    },
+    "Enterococcus faecium": {
+        "TAX_ID": "1352",
+        "Type": "Gram-positive"
+    },
+    "Escherichia coli": {
+        "TAX_ID": "562",
+        "Type": "Gram-negative"
+    },
+    "Pseudomonas aeruginosa": {
+        "TAX_ID": "287",
+        "Type": "Gram-negative"
+    },
+    "Staphylococcus aureus": {
+        "TAX_ID": "1280",
+        "Type": "Gram-positive"
+    },
+    "Candida albicans": {
+        "TAX_ID": "5476",
+        "Type": "Fungi"
+    },
+    "Cutibacterium acnes": {
+        "TAX_ID": "1747",
+        "Type": "Gram-positive"
+    },
+    "Streptococcus mutans": {
+        "TAX_ID": "1309",
+        "Type": "Gram-positive"
+    },
+    "Staphylococcus epidermidis": {
+        "TAX_ID": "1282",
+        "Type": "Gram-positive"
+    },
+    "Acinetobacter baumannii": {
+        "TAX_ID": "470",
+        "Type": "Gram-negative"
+    },
+    "Burkholderia pseudomallei": {
+        "TAX_ID": "28450",
+        "Type": "unknown"
+    },
+    "Candida tropicalis": {
+        "TAX_ID": "5482",
+        "Type": "Fungi"
+    },
+    "Nakaseomyces glabratus": {
+        "TAX_ID": "5478",
+        "Type": "Fungi"
+    },
+    "Cryptococcus neoformans": {
+        "TAX_ID": "5207",
+        "Type": "Fungi"
+    },
+    "Streptococcus gordonii": {
+        "TAX_ID": "1302",
+        "Type": "Gram-positive"
+    },
+    "Streptococcus sanguinis": {
+        "TAX_ID": "1305",
+        "Type": "Gram-positive"
+    },
+    "Burkholderia cenocepacia": {
+        "TAX_ID": "95486",
+        "Type": "Gram-negative"
+    },
+    "Francisella tularensis": {
+        "TAX_ID": "263",
+        "Type": "unknown"
+    },
+    "Listeria monocytogenes": {
+        "TAX_ID": "1639",
+        "Type": "Gram-positive"
+    },
+    "Porphyromonas gingivalis": {
+        "TAX_ID": "837",
+        "Type": "unknown"
+    },
+    "Aspergillus fumigatus": {
+        "TAX_ID": "746128",
+        "Type": "Fungi"
+    },
+    "Fusarium solani": {
+        "TAX_ID": "169388",
+        "Type": "Fungi"
+    },
+    "Streptococcus parasanguinis": {
+        "TAX_ID": "1318",
+        "Type": "Gram-positive"
+    },
+    "Streptococcus oralis": {
+        "TAX_ID": "1303",
+        "Type": "Gram-positive"
+    },
+    "Streptococcus sobrinus": {
+        "TAX_ID": "1310",
+        "Type": "Gram-positive"
+    },
+    "Neurospora crassa": {
+        "TAX_ID": "5141",
+        "Type": "Fungi"
+    },
+    "Streptococcus salivarius": {
+        "TAX_ID": "1304",
+        "Type": "Gram-positive"
+    },
+    "Enterococcus faecalis": {
+        "TAX_ID": "1351",
+        "Type": "Gram-positive"
+    },
+    "Ligilactobacillus salivarius": {
+        "TAX_ID": "1624",
+        "Type": "Gram-positive"
+    },
+    "Candida dubliniensis": {
+        "TAX_ID": "42374",
+        "Type": "Fungi"
+    },
+    "Pichia kudriavzevii": {
+        "TAX_ID": "4909",
+        "Type": "Fungi"
+    },
+    "Listeria ivanovii": {
+        "TAX_ID": "1638",
+        "Type": "Gram-positive"
+    },
+    "Bacillus subtilis": {
+        "TAX_ID": "1423",
+        "Type": "Gram-positive"
+    },
+    "Aggregatibacter actinomycetemcomitans": {
+        "TAX_ID": "714",
+        "Type": "Gram-negative"
+    },
+    "Burkholderia ambifaria": {
+        "TAX_ID": "152480",
+        "Type": "Gram-negative"
+    },
+    "Klebsiella pneumoniae": {
+        "TAX_ID": "573",
+        "Type": "Gram-negative"
+    },
+    "Burkholderia multivorans": {
+        "TAX_ID": "87883",
+        "Type": "Gram-negative"
+    },
+    "Salmonella enterica": {
+        "TAX_ID": "28901",
+        "Type": "Gram-negative"
+    },
+    "Burkholderia dolosa": {
+        "TAX_ID": "152500",
+        "Type": "Gram-negative"
+    },
+    "Burkholderia stabilis": {
+        "TAX_ID": "95485",
+        "Type": "Gram-negative"
+    },
+    "Burkholderia thailandensis": {
+        "TAX_ID": "57975",
+        "Type": "Gram-negative"
+    },
+    "Staphylococcus haemolyticus": {
+        "TAX_ID": "1283",
+        "Type": "Gram-positive"
+    },
+    "Staphylococcus saprophyticus": {
+        "TAX_ID": "29385",
+        "Type": "Gram-positive"
+    },
+    "Staphylococcus lugdunensis": {
+        "TAX_ID": "28035",
+        "Type": "Gram-positive"
+    },
+    "Enterococcus casseliflavus": {
+        "TAX_ID": "37734",
+        "Type": "Gram-positive"
+    },
+    "Pseudomonas putida": {
+        "TAX_ID": "303",
+        "Type": "Gram-negative"
+    },
+    "Acinetobacter nosocomialis": {
+        "TAX_ID": "106654",
+        "Type": "Gram-negative"
+    },
+    "Pseudomonas fluorescens": {
+        "TAX_ID": "294",
+        "Type": "Gram-negative"
+    },
+    "Klebsiella oxytoca": {
+        "TAX_ID": "571",
+        "Type": "Gram-negative"
+    },
+    "Bacillus anthracis": {
+        "TAX_ID": "1392",
+        "Type": "unknown"
+    },
+    "Bacillus cereus": {
+        "TAX_ID": "1396",
+        "Type": "Gram-positive"
+    },
+    "Aspergillus brasiliensis": {
+        "TAX_ID": "319629",
+        "Type": "Fungi"
+    },
+    "Salmonella typhimurium": {
+        "TAX_ID": "90371",
+        "Type": "Gram-negative"
+    },
+    "Salmonella enteritidis": {
+        "TAX_ID": "149539",
+        "Type": "Gram-negative"
+    },
+    "Vibrio cholerae": {
+        "TAX_ID": "666",
+        "Type": "Gram-negative"
+    },
+    "Vibrio parahaemolyticus": {
+        "TAX_ID": "670",
+        "Type": "Gram-negative"
+    },
+    "Acinetobacter calcoaceticus": {
+        "TAX_ID": "471",
+        "Type": "Gram-negative"
+    },
+    "Aspergillus flavus": {
+        "TAX_ID": "5059",
+        "Type": "Fungi"
+    },
+    "Aspergillus niger": {
+        "TAX_ID": "5061",
+        "Type": "Fungi"
+    },
+    "Aspergillus ochraceus": {
+        "TAX_ID": "40380",
+        "Type": "Fungi"
+    },
+    "Aspergillus parasiticus": {
+        "TAX_ID": "5067",
+        "Type": "Fungi"
+    },
+    "Aspergillus sydowii": {
+        "TAX_ID": "75750",
+        "Type": "Fungi"
+    },
+    "Aspergillus clavatus": {
+        "TAX_ID": "5057",
+        "Type": "Fungi"
+    },
+    "Aspergillus terreus": {
+        "TAX_ID": "33178",
+        "Type": "Fungi"
+    },
+    "Acinetobacter faecalis": {
+        "TAX_ID": "2665161",
+        "Type": "unknown"
+    },
+    "Aspergillus ustus": {
+        "TAX_ID": "40382",
+        "Type": "Fungi"
+    },
+    "Acinetobacter bohemicus": {
+        "TAX_ID": "1435036",
+        "Type": "Gram-negative"
+    },
+    "Acinetobacter johnsonii": {
+        "TAX_ID": "40214",
+        "Type": "Gram-negative"
+    },
+    "Acinetobacter junii": {
+        "TAX_ID": "40215",
+        "Type": "Gram-negative"
+    },
+    "Bacillus amyloliquefaciens": {
+        "TAX_ID": "1390",
+        "Type": "Gram-positive"
+    },
+    "Aspergillus oryzae": {
+        "TAX_ID": "5062",
+        "Type": "Fungi"
+    },
+    "Bacillus luti": {
+        "TAX_ID": "2026191",
+        "Type": "Gram-positive"
+    },
+    "Burkholderia cepacia": {
+        "TAX_ID": "292",
+        "Type": "Gram-negative"
+    },
+    "Bacillus licheniformis": {
+        "TAX_ID": "1402",
+        "Type": "Gram-positive"
+    },
+    "Aspergillus nidulans": {
+        "TAX_ID": "162425",
+        "Type": "Fungi"
+    },
+    "Bacillus mycoides": {
+        "TAX_ID": "1405",
+        "Type": "Gram-positive"
+    },
+    "Candida parapsilosis": {
+        "TAX_ID": "5480",
+        "Type": "Fungi"
+    },
+    "Cryptococcus gattii": {
+        "TAX_ID": "37769",
+        "Type": "Fungi"
+    },
+    "Bacillus magaterium": {
+        "TAX_ID": "1799160",
+        "Type": "unknown"
+    },
+    "Bacillus velezensis": {
+        "TAX_ID": "492670",
+        "Type": "Gram-positive"
+    },
+    "Bacillus pumilus": {
+        "TAX_ID": "1408",
+        "Type": "Gram-positive"
+    },
+    "Fusarium avenaceum": {
+        "TAX_ID": "40199",
+        "Type": "Fungi"
+    },
+    "Bacillus thuringiensis": {
+        "TAX_ID": "1428",
+        "Type": "Gram-positive"
+    },
+    "Enterococcus durans": {
+        "TAX_ID": "53345",
+        "Type": "Gram-positive"
+    },
+    "Fusarium graminearum": {
+        "TAX_ID": "5518",
+        "Type": "Fungi"
+    },
+    "Fusarium culmorum": {
+        "TAX_ID": "5516",
+        "Type": "Fungi"
+    },
+    "Fusarium subglutinans": {
+        "TAX_ID": "42677",
+        "Type": "Fungi"
+    },
+    "Fusarium verticillioides": {
+        "TAX_ID": "117187",
+        "Type": "Fungi"
+    },
+    "Burkholderia mallei": {
+        "TAX_ID": "13373",
+        "Type": "unknown"
+    },
+    "Enterococcus plantarum": {
+        "TAX_ID": "1077675",
+        "Type": "Gram-positive"
+    },
+    "Enterococcus hirae": {
+        "TAX_ID": "1354",
+        "Type": "Gram-positive"
+    },
+    "Enterococcus mundtii": {
+        "TAX_ID": "53346",
+        "Type": "Gram-positive"
+    },
+    "Klebsiella aerogenes": {
+        "TAX_ID": "548",
+        "Type": "Gram-negative"
+    },
+    "Listeria fleischmannii": {
+        "TAX_ID": "1069827",
+        "Type": "Gram-positive"
+    },
+    "Lactobacillus gallinarum": {
+        "TAX_ID": "52242",
+        "Type": "Gram-positive"
+    },
+    "Fusarium proliferatum": {
+        "TAX_ID": "948311",
+        "Type": "Fungi"
+    },
+    "Lactobacillus delbrueckii": {
+        "TAX_ID": "1584",
+        "Type": "Gram-positive"
+    },
+    "Lactobacillus acidophilus": {
+        "TAX_ID": "1579",
+        "Type": "Gram-positive"
+    },
+    "Listeria grayi": {
+        "TAX_ID": "1641",
+        "Type": "Gram-positive"
+    },
+    "Lactobacillus helveticus": {
+        "TAX_ID": "1587",
+        "Type": "Gram-positive"
+    },
+    "Pseudomonas haemolytica": {
+        "TAX_ID": "2600065",
+        "Type": "unknown"
+    },
+    "Listeria seeligeri": {
+        "TAX_ID": "1640",
+        "Type": "Gram-positive"
+    },
+    "Listeria innocua": {
+        "TAX_ID": "1642",
+        "Type": "Gram-positive"
+    },
+    "Pichia membranifaciens": {
+        "TAX_ID": "4926",
+        "Type": "Fungi"
+    },
+    "Pseudomonas plecoglossicida": {
+        "TAX_ID": "70775",
+        "Type": "Gram-negative"
+    },
+    "Pseudomonas alginovora": {
+        "TAX_ID": "37638",
+        "Type": "Gram-negative"
+    },
+    "Streptococcus alactolyticus": {
+        "TAX_ID": "29389",
+        "Type": "Gram-positive"
+    },
+    "Pseudomonas syringae": {
+        "TAX_ID": "317",
+        "Type": "Gram-negative"
+    },
+    "Streptococcus agalactiae": {
+        "TAX_ID": "1311",
+        "Type": "Gram-positive"
+    },
+    "Staphylococcus carnosus": {
+        "TAX_ID": "1281",
+        "Type": "Gram-positive"
+    },
+    "Staphylococcus capitis": {
+        "TAX_ID": "29388",
+        "Type": "Gram-positive"
+    },
+    "Staphylococcus auricularis": {
+        "TAX_ID": "29379",
+        "Type": "Gram-positive"
+    },
+    "Streptococcus constellatus": {
+        "TAX_ID": "76860",
+        "Type": "Gram-positive"
+    },
+    "Streptococcus anginosus": {
+        "TAX_ID": "1328",
+        "Type": "Gram-positive"
+    },
+    "Staphylococcus delphini": {
+        "TAX_ID": "53344",
+        "Type": "Gram-positive"
+    },
+    "Streptococcus equi": {
+        "TAX_ID": "1336",
+        "Type": "Gram-positive"
+    },
+    "Staphylococcus faecalis": {
+        "TAX_ID": "310516",
+        "Type": "unknown"
+    },
+    "Staphylococcus gallinarum": {
+        "TAX_ID": "1293",
+        "Type": "Gram-positive"
+    },
+    "Streptococcus gallolyticus": {
+        "TAX_ID": "315405",
+        "Type": "Gram-positive"
+    },
+    "Streptococcus hyointestinalis": {
+        "TAX_ID": "1337",
+        "Type": "Gram-positive"
+    },
+    "Staphylococcus hyicus": {
+        "TAX_ID": "1284",
+        "Type": "Gram-positive"
+    },
+    "Staphylococcus hominis": {
+        "TAX_ID": "1290",
+        "Type": "Gram-positive"
+    },
+    "Streptococcus infantis": {
+        "TAX_ID": "68892",
+        "Type": "Gram-positive"
+    },
+    "Streptococcus iniae": {
+        "TAX_ID": "1346",
+        "Type": "Gram-positive"
+    },
+    "Staphylococcus intermedius": {
+        "TAX_ID": "1285",
+        "Type": "Gram-positive"
+    },
+    "Streptococcus dysgalactiae": {
+        "TAX_ID": "1334",
+        "Type": "Gram-positive"
+    },
+    "Streptococcus lutetiensis": {
+        "TAX_ID": "150055",
+        "Type": "Gram-positive"
+    },
+    "Streptococcus equinus": {
+        "TAX_ID": "1335",
+        "Type": "Gram-positive"
+    },
+    "Streptococcus mitis": {
+        "TAX_ID": "28037",
+        "Type": "Gram-positive"
+    },
+    "Stenotrophomonas sp.": {
+        "TAX_ID": "69392",
+        "Type": "unknown"
+    },
+    "Staphylococcus pseudintermedius": {
+        "TAX_ID": "283734",
+        "Type": "Gram-positive"
+    },
+    "Staphylococcus simulans": {
+        "TAX_ID": "1286",
+        "Type": "Gram-negative"
+    },
+    "Streptococcus pyogenes": {
+        "TAX_ID": "1314",
+        "Type": "Gram-positive"
+    },
+    "Streptococcus sciuri": {
+        "TAX_ID": "2973939",
+        "Type": "unknown"
+    },
+    "Streptococcus suis": {
+        "TAX_ID": "1307",
+        "Type": "Gram-positive"
+    },
+    "Aureobasidium pullulans": {
+        "TAX_ID": "5580",
+        "Type": "Fungi"
+    },
+    "Streptococcus uberis": {
+        "TAX_ID": "1349",
+        "Type": "Gram-positive"
+    },
+    "Botrytis cinerea": {
+        "TAX_ID": "40559",
+        "Type": "Fungi"
+    },
+    "Batrachochytrium dendrobatidis": {
+        "TAX_ID": "109871",
+        "Type": "Fungi"
+    },
+    "Staphylococcus warneri": {
+        "TAX_ID": "1292",
+        "Type": "Gram-positive"
+    },
+    "Staphylococcus xylosus": {
+        "TAX_ID": "1288",
+        "Type": "Gram-positive"
+    },
+    "Arthrobacter globiformis": {
+        "TAX_ID": "1665",
+        "Type": "Gram-positive"
+    },
+    "Aerococcus viridans": {
+        "TAX_ID": "1377",
+        "Type": "Gram-positive"
+    },
+    "Corynebacterium glutamicum": {
+        "TAX_ID": "1718",
+        "Type": "Gram-positive"
+    },
+    "Streptococcus thermophilus": {
+        "TAX_ID": "1308",
+        "Type": "Gram-positive"
+    },
+    "Priestia megaterium": {
+        "TAX_ID": "1404",
+        "Type": "Gram-positive"
+    },
+    "Clostridium perfringens": {
+        "TAX_ID": "1502",
+        "Type": "Gram-positive"
+    },
+    "Enterobacter cloacae": {
+        "TAX_ID": "550",
+        "Type": "Gram-negative"
+    },
+    "Edwardsiella tarda": {
+        "TAX_ID": "636",
+        "Type": "Gram-negative"
+    },
+    "Penicillium digitatum": {
+        "TAX_ID": "36651",
+        "Type": "Fungi"
+    },
+    "Penicillium italicum": {
+        "TAX_ID": "40296",
+        "Type": "Fungi"
+    },
+    "Vibrio anguillarum": {
+        "TAX_ID": "55601",
+        "Type": "Gram-negative"
+    },
+    "Micrococcus luteus": {
+        "TAX_ID": "1270",
+        "Type": "Gram-positive"
+    },
+    "Lactococcus lactis": {
+        "TAX_ID": "1358",
+        "Type": "Gram-positive"
+    },
+    "Saccharomyces cerevisiae": {
+        "TAX_ID": "4932",
+        "Type": "Fungi"
+    },
+    "Nocardia asteroides": {
+        "TAX_ID": "1824",
+        "Type": "Gram-positive"
+    },
+    "Proteus mirabilis": {
+        "TAX_ID": "584",
+        "Type": "Gram-negative"
+    },
+    "Pasteurella multocida": {
+        "TAX_ID": "747",
+        "Type": "Gram-negative"
+    },
+    "Proteus vulgaris": {
+        "TAX_ID": "585",
+        "Type": "Gram-negative"
+    },
+    "Penicillium expansum": {
+        "TAX_ID": "27334",
+        "Type": "Fungi"
+    },
+    "Shigella dysenteriae": {
+        "TAX_ID": "622",
+        "Type": "Gram-negative"
+    },
+    "Sphingobacterium lactis": {
+        "TAX_ID": "797291",
+        "Type": "Gram-negative"
+    },
+    "Serratia marcescens": {
+        "TAX_ID": "615",
+        "Type": "Gram-negative"
+    },
+    "Shigella sonnei": {
+        "TAX_ID": "624",
+        "Type": "Gram-negative"
+    },
+    "Vibrio alginolyticus": {
+        "TAX_ID": "663",
+        "Type": "Gram-negative"
+    },
+    "Trichophyton rubrum": {
+        "TAX_ID": "5551",
+        "Type": "Fungi"
+    },
+    "Candida boidinii": {
+        "TAX_ID": "5477",
+        "Type": "Fungi"
+    },
+    "Fusarium cerealis": {
+        "TAX_ID": "56641",
+        "Type": "Fungi"
+    },
+    "Fusarium oxysporum": {
+        "TAX_ID": "5507",
+        "Type": "Fungi"
+    },
+    "Vibrio harveyi": {
+        "TAX_ID": "669",
+        "Type": "Gram-negative"
+    },
+    "Vibrio vulnificus": {
+        "TAX_ID": "672",
+        "Type": "Gram-negative"
+    },
+    "Aureobasidium sp.": {
+        "TAX_ID": "61296",
+        "Type": "Fungi"
+    },
+    "Rhodococcus rhodochrous": {
+        "TAX_ID": "1829",
+        "Type": "Gram-positive"
+    },
+    "Lactococcus garvieae": {
+        "TAX_ID": "1363",
+        "Type": "Gram-positive"
+    },
+    "Alternaria longipes": {
+        "TAX_ID": "160389",
+        "Type": "Fungi"
+    },
+    "Ascochyta rabiei": {
+        "TAX_ID": "5454",
+        "Type": "Fungi"
+    },
+    "Aeromonas salmonicida": {
+        "TAX_ID": "645",
+        "Type": "Gram-negative"
+    },
+    "Streptococcus pneumoniae": {
+        "TAX_ID": "1313",
+        "Type": "Gram-positive"
+    },
+    "Aeromonas caviae": {
+        "TAX_ID": "648",
+        "Type": "Gram-negative"
+    },
+    "Aeromonas hydrophila": {
+        "TAX_ID": "644",
+        "Type": "Gram-negative"
+    },
+    "Bacteroides fragilis": {
+        "TAX_ID": "817",
+        "Type": "Gram-negative"
+    },
+    "Cercospora beticola": {
+        "TAX_ID": "122368",
+        "Type": "Fungi"
+    },
+    "Chaetomium globosum": {
+        "TAX_ID": "38033",
+        "Type": "Fungi"
+    },
+    "Bifidobacterium adolescentis": {
+        "TAX_ID": "1680",
+        "Type": "Gram-positive"
+    },
+    "Cladosporium sphaerospermum": {
+        "TAX_ID": "92950",
+        "Type": "Fungi"
+    },
+    "Bacteroides thetaiotaomicron": {
+        "TAX_ID": "818",
+        "Type": "Gram-negative"
+    },
+    "Bifidobacterium breve": {
+        "TAX_ID": "1685",
+        "Type": "Gram-positive"
+    },
+    "Colletotrichum lindemuthianum": {
+        "TAX_ID": "290576",
+        "Type": "Fungi"
+    },
+    "Bifidobacterium catenulatum": {
+        "TAX_ID": "1686",
+        "Type": "unknown"
+    },
+    "Citrobacter freundii": {
+        "TAX_ID": "546",
+        "Type": "Gram-negative"
+    },
+    "Clavibacter michiganensis": {
+        "TAX_ID": "28447",
+        "Type": "unknown"
+    },
+    "Erwinia amylovora": {
+        "TAX_ID": "552",
+        "Type": "unknown"
+    },
+    "Clostridium sporogenes": {
+        "TAX_ID": "1509",
+        "Type": "Gram-positive"
+    },
+    "Haemophilus influenzae": {
+        "TAX_ID": "727",
+        "Type": "Gram-negative"
+    },
+    "Helicobacter pylori": {
+        "TAX_ID": "210",
+        "Type": "Gram-negative"
+    },
+    "Leuconostoc lactis": {
+        "TAX_ID": "1246",
+        "Type": "Gram-positive"
+    },
+    "Neisseria cinerea": {
+        "TAX_ID": "483",
+        "Type": "Gram-negative"
+    },
+    "Penicillium jensenii": {
+        "TAX_ID": "261906",
+        "Type": "Fungi"
+    },
+    "Moraxella catarrhalis": {
+        "TAX_ID": "480",
+        "Type": "Gram-negative"
+    },
+    "Pyrenophora tritici-repentis": {
+        "TAX_ID": "45151",
+        "Type": "Fungi"
+    },
+    "Pyricularia oryzae": {
+        "TAX_ID": "318829",
+        "Type": "Fungi"
+    },
+    "Neisseria gonorrhoeae": {
+        "TAX_ID": "485",
+        "Type": "Gram-negative"
+    },
+    "Rhizoctonia solani": {
+        "TAX_ID": "456999",
+        "Type": "Fungi"
+    },
+    "Pseudomonas sp.": {
+        "TAX_ID": "306",
+        "Type": "unknown"
+    },
+    "Neisseria meningitidis": {
+        "TAX_ID": "487",
+        "Type": "Gram-negative"
+    },
+    "Pythium graminicola": {
+        "TAX_ID": "82937",
+        "Type": "unknown"
+    },
+    "Trichophyton mentagrophytes": {
+        "TAX_ID": "523103",
+        "Type": "Fungi"
+    },
+    "Nocardia brasiliensis": {
+        "TAX_ID": "37326",
+        "Type": "Gram-positive"
+    },
+    "Verticillium dahliae": {
+        "TAX_ID": "27337",
+        "Type": "Fungi"
+    },
+    "Sphingobacterium sp.": {
+        "TAX_ID": "341027",
+        "Type": "unknown"
+    },
+    "Sphingobacterium siyangense": {
+        "TAX_ID": "459529",
+        "Type": "Gram-negative"
+    },
+    "Shigella flexneri": {
+        "TAX_ID": "623",
+        "Type": "Gram-negative"
+    },
+    "Alternaria brassicae": {
+        "TAX_ID": "29911",
+        "Type": "Fungi"
+    },
+    "Ascochyta pisi": {
+        "TAX_ID": "749586",
+        "Type": "Fungi"
+    },
+    "Aspergillus versicolor": {
+        "TAX_ID": "46472",
+        "Type": "Fungi"
+    },
+    "Veillonella parvula": {
+        "TAX_ID": "29466",
+        "Type": "Gram-negative"
+    },
+    "Vibrio splendidus": {
+        "TAX_ID": "29497",
+        "Type": "Gram-negative"
+    },
+    "Yersinia enterocolitica": {
+        "TAX_ID": "630",
+        "Type": "Gram-negative"
+    },
+    "Agrobacterium tumefaciens": {
+        "TAX_ID": "358",
+        "Type": "Gram-negative"
+    },
+    "Clostridium botulinum": {
+        "TAX_ID": "1491",
+        "Type": "unknown"
+    },
+    "Clostridium septicum": {
+        "TAX_ID": "1504",
+        "Type": "Gram-positive"
+    },
+    "Macrophomina phaseolina": {
+        "TAX_ID": "35725",
+        "Type": "Fungi"
+    },
+    "Microsporum canis": {
+        "TAX_ID": "63405",
+        "Type": "Fungi"
+    },
+    "Penicillium crustosum": {
+        "TAX_ID": "36656",
+        "Type": "Fungi"
+    },
+    "Brucella suis": {
+        "TAX_ID": "29461",
+        "Type": "Gram-negative"
+    },
+    "Klebsiella sp.": {
+        "TAX_ID": "576",
+        "Type": "unknown"
+    },
+    "Edwardsiella ictaluri": {
+        "TAX_ID": "67780",
+        "Type": "Gram-negative"
+    },
+    "Leucothrix mucor": {
+        "TAX_ID": "45248",
+        "Type": "unknown"
+    },
+    "Pseudomonas oryzae": {
+        "TAX_ID": "1392877",
+        "Type": "unknown"
+    },
+    "Propionibacterium freudenreichii": {
+        "TAX_ID": "1744",
+        "Type": "Gram-positive"
+    },
+    "Sclerotinia sclerotiorum": {
+        "TAX_ID": "5180",
+        "Type": "Fungi"
+    },
+    "Trichoderma viride": {
+        "TAX_ID": "5547",
+        "Type": "Fungi"
+    },
+    "Perkinsus marinus": {
+        "TAX_ID": "31276",
+        "Type": "unknown"
+    },
+    "Pediococcus parvulus": {
+        "TAX_ID": "54062",
+        "Type": "Gram-positive"
+    },
+    "Trypanosoma cruzi": {
+        "TAX_ID": "5693",
+        "Type": "unknown"
+    },
+    "Pseudomonas luteola": {
+        "TAX_ID": "47886",
+        "Type": "Gram-negative"
+    },
+    "Malassezia sympodialis": {
+        "TAX_ID": "76777",
+        "Type": "Fungi"
+    },
+    "Providencia stuartii": {
+        "TAX_ID": "588",
+        "Type": "Gram-negative"
+    },
+    "Ureaplasma canigenitalium": {
+        "TAX_ID": "42092",
+        "Type": "unknown"
+    },
+    "Ureaplasma urealyticum": {
+        "TAX_ID": "2130",
+        "Type": "Gram-negative"
+    },
+    "Streptococcus sp.": {
+        "TAX_ID": "1306",
+        "Type": "unknown"
+    },
+    "Kocuria rhizophila": {
+        "TAX_ID": "72000",
+        "Type": "Gram-positive"
+    },
+    "Corynebacterium diphtheriae": {
+        "TAX_ID": "1717",
+        "Type": "Gram-positive"
+    },
+    "Corynebacterium xerosis": {
+        "TAX_ID": "1725",
+        "Type": "Gram-positive"
+    },
+    "Pyricularia grisea": {
+        "TAX_ID": "148305",
+        "Type": "Fungi"
+    },
+    "Geotrichum candidum": {
+        "TAX_ID": "1173061",
+        "Type": "Fungi"
+    },
+    "Trichosporon beigelii": {
+        "TAX_ID": "5553",
+        "Type": "Fungi"
+    },
+    "Ralstonia pickettii": {
+        "TAX_ID": "329",
+        "Type": "Gram-negative"
+    },
+    "Aggregatibacter sp.": {
+        "TAX_ID": "1872413",
+        "Type": "unknown"
+    },
+    "Achromobacter xylosoxidans": {
+        "TAX_ID": "85698",
+        "Type": "Gram-negative"
+    },
+    "Xanthomonas campestris": {
+        "TAX_ID": "339",
+        "Type": "Gram-negative"
+    },
+    "Mycobacterium tuberculosis": {
+        "TAX_ID": "1773",
+        "Type": "unknown"
+    },
+    "Lacticaseibacillus casei": {
+        "TAX_ID": "1582",
+        "Type": "Gram-positive"
+    },
+    "Veillonella atypica": {
+        "TAX_ID": "39777",
+        "Type": "Gram-negative"
+    },
+    "Kitasatospora kifunensis": {
+        "TAX_ID": "58351",
+        "Type": "unknown"
+    },
+    "Alternaria alternata": {
+        "TAX_ID": "5599",
+        "Type": "Fungi"
+    },
+    "Cladosporium herbarum": {
+        "TAX_ID": "29918",
+        "Type": "Fungi"
+    },
+    "Geobacillus stearothermophilus": {
+        "TAX_ID": "1422",
+        "Type": "Gram-positive"
+    },
+    "Rhodococcus oryzae": {
+        "TAX_ID": "2571143",
+        "Type": "unknown"
+    },
+    "Levilactobacillus brevis": {
+        "TAX_ID": "1580",
+        "Type": "Gram-positive"
+    },
+    "Bordetella bronchiseptica": {
+        "TAX_ID": "518",
+        "Type": "Gram-negative"
+    },
+    "Pectobacterium carotovorum": {
+        "TAX_ID": "554",
+        "Type": "Gram-negative"
+    },
+    "Xanthomonas vesicatoria": {
+        "TAX_ID": "56460",
+        "Type": "unknown"
+    },
+    "Alternaria dauci": {
+        "TAX_ID": "48095",
+        "Type": "Fungi"
+    },
+    "Alternaria brassicicola": {
+        "TAX_ID": "29001",
+        "Type": "Fungi"
+    },
+    "Fusarium haematococcum": {
+        "TAX_ID": "984957",
+        "Type": "Fungi"
+    },
+    "Pseudomonas corrugata": {
+        "TAX_ID": "47879",
+        "Type": "Gram-negative"
+    },
+    "Acholeplasma laidlawii": {
+        "TAX_ID": "2148",
+        "Type": "Gram-negative"
+    },
+    "Spiroplasma melliferum": {
+        "TAX_ID": "2134",
+        "Type": "unknown"
+    },
+    "Mannheimia haemolytica": {
+        "TAX_ID": "75985",
+        "Type": "Gram-negative"
+    },
+    "Sinorhizobium meliloti": {
+        "TAX_ID": "382",
+        "Type": "Gram-negative"
+    },
+    "Bibersteinia trehalosi": {
+        "TAX_ID": "47735",
+        "Type": "Gram-negative"
+    },
+    "Corynebacterium pseudotuberculosis": {
+        "TAX_ID": "1719",
+        "Type": "Gram-positive"
+    },
+    "Fusobacterium nucleatum": {
+        "TAX_ID": "851",
+        "Type": "Gram-negative"
+    },
+    "Pediococcus pentosaceus": {
+        "TAX_ID": "1255",
+        "Type": "Gram-positive"
+    },
+    "Penicillium urticae": {
+        "TAX_ID": "29844",
+        "Type": "Fungi"
+    },
+    "Weissella viridescens": {
+        "TAX_ID": "1629",
+        "Type": "Gram-positive"
+    },
+    "Rhizopus stolonifer": {
+        "TAX_ID": "4846",
+        "Type": "Fungi"
+    },
+    "Carnobacterium maltaromaticum": {
+        "TAX_ID": "2751",
+        "Type": "Gram-positive"
+    },
+    "Lactiplantibacillus plantarum": {
+        "TAX_ID": "1590",
+        "Type": "Gram-positive"
+    },
+    "Schizosaccharomyces pombe": {
+        "TAX_ID": "4896",
+        "Type": "Fungi"
+    },
+    "Latilactobacillus sakei": {
+        "TAX_ID": "1599",
+        "Type": "Gram-positive"
+    },
+    "Pediococcus acidilactici": {
+        "TAX_ID": "1254",
+        "Type": "Gram-positive"
+    },
+    "Corynebacterium jeikeium": {
+        "TAX_ID": "38289",
+        "Type": "Gram-positive"
+    },
+    "Micrococcus sp.": {
+        "TAX_ID": "1271",
+        "Type": "unknown"
+    },
+    "Yersinia pseudotuberculosis": {
+        "TAX_ID": "633",
+        "Type": "Gram-negative"
+    },
+    "Cronobacter sakazakii": {
+        "TAX_ID": "28141",
+        "Type": "Gram-negative"
+    },
+    "Cronobacter muytjensii": {
+        "TAX_ID": "413501",
+        "Type": "Gram-negative"
+    },
+    "Brenneria salicis": {
+        "TAX_ID": "55214",
+        "Type": "Gram-negative"
+    },
+    "Malassezia furfur": {
+        "TAX_ID": "55194",
+        "Type": "Fungi"
+    },
+    "Kluyveromyces marxianus": {
+        "TAX_ID": "4911",
+        "Type": "Fungi"
+    },
+    "Pachysolen tannophilus": {
+        "TAX_ID": "4918",
+        "Type": "Fungi"
+    },
+    "Trichoderma harzianum": {
+        "TAX_ID": "5544",
+        "Type": "Fungi"
+    },
+    "Rhodotorula mucilaginosa": {
+        "TAX_ID": "5537",
+        "Type": "Fungi"
+    },
+    "Paenibacillus alvei": {
+        "TAX_ID": "44250",
+        "Type": "Gram-positive"
+    },
+    "Morganella morganii": {
+        "TAX_ID": "582",
+        "Type": "Gram-negative"
+    },
+    "Elizabethkingia meningoseptica": {
+        "TAX_ID": "238",
+        "Type": "Gram-negative"
+    },
+    "Streptomyces aureus": {
+        "TAX_ID": "193461",
+        "Type": "Gram-positive"
+    },
+    "Saccharibacillus kuerlensis": {
+        "TAX_ID": "459527",
+        "Type": "Gram-positive"
+    },
+    "Citrobacter koseri": {
+        "TAX_ID": "545",
+        "Type": "Gram-negative"
+    },
+    "Yersinia ruckeri": {
+        "TAX_ID": "29486",
+        "Type": "Gram-negative"
+    },
+    "Psychrobacter faecalis": {
+        "TAX_ID": "180588",
+        "Type": "Gram-negative"
+    },
+    "Mycobacterium avium": {
+        "TAX_ID": "1764",
+        "Type": "Gram-positive"
+    },
+    "Ramulariopsis gossypii": {
+        "TAX_ID": "378545",
+        "Type": "Fungi"
+    },
+    "Trichoderma asperellum": {
+        "TAX_ID": "101201",
+        "Type": "Fungi"
+    },
+    "Yersinia pestis": {
+        "TAX_ID": "632",
+        "Type": "unknown"
+    },
+    "Serratia rubidaea": {
+        "TAX_ID": "61652",
+        "Type": "Gram-negative"
+    },
+    "Brucella abortus": {
+        "TAX_ID": "235",
+        "Type": "Gram-negative"
+    },
+    "Xanthomonas axonopodis": {
+        "TAX_ID": "53413",
+        "Type": "unknown"
+    },
+    "Spiroplasma citri": {
+        "TAX_ID": "2133",
+        "Type": "unknown"
+    },
+    "Mycoplasma mycoides": {
+        "TAX_ID": "2102",
+        "Type": "unknown"
+    },
+    "Spiroplasma floricola": {
+        "TAX_ID": "216937",
+        "Type": "unknown"
+    },
+    "Fusobacterium varium": {
+        "TAX_ID": "856",
+        "Type": "unknown"
+    },
+    "Prevotella melaninogenica": {
+        "TAX_ID": "28132",
+        "Type": "Gram-negative"
+    },
+    "Clostridium tertium": {
+        "TAX_ID": "1559",
+        "Type": "Gram-positive"
+    },
+    "Peptoniphilus asaccharolyticus": {
+        "TAX_ID": "1258",
+        "Type": "Gram-positive"
+    },
+    "Peptostreptococcus anaerobius": {
+        "TAX_ID": "1261",
+        "Type": "Gram-positive"
+    },
+    "Phytophthora nicotianae": {
+        "TAX_ID": "4792",
+        "Type": "unknown"
+    },
+    "Mammaliicoccus lentus": {
+        "TAX_ID": "42858",
+        "Type": "Gram-positive"
+    },
+    "Legionella feeleii": {
+        "TAX_ID": "453",
+        "Type": "Gram-negative"
+    },
+    "Legionella longbeachae": {
+        "TAX_ID": "450",
+        "Type": "Gram-negative"
+    },
+    "Legionella pneumophila": {
+        "TAX_ID": "446",
+        "Type": "Gram-negative"
+    },
+    "Alcaligenes faecalis": {
+        "TAX_ID": "511",
+        "Type": "Gram-negative"
+    },
+    "Cutibacterium sp.": {
+        "TAX_ID": "1912221",
+        "Type": "unknown"
+    },
+    "Vibrio metschnikovii": {
+        "TAX_ID": "28172",
+        "Type": "Gram-negative"
+    },
+    "Latilactobacillus curvatus": {
+        "TAX_ID": "28038",
+        "Type": "Gram-positive"
+    },
+    "Beauveria bassiana": {
+        "TAX_ID": "176275",
+        "Type": "Fungi"
+    },
+    "Trypanosoma brucei": {
+        "TAX_ID": "5691",
+        "Type": "unknown"
+    },
+    "Theileria equi": {
+        "TAX_ID": "5872",
+        "Type": "unknown"
+    },
+    "Enterobacter sp.": {
+        "TAX_ID": "42895",
+        "Type": "unknown"
+    },
+    "Pseudoalteromonas carrageenovora": {
+        "TAX_ID": "227",
+        "Type": "unknown"
+    },
+    "Campylobacter jejuni": {
+        "TAX_ID": "197",
+        "Type": "Gram-negative"
+    },
+    "Aeromonas intestinalis": {
+        "TAX_ID": "1917144",
+        "Type": "unknown"
+    },
+    "Flavobacterium columnare": {
+        "TAX_ID": "996",
+        "Type": "Gram-negative"
+    },
+    "Aeromonas sobria": {
+        "TAX_ID": "646",
+        "Type": "Gram-negative"
+    },
+    "Sporothrix schenckii": {
+        "TAX_ID": "29908",
+        "Type": "Fungi"
+    },
+    "Zymomonas mobilis": {
+        "TAX_ID": "542",
+        "Type": "Gram-negative"
+    },
+    "Actinomyces viscosus": {
+        "TAX_ID": "1656",
+        "Type": "Gram-positive"
+    },
+    "Trichophyton sp.": {
+        "TAX_ID": "1903958",
+        "Type": "Fungi"
+    },
+    "Actinomyces naeslundii": {
+        "TAX_ID": "1655",
+        "Type": "Gram-positive"
+    },
+    "Xanthomonas arboricola": {
+        "TAX_ID": "56448",
+        "Type": "unknown"
+    },
+    "Xanthomonas fragariae": {
+        "TAX_ID": "48664",
+        "Type": "unknown"
+    },
+    "Limosilactobacillus fermentum": {
+        "TAX_ID": "1613",
+        "Type": "Gram-positive"
+    },
+    "Saccharomyces sp.": {
+        "TAX_ID": "4935",
+        "Type": "Fungi"
+    },
+    "Photobacterium damselae": {
+        "TAX_ID": "38293",
+        "Type": "Gram-negative"
+    },
+    "Shewanella putrefaciens": {
+        "TAX_ID": "24",
+        "Type": "Gram-negative"
+    },
+    "Vibrio aestuarianus": {
+        "TAX_ID": "28171",
+        "Type": "Gram-negative"
+    },
+    "Xanthomonas citri": {
+        "TAX_ID": "346",
+        "Type": "unknown"
+    },
+    "Planococcus citreus": {
+        "TAX_ID": "1373",
+        "Type": "unknown"
+    },
+    "Leuconostoc mesenteroides": {
+        "TAX_ID": "1245",
+        "Type": "Gram-positive"
+    },
+    "Legionella bozemanae": {
+        "TAX_ID": "447",
+        "Type": "Gram-negative"
+    },
+    "Trichophyton simii": {
+        "TAX_ID": "63406",
+        "Type": "Fungi"
+    },
+    "Psychrobacter immobilis": {
+        "TAX_ID": "498",
+        "Type": "Gram-negative"
+    },
+    "Legionella micdadei": {
+        "TAX_ID": "451",
+        "Type": "Gram-negative"
+    },
+    "Legionella oakridgensis": {
+        "TAX_ID": "29423",
+        "Type": "Gram-negative"
+    },
+    "Dermacoccus nishinomiyaensis": {
+        "TAX_ID": "1274",
+        "Type": "Gram-positive"
+    },
+    "Gardnerella vaginalis": {
+        "TAX_ID": "2702",
+        "Type": "Gram-negative"
+    },
+    "Lactobacillus crispatus": {
+        "TAX_ID": "47770",
+        "Type": "Gram-positive"
+    },
+    "Lactobacillus gasseri": {
+        "TAX_ID": "1596",
+        "Type": "Gram-positive"
+    },
+    "Lactobacillus jensenii": {
+        "TAX_ID": "109790",
+        "Type": "Gram-positive"
+    },
+    "Streptococcus intermedius": {
+        "TAX_ID": "1338",
+        "Type": "Gram-positive"
+    },
+    "Acetobacterium wieringae": {
+        "TAX_ID": "52694",
+        "Type": "unknown"
+    },
+    "Pichia sp.": {
+        "TAX_ID": "4925",
+        "Type": "Fungi"
+    },
+    "Enterococcus avium": {
+        "TAX_ID": "33945",
+        "Type": "Gram-positive"
+    },
+    "Streptococcus pasteurianus": {
+        "TAX_ID": "197614",
+        "Type": "Gram-positive"
+    },
+    "Providencia rettgeri": {
+        "TAX_ID": "587",
+        "Type": "Gram-negative"
+    },
+    "Tetragenococcus halophilus": {
+        "TAX_ID": "51669",
+        "Type": "Gram-positive"
+    },
+    "Acinetobacter sp.": {
+        "TAX_ID": "472",
+        "Type": "unknown"
+    },
+    "Enterococcus gallinarum": {
+        "TAX_ID": "1353",
+        "Type": "Gram-positive"
+    },
+    "Arcyria cinerea": {
+        "TAX_ID": "137621",
+        "Type": "unknown"
+    },
+    "Bordetella pertussis": {
+        "TAX_ID": "520",
+        "Type": "Gram-negative"
+    },
+    "Raoultella terrigena": {
+        "TAX_ID": "577",
+        "Type": "Gram-negative"
+    },
+    "Glaesserella parasuis": {
+        "TAX_ID": "738",
+        "Type": "Gram-negative"
+    },
+    "Microbacterium maritypicum": {
+        "TAX_ID": "33918",
+        "Type": "Gram-negative"
+    },
+    "Lysinibacillus sphaericus": {
+        "TAX_ID": "1421",
+        "Type": "Gram-positive"
+    },
+    "Corynebacterium stationis": {
+        "TAX_ID": "1705",
+        "Type": "Gram-positive"
+    },
+    "Actinobacillus pleuropneumoniae": {
+        "TAX_ID": "715",
+        "Type": "Gram-negative"
+    },
+    "Botrytis sp.": {
+        "TAX_ID": "1849799",
+        "Type": "Fungi"
+    },
+    "Vibrio nigripulchritudo": {
+        "TAX_ID": "28173",
+        "Type": "Gram-negative"
+    },
+    "Burkholderia sp.": {
+        "TAX_ID": "36773",
+        "Type": "unknown"
+    },
+    "Vibrio coralliilyticus": {
+        "TAX_ID": "190893",
+        "Type": "Gram-negative"
+    },
+    "Aspergillus awamori": {
+        "TAX_ID": "105351",
+        "Type": "Fungi"
+    },
+    "Campylobacter coli": {
+        "TAX_ID": "195",
+        "Type": "Gram-negative"
+    },
+    "Campylobacter lari": {
+        "TAX_ID": "201",
+        "Type": "Gram-negative"
+    },
+    "Carnobacterium mobile": {
+        "TAX_ID": "2750",
+        "Type": "unknown"
+    },
+    "Aeromonas veronii": {
+        "TAX_ID": "654",
+        "Type": "Gram-negative"
+    },
+    "Raoultella ornithinolytica": {
+        "TAX_ID": "54291",
+        "Type": "Gram-negative"
+    },
+    "Histophilus somni": {
+        "TAX_ID": "731",
+        "Type": "Gram-negative"
+    },
+    "Priestia flexa": {
+        "TAX_ID": "86664",
+        "Type": "Gram-positive"
+    },
+    "Enterococcus sp.": {
+        "TAX_ID": "35783",
+        "Type": "unknown"
+    },
+    "Pasteurella sp.": {
+        "TAX_ID": "759",
+        "Type": "unknown"
+    },
+    "Vibrio penaeicida": {
+        "TAX_ID": "104609",
+        "Type": "Gram-negative"
+    },
+    "Yarrowia lipolytica": {
+        "TAX_ID": "4952",
+        "Type": "Fungi"
+    },
+    "Colletotrichum graminicola": {
+        "TAX_ID": "31870",
+        "Type": "Fungi"
+    },
+    "Fulvia fulva": {
+        "TAX_ID": "5499",
+        "Type": "Fungi"
+    },
+    "Staphylococcus cohnii": {
+        "TAX_ID": "29382",
+        "Type": "Gram-positive"
+    },
+    "Penicillium roqueforti": {
+        "TAX_ID": "5082",
+        "Type": "Fungi"
+    },
+    "Azotobacter vinelandii": {
+        "TAX_ID": "354",
+        "Type": "Gram-negative"
+    },
+    "Cupriavidus necator": {
+        "TAX_ID": "106590",
+        "Type": "unknown"
+    },
+    "Corynebacterium sp.": {
+        "TAX_ID": "1720",
+        "Type": "unknown"
+    },
+    "Leishmania infantum": {
+        "TAX_ID": "5671",
+        "Type": "unknown"
+    },
+    "Actinomyces israelii": {
+        "TAX_ID": "1659",
+        "Type": "Gram-positive"
+    },
+    "Ralstonia solanacearum": {
+        "TAX_ID": "305",
+        "Type": "unknown"
+    },
+    "Microbacterium oxydans": {
+        "TAX_ID": "82380",
+        "Type": "Gram-positive"
+    },
+    "Sporosarcina ureae": {
+        "TAX_ID": "1571",
+        "Type": "unknown"
+    },
+    "Lelliottia amnigena": {
+        "TAX_ID": "61646",
+        "Type": "Gram-negative"
+    },
+    "Kluyvera cryocrescens": {
+        "TAX_ID": "580",
+        "Type": "Gram-negative"
+    },
+    "Salmonella sp.": {
+        "TAX_ID": "599",
+        "Type": "unknown"
+    },
+    "Franconibacter helveticus": {
+        "TAX_ID": "357240",
+        "Type": "Gram-negative"
+    },
+    "Trichomonas vaginalis": {
+        "TAX_ID": "5722",
+        "Type": "unknown"
+    },
+    "Miamiensis avidus": {
+        "TAX_ID": "279580",
+        "Type": "unknown"
+    },
+    "Vibrio tapetis": {
+        "TAX_ID": "52443",
+        "Type": "Gram-negative"
+    },
+    "Flavobacterium psychrophilum": {
+        "TAX_ID": "96345",
+        "Type": "Gram-negative"
+    },
+    "Vibrio fluvialis": {
+        "TAX_ID": "676",
+        "Type": "Gram-negative"
+    },
+    "Vibrio ordalii": {
+        "TAX_ID": "28174",
+        "Type": "Gram-negative"
+    },
+    "Vibrio campbellii": {
+        "TAX_ID": "680",
+        "Type": "Gram-negative"
+    },
+    "Rothia nasimurium": {
+        "TAX_ID": "85336",
+        "Type": "Gram-positive"
+    },
+    "Delftia acidovorans": {
+        "TAX_ID": "80866",
+        "Type": "Gram-negative"
+    },
+    "Xanthomonas oryzae": {
+        "TAX_ID": "347",
+        "Type": "unknown"
+    },
+    "Papiliotrema laurentii": {
+        "TAX_ID": "5418",
+        "Type": "Fungi"
+    },
+    "Alicyclobacillus acidoterrestris": {
+        "TAX_ID": "1450",
+        "Type": "Gram-positive"
+    },
+    "Paenibacillus polymyxa": {
+        "TAX_ID": "1406",
+        "Type": "Gram-positive"
+    },
+    "Clostridioides difficile": {
+        "TAX_ID": "1496",
+        "Type": "Gram-positive"
+    },
+    "Francisella sp.": {
+        "TAX_ID": "2047875",
+        "Type": "unknown"
+    },
+    "Carnobacterium divergens": {
+        "TAX_ID": "2748",
+        "Type": "Gram-positive"
+    },
+    "Aspicilia cinerea": {
+        "TAX_ID": "170004",
+        "Type": "Fungi"
+    },
+    "Bacillus atrophaeus": {
+        "TAX_ID": "1452",
+        "Type": "Gram-positive"
+    },
+    "Lacinutrix algicola": {
+        "TAX_ID": "342954",
+        "Type": "unknown"
+    },
+    "Leishmania major": {
+        "TAX_ID": "5664",
+        "Type": "unknown"
+    },
+    "Shigella boydii": {
+        "TAX_ID": "621",
+        "Type": "Gram-negative"
+    },
+    "Vibrio litoralis": {
+        "TAX_ID": "335972",
+        "Type": "Gram-negative"
+    },
+    "Colletotrichum gloeosporioides": {
+        "TAX_ID": "474922",
+        "Type": "Fungi"
+    },
+    "Trichoderma virens": {
+        "TAX_ID": "29875",
+        "Type": "Fungi"
+    },
+    "Vibrio ichthyoenteri": {
+        "TAX_ID": "142461",
+        "Type": "Gram-negative"
+    },
+    "Paracoccidioides brasiliensis": {
+        "TAX_ID": "121759",
+        "Type": "Fungi"
+    },
+    "Paracoccidioides lutzii": {
+        "TAX_ID": "1048829",
+        "Type": "Fungi"
+    },
+    "Acinetobacter baylyi": {
+        "TAX_ID": "202950",
+        "Type": "Gram-negative"
+    },
+    "Vibrio scophthalmi": {
+        "TAX_ID": "45658",
+        "Type": "Gram-negative"
+    },
+    "Lichtheimia corymbifera": {
+        "TAX_ID": "42458",
+        "Type": "Fungi"
+    },
+    "Mucor circinelloides": {
+        "TAX_ID": "36080",
+        "Type": "Fungi"
+    },
+    "Pseudomonas tolaasii": {
+        "TAX_ID": "29442",
+        "Type": "Gram-negative"
+    },
+    "Pluralibacter gergoviae": {
+        "TAX_ID": "61647",
+        "Type": "Gram-negative"
+    },
+    "Kluyveromyces lactis": {
+        "TAX_ID": "28985",
+        "Type": "Fungi"
+    },
+    "Debaryomyces hansenii": {
+        "TAX_ID": "4959",
+        "Type": "Fungi"
+    },
+    "Alkalihalobacillus alcalophilus": {
+        "TAX_ID": "1445",
+        "Type": "Gram-positive"
+    },
+    "Candida viswanathii": {
+        "TAX_ID": "5486",
+        "Type": "Fungi"
+    },
+    "Lacticaseibacillus rhamnosus": {
+        "TAX_ID": "47715",
+        "Type": "Gram-positive"
+    },
+    "Enterobacter asburiae": {
+        "TAX_ID": "61645",
+        "Type": "Gram-negative"
+    },
+    "Syspastospora parasitica": {
+        "TAX_ID": "152787",
+        "Type": "Fungi"
+    },
+    "Vibrio proteolyticus": {
+        "TAX_ID": "671",
+        "Type": "Gram-negative"
+    },
+    "Streptococcus parauberis": {
+        "TAX_ID": "1348",
+        "Type": "Gram-positive"
+    },
+    "Edwardsiella piscicida": {
+        "TAX_ID": "1263550",
+        "Type": "unknown"
+    },
+    "Chromobacterium violaceum": {
+        "TAX_ID": "536",
+        "Type": "Gram-negative"
+    },
+    "Penicillium thomii": {
+        "TAX_ID": "36647",
+        "Type": "Fungi"
+    },
+    "Leishmania mexicana": {
+        "TAX_ID": "5665",
+        "Type": "unknown"
+    },
+    "Leishmania donovani": {
+        "TAX_ID": "5661",
+        "Type": "unknown"
+    },
+    "Bifidobacterium longum": {
+        "TAX_ID": "216816",
+        "Type": "Gram-positive"
+    },
+    "Lactococcus kimchii": {
+        "TAX_ID": "2568007",
+        "Type": "Gram-positive"
+    },
+    "Paenibacillus solanacearum": {
+        "TAX_ID": "2048548",
+        "Type": "Gram-positive"
+    },
+    "Shewanella oneidensis": {
+        "TAX_ID": "70863",
+        "Type": "Gram-negative"
+    },
+    "Mannheimia bovis": {
+        "TAX_ID": "2770636",
+        "Type": "unknown"
+    },
+    "Candida zeylanoides": {
+        "TAX_ID": "5493",
+        "Type": "Fungi"
+    },
+    "Fusarium breve": {
+        "TAX_ID": "2747387",
+        "Type": "Fungi"
+    },
+    "Pyricularia parasitica": {
+        "TAX_ID": "228892",
+        "Type": "Fungi"
+    },
+    "Trichosporon asahii": {
+        "TAX_ID": "82508",
+        "Type": "Fungi"
+    },
+    "Corynebacterium renale": {
+        "TAX_ID": "1724",
+        "Type": "Gram-positive"
+    },
+    "Cercospora nicotianae": {
+        "TAX_ID": "29003",
+        "Type": "Fungi"
+    },
+    "Paenibacillus tritici": {
+        "TAX_ID": "1873425",
+        "Type": "Gram-positive"
+    },
+    "Pseudoalteromonas denitrificans": {
+        "TAX_ID": "43656",
+        "Type": "unknown"
+    },
+    "Phytophthora cryptogea": {
+        "TAX_ID": "4786",
+        "Type": "unknown"
+    },
+    "Agrobacterium radiobacter": {
+        "TAX_ID": "362",
+        "Type": "Gram-negative"
+    },
+    "Leishmania amazonensis": {
+        "TAX_ID": "5659",
+        "Type": "unknown"
+    },
+    "Leishmania tropica": {
+        "TAX_ID": "5666",
+        "Type": "unknown"
+    },
+    "Leishmania braziliensis": {
+        "TAX_ID": "5660",
+        "Type": "unknown"
+    },
+    "Colletotrichum orbiculare": {
+        "TAX_ID": "5465",
+        "Type": "Fungi"
+    },
+    "Phytophthora infestans": {
+        "TAX_ID": "4787",
+        "Type": "unknown"
+    },
+    "Alternaria solani": {
+        "TAX_ID": "48100",
+        "Type": "Fungi"
+    },
+    "Pichia exigua": {
+        "TAX_ID": "1171599",
+        "Type": "Fungi"
+    },
+    "Trichoderma hamatum": {
+        "TAX_ID": "49224",
+        "Type": "Fungi"
+    },
+    "Microsporum audouinii": {
+        "TAX_ID": "34393",
+        "Type": "Fungi"
+    },
+    "Colletotrichum acutatum": {
+        "TAX_ID": "27357",
+        "Type": "Fungi"
+    },
+    "Botrytis elliptica": {
+        "TAX_ID": "278938",
+        "Type": "Fungi"
+    },
+    "Raoultella sp.": {
+        "TAX_ID": "1873496",
+        "Type": "unknown"
+    },
+    "Sclerotinia trifoliorum": {
+        "TAX_ID": "28548",
+        "Type": "Fungi"
+    },
+    "Streptomyces tritici": {
+        "TAX_ID": "2054410",
+        "Type": "Gram-positive"
+    },
+    "Phytophthora litchii": {
+        "TAX_ID": "100870",
+        "Type": "unknown"
+    },
+    "Phytophthora pisi": {
+        "TAX_ID": "1131323",
+        "Type": "unknown"
+    },
+    "Penicillium chrysogenum": {
+        "TAX_ID": "5076",
+        "Type": "Fungi"
+    },
+    "Phytophthora capsici": {
+        "TAX_ID": "4784",
+        "Type": "unknown"
+    },
+    "Lacticaseibacillus paracasei": {
+        "TAX_ID": "1597",
+        "Type": "Gram-positive"
+    },
+    "Lactobacillus sp.": {
+        "TAX_ID": "1591",
+        "Type": "unknown"
+    },
+    "Colletotrichum falcatum": {
+        "TAX_ID": "129314",
+        "Type": "Fungi"
+    },
+    "Limosilactobacillus reuteri": {
+        "TAX_ID": "1598",
+        "Type": "Gram-positive"
+    },
+    "Vibrio sp.": {
+        "TAX_ID": "678",
+        "Type": "unknown"
+    },
+    "Acinetobacter lwoffii": {
+        "TAX_ID": "28090",
+        "Type": "Gram-negative"
+    },
+    "Carnobacterium funditum": {
+        "TAX_ID": "2752",
+        "Type": "Gram-positive"
+    },
+    "Weissella cibaria": {
+        "TAX_ID": "137591",
+        "Type": "Gram-positive"
+    },
+    "Microbacterium hominis": {
+        "TAX_ID": "162426",
+        "Type": "Gram-positive"
+    },
+    "Clostridium tyrobutyricum": {
+        "TAX_ID": "1519",
+        "Type": "Gram-positive"
+    },
+    "Mycobacterium albicans": {
+        "TAX_ID": "2825890",
+        "Type": "unknown"
+    },
+    "Paenibacillus larvae": {
+        "TAX_ID": "1464",
+        "Type": "Gram-positive"
+    },
+    "Corynebacterium bovis": {
+        "TAX_ID": "36808",
+        "Type": "Gram-positive"
+    },
+    "Rhizopus homothallicus": {
+        "TAX_ID": "86632",
+        "Type": "Fungi"
+    },
+    "Pythium aphanidermatum": {
+        "TAX_ID": "65070",
+        "Type": "unknown"
+    },
+    "Phytophthora cichorii": {
+        "TAX_ID": "1320215",
+        "Type": "unknown"
+    },
+    "Clostridium gallinarum": {
+        "TAX_ID": "2762246",
+        "Type": "unknown"
+    },
+    "Trypanosoma equiperdum": {
+        "TAX_ID": "5694",
+        "Type": "unknown"
+    },
+    "Trypanosoma evansi": {
+        "TAX_ID": "5697",
+        "Type": "unknown"
+    },
+    "Haemophilus ducreyi": {
+        "TAX_ID": "730",
+        "Type": "unknown"
+    },
+    "Fusarium lactis": {
+        "TAX_ID": "48493",
+        "Type": "Fungi"
+    },
+    "Fusarium equiseti": {
+        "TAX_ID": "61235",
+        "Type": "Fungi"
+    },
+    "Fusarium poae": {
+        "TAX_ID": "36050",
+        "Type": "Fungi"
+    },
+    "Aspergillus giganteus": {
+        "TAX_ID": "5060",
+        "Type": "Fungi"
+    },
+    "Fusarium sporotrichioides": {
+        "TAX_ID": "5514",
+        "Type": "Fungi"
+    },
+    "Weissella paramesenteroides": {
+        "TAX_ID": "1249",
+        "Type": "Gram-positive"
+    },
+    "Paenibacillus macerans": {
+        "TAX_ID": "44252",
+        "Type": "Gram-positive"
+    },
+    "Streptococcus viridans": {
+        "TAX_ID": "78535",
+        "Type": "unknown"
+    },
+    "Paenibacillus granivorans": {
+        "TAX_ID": "119702",
+        "Type": "unknown"
+    },
+    "Corynebacterium striatum": {
+        "TAX_ID": "43770",
+        "Type": "Gram-positive"
+    },
+    "Listeria welshimeri": {
+        "TAX_ID": "1643",
+        "Type": "Gram-positive"
+    }
+}

@@ -1,0 +1,230 @@
+{
+    "S": [
+        "Saccharibacillus",
+        "Saccharomyces",
+        "Salmonella",
+        "Schizosaccharomyces",
+        "Sclerotinia",
+        "Serratia",
+        "Shewanella",
+        "Shigella",
+        "Sinorhizobium",
+        "Sphingobacterium",
+        "Spiroplasma",
+        "Sporosarcina",
+        "Sporothrix",
+        "Staphylococcus",
+        "Stenotrophomonas",
+        "Streptococcus",
+        "Streptomyces",
+        "Syspastospora"
+    ],
+    "P": [
+        "Pachysolen",
+        "Paenibacillus",
+        "Papiliotrema",
+        "Paracoccidioides",
+        "Pasteurella",
+        "Pectobacterium",
+        "Pediococcus",
+        "Penicillium",
+        "Peptoniphilus",
+        "Peptostreptococcus",
+        "Perkinsus",
+        "Photobacterium",
+        "Phytophthora",
+        "Pichia",
+        "Planococcus",
+        "Pluralibacter",
+        "Porphyromonas",
+        "Prevotella",
+        "Priestia",
+        "Propionibacterium",
+        "Proteus",
+        "Providencia",
+        "Pseudoalteromonas",
+        "Pseudomonas",
+        "Psychrobacter",
+        "Pyrenophora",
+        "Pyricularia",
+        "Pythium"
+    ],
+    "E": [
+        "Edwardsiella",
+        "Elizabethkingia",
+        "Enterobacter",
+        "Enterococcus",
+        "Erwinia",
+        "Escherichia"
+    ],
+    "C": [
+        "Campylobacter",
+        "Candida",
+        "Carnobacterium",
+        "Cercospora",
+        "Chaetomium",
+        "Chromobacterium",
+        "Citrobacter",
+        "Cladosporium",
+        "Clavibacter",
+        "Clostridioides",
+        "Clostridium",
+        "Colletotrichum",
+        "Corynebacterium",
+        "Cronobacter",
+        "Cryptococcus",
+        "Cupriavidus",
+        "Cutibacterium"
+    ],
+    "A": [
+        "Acetobacterium",
+        "Acholeplasma",
+        "Achromobacter",
+        "Acinetobacter",
+        "Actinobacillus",
+        "Actinomyces",
+        "Aerococcus",
+        "Aeromonas",
+        "Aggregatibacter",
+        "Agrobacterium",
+        "Alcaligenes",
+        "Alicyclobacillus",
+        "Alkalihalobacillus",
+        "Alternaria",
+        "Arcyria",
+        "Arthrobacter",
+        "Ascochyta",
+        "Aspergillus",
+        "Aspicilia",
+        "Aureobasidium",
+        "Azotobacter"
+    ],
+    "B": [
+        "Bacillus",
+        "Bacteroides",
+        "Batrachochytrium",
+        "Beauveria",
+        "Bibersteinia",
+        "Bifidobacterium",
+        "Bordetella",
+        "Botrytis",
+        "Brenneria",
+        "Brucella",
+        "Burkholderia"
+    ],
+    "L": [
+        "Lacinutrix",
+        "Lacticaseibacillus",
+        "Lactiplantibacillus",
+        "Lactobacillus",
+        "Lactococcus",
+        "Latilactobacillus",
+        "Legionella",
+        "Leishmania",
+        "Lelliottia",
+        "Leuconostoc",
+        "Leucothrix",
+        "Levilactobacillus",
+        "Lichtheimia",
+        "Ligilactobacillus",
+        "Limosilactobacillus",
+        "Listeria",
+        "Lysinibacillus"
+    ],
+    "F": [
+        "Flavobacterium",
+        "Francisella",
+        "Franconibacter",
+        "Fulvia",
+        "Fusarium",
+        "Fusobacterium"
+    ],
+    "N": [
+        "Nakaseomyces",
+        "Neisseria",
+        "Neurospora",
+        "Nocardia"
+    ],
+    "K": [
+        "Kitasatospora",
+        "Klebsiella",
+        "Kluyvera",
+        "Kluyveromyces",
+        "Kocuria"
+    ],
+    "M": [
+        "Macrophomina",
+        "Malassezia",
+        "Mammaliicoccus",
+        "Mannheimia",
+        "Miamiensis",
+        "Microbacterium",
+        "Micrococcus",
+        "Microsporum",
+        "Moraxella",
+        "Morganella",
+        "Mucor",
+        "Mycobacterium",
+        "Mycoplasma"
+    ],
+    "R": [
+        "Ralstonia",
+        "Ramulariopsis",
+        "Raoultella",
+        "Rhizoctonia",
+        "Rhizopus",
+        "Rhodococcus",
+        "Rhodotorula",
+        "Rothia"
+    ],
+    "T": [
+        "Tetragenococcus",
+        "Theileria",
+        "Trichoderma",
+        "Trichomonas",
+        "Trichophyton",
+        "Trichosporon",
+        "Trypanosoma"
+    ],
+    "V": [
+        "Veillonella",
+        "Verticillium",
+        "Vibrio"
+    ],
+    "[": [
+        "[Candida]",
+        "[Haemophilus]"
+    ],
+    "H": [
+        "Haemophilus",
+        "Helicobacter",
+        "Histophilus"
+    ],
+    "Y": [
+        "Yarrowia",
+        "Yersinia"
+    ],
+    "U": [
+        "Ureaplasma"
+    ],
+    "X": [
+        "Xanthomonas"
+    ],
+    "G": [
+        "Gardnerella",
+        "Geobacillus",
+        "Geotrichum",
+        "Glaesserella"
+    ],
+    "W": [
+        "Weissella"
+    ],
+    "Z": [
+        "Zymomonas"
+    ],
+    "D": [
+        "Debaryomyces",
+        "Delftia",
+        "Dermacoccus"
+    ]
+}
