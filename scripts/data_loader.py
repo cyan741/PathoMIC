@@ -57,7 +57,13 @@ class MIC_Dataset(Dataset):
     def __init__(
         self,
         mic_df: pd.DataFrame,
-        max_length: int = 70,
+        max_length: int =70,
+        # 'fill' : right-pad each sequence with the ambiguous-residue symbol
+        #          'X' up to ``max_length`` (default; every example becomes a
+        #          fixed-width window and the tokenizer never emits <pad>).
+        # 'none' : emit the raw sequence and let the tokenizer pad the batch to
+        #          its longest member, which yields a real attention mask.
+        pad_mode: str = "fill",
         species_mode: str = "none",
         species_emb_map: Optional[Dict[str, torch.Tensor]] = None,
         species_emb_dim: int = 768,
@@ -77,6 +83,9 @@ class MIC_Dataset(Dataset):
         self.amp_seqs = mic_df.Sequence.tolist()
         self.mic_values = torch.tensor(mic_df.Median_MIC, dtype=torch.float32)
         self.max_length = max_length
+        if pad_mode not in ("fill", "none"):
+            raise ValueError(f"pad_mode must be 'fill' or 'none', got {pad_mode!r}")
+        self.pad_mode = pad_mode
         self.return_meta = return_meta
 
         needs_emb = species_mode in ("adapter", "both")
@@ -96,16 +105,19 @@ class MIC_Dataset(Dataset):
         # When `shuffle_species` is True, replace each sample's species name
         # with a randomly permuted name from THIS SAME SPLIT (so the species
         # set is unchanged but the (peptide -> species) pairing is destroyed).
-        # The peptide / MIC value are untouched, so the only information the
-        # species channel can carry now is noise. If the GNN really helps,
-        # MSE under this control should regress toward the vanilla baseline.
+        # Works for both GNN (node id lookup) and adapter (PubMedBERT emb lookup).
+        # The peptide / MIC value are untouched; val/test splits are never shuffled.
         self.shuffle_species = bool(shuffle_species)
+        self._original_species_names = (
+            list(self.species_names) if self.species_names is not None else None
+        )
         if self.shuffle_species and self.species_names is not None:
             rng = np.random.RandomState(int(shuffle_species_seed))
             perm = rng.permutation(len(self.species_names))
             self.species_names = [self.species_names[i] for i in perm]
             print(f"[MIC_Dataset] shuffle_species=True (seed={shuffle_species_seed}); "
-                  f"{len(self.species_names)} (peptide, species) pairs randomly re-shuffled.")
+                  f"{len(self.species_names)} (peptide, species) pairs randomly re-shuffled "
+                  f"(species_mode={species_mode!r}).")
 
         # legacy adapter pathway
         self.species_emb_map = species_emb_map if needs_emb else None
@@ -133,16 +145,19 @@ class MIC_Dataset(Dataset):
         self.bucket_lookup = bucket_lookup
         self.sp_to_group_id = sp_to_group_id
         if return_meta and bucket_lookup is not None:
-            # Pre-compute bucket id for every row using the species_count_lookup.
+            # Bucket / group ids always use the TRUE species label (pre-shuffle)
+            # so train-side GroupDRO grouping stays consistent with val/test.
+            _meta_sp = self._original_species_names or self.species_names
             self._bucket_id = torch.tensor(
-                [bucket_lookup[str(n)] for n in self.species_names],
+                [bucket_lookup[str(n)] for n in _meta_sp],
                 dtype=torch.long,
             )
         else:
             self._bucket_id = None
         if return_meta and sp_to_group_id is not None:
+            _meta_sp = self._original_species_names or self.species_names
             self._species_group_id = torch.tensor(
-                [sp_to_group_id.get(str(n), 0) for n in self.species_names],
+                [sp_to_group_id.get(str(n), 0) for n in _meta_sp],
                 dtype=torch.long,
             )
         else:
@@ -160,7 +175,9 @@ class MIC_Dataset(Dataset):
         return meta
 
     def __getitem__(self, idx):
-        sequence = self.amp_seqs[idx].ljust(self.max_length, "X")
+        sequence = self.amp_seqs[idx]
+        if self.pad_mode == "fill":
+            sequence = sequence.ljust(self.max_length, "X")
         mic_value = self.mic_values[idx]
         mode = self.species_mode
 
@@ -207,7 +224,21 @@ class MIC_Dataset(Dataset):
         return sequence, sp_emb, node_id, mic_value, meta
 
 
-def seq2token(sequences: List[str], tokenizer, device) -> torch.Tensor:
+def seq2token(sequences: List[str], tokenizer, device, return_mask: bool = False):
+    """Tokenize a batch of sequences.
+
+    ``return_mask=False`` (default) reproduces the historical behaviour: every
+    sequence is assumed to already have the same length, so ``tokenizer.encode``
+    is called per sequence and the rows are stacked directly. No <pad> token is
+    ever produced and the attention mask would be all-ones, so none is returned.
+
+    ``return_mask=True`` lets the tokenizer pad the batch to its longest member
+    and returns the accompanying ``attention_mask``, which is what the
+    residue-masked pooling path needs to average over true residues only.
+    """
+    if return_mask:
+        enc = tokenizer(list(sequences), padding=True, return_tensors="pt")
+        return enc["input_ids"].to(device), enc["attention_mask"].to(device)
     token_list = []
     for sequence in sequences:
         tokens = tokenizer.encode(sequence)
@@ -242,6 +273,8 @@ def _meta_collate(batch):
 
 
 def data_loader(data_path, batch_size, num_workers, seed,
+                max_length: int = 70,
+                pad_mode: str = "fill",
                 species_mode: str = "none",
                 species_emb_path: Optional[str] = None,
                 species_emb_dim: int = 768,
@@ -320,6 +353,8 @@ def data_loader(data_path, batch_size, num_workers, seed,
             raise ValueError(f"Unknown dro_group_by: {dro_group_by!r}")
 
     common_kwargs = dict(
+        max_length=max_length,
+        pad_mode=pad_mode,
         species_mode=species_mode,
         species_emb_map=species_emb_map,
         species_emb_dim=species_emb_dim,

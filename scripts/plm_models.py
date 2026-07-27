@@ -75,8 +75,8 @@ esm2_35m_checkpoint = "/NAS/luyq/huggingface/hub/esm2_t12_35M_UR50D"
 esm2_150m_checkpoint = "/NAS/luyq/huggingface/hub/esm2_t30_150M_UR50D"
 esm2_650m_checkpoint = "/NAS/luyq/huggingface/hub/models--facebook--esm2_t33_650M_UR50D/snapshots/08e4846e537177426273712802403f7ba8261b6c"
 esm2_3b_checkpoint = "/NAS/luyq/esm2_models/esm2_t36_3B_UR50D"
-
-
+protbert_checkpoint = "/NAS/luyq/huggingface/hub/models--Rostlab--prot_bert/snapshots/7a894481acdc12202f0a415dd567f6cfdb698908"
+protgpt2_checkpoint = "/NAS/luyq/huggingface/hub/models--nferruz--ProtGPT2/snapshots/ff981fc96771d6f6d3b6453f94772d3cb6c7b90b"
 '''
 Tokenizer
 '''
@@ -260,6 +260,9 @@ class ESM2(nn.Module):
                  lora_rank=16,
                  gnn_residual=False,
                  gnn_layernorm=False,
+                 # ----- Random-init species baseline (replace PubMedBERT feats) -----
+                 gnn_random_init=False,
+                 gnn_random_init_seed=None,
                  # ----- ESM<->GNN fusion strategy (Stage 3) -----
                  fusion_strategy='concat',
                  # ----- Species injection point (Stage 3b) -----
@@ -371,6 +374,8 @@ class ESM2(nn.Module):
                 gate_count_threshold=gnn_gate_count_threshold,
                 adapter_bottleneck=species_bottleneck,
                 adapter_dropout=species_dropout,
+                random_init=gnn_random_init,
+                random_init_seed=gnn_random_init_seed,
             )
         else:
             self.species_gnn = None
@@ -552,10 +557,30 @@ class ESM2(nn.Module):
 
         # cross_attn fusion needs token-level output; for the rest, mean/cls is enough
         need_tokens = (self.fusion is not None) and (self.fusion_strategy == "cross_attn")
-        outputs = self.esm(input_ids)
+        # With the default 'fill' padding scheme the tokenizer never emits <pad>,
+        # so attention_mask is all-ones and passing it changes nothing. It is only
+        # meaningful for the 'mean_masked' read-out, where the batch is padded by
+        # the tokenizer and the filler must be excluded from the average.
+        outputs = (self.esm(input_ids) if attention_mask is None
+                   else self.esm(input_ids, attention_mask=attention_mask))
         seq_tokens = outputs[0] if need_tokens else None         # [B, L, hidden_size]
         if self.plm_output == 'mean':
             seq_rep = outputs[0].mean(dim=1)        # [B, hidden_size]
+        elif self.plm_output == 'mean_masked':
+            if attention_mask is None:
+                raise ValueError(
+                    "plm_output='mean_masked' requires an attention_mask. Build the "
+                    "batch with pad_mode='none' and seq2token(..., return_mask=True)."
+                )
+            # Average over true residue positions only. The ESM tokenizer always
+            # emits <cls> at index 0 and <eos> at the last unmasked index, so both
+            # are dropped from the mask before pooling.
+            res_mask = attention_mask.clone()
+            res_mask[:, 0] = 0
+            eos_pos = (attention_mask.sum(dim=1) - 1).clamp(min=0).unsqueeze(1)
+            res_mask.scatter_(1, eos_pos, 0)
+            m = res_mask.unsqueeze(-1).to(outputs[0].dtype)         # [B, L, 1]
+            seq_rep = (outputs[0] * m).sum(dim=1) / m.sum(dim=1).clamp(min=1.0)
         elif self.plm_output == 'cls':
             seq_rep = outputs[0][:, 0]              # [B, hidden_size]
         else:

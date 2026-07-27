@@ -447,15 +447,37 @@ def build_species_encoder_from_graph(
     gate_count_threshold: int = 100,
     adapter_bottleneck: int = 128,
     adapter_dropout: float = 0.1,
+    random_init: bool = False,
+    random_init_seed: Optional[int] = None,
+    random_init_std: Optional[float] = None,
 ) -> TaxonomySpeciesEncoder:
     g = torch.load(graph_path, weights_only=False, map_location="cpu")
     species_to_sp_idx = {name: i for i, name in enumerate(g["species_names"])}
+
+    init_features = g["init_features"]
+    if random_init:
+        # Baseline control: destroy the PubMedBERT semantics by replacing every
+        # node's 768-d feature with a random Gaussian vector, scaled to match the
+        # std of the real features so the downstream GNN sees comparable
+        # magnitudes. Everything else (graph topology, GCN, fusion, freeze_init)
+        # stays identical to v15, isolating the value of the pretrained text
+        # embedding. The draw is seeded so runs are reproducible and vary per seed.
+        n_nodes, in_dim = init_features.shape
+        std = (random_init_std if random_init_std is not None
+               else float(init_features.float().std()))
+        gen = torch.Generator()
+        if random_init_seed is not None:
+            gen.manual_seed(int(random_init_seed))
+        init_features = torch.randn(n_nodes, in_dim, generator=gen) * std
+        print(f"[build_species_encoder] RANDOM node features: "
+              f"shape=({n_nodes},{in_dim}) std={std:.4f} seed={random_init_seed}")
+
     return TaxonomySpeciesEncoder(
-        init_features=g["init_features"],
+        init_features=init_features,
         edge_index=g["edge_index"],
         ancestors_per_species=g["ancestors_per_species"],
         species_to_sp_idx=species_to_sp_idx,
-        in_dim=g["init_features"].size(1),
+        in_dim=init_features.size(1),
         hidden=hidden,
         out_dim=out_dim,
         num_layers=num_layers,

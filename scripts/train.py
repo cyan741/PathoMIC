@@ -36,7 +36,8 @@ def save_checkpoint(model,
                     epoch: int = None,
                     best_val_loss: float = None,
                     best_ep: int = None,
-                    criterion: nn.Module = None) -> None:
+                    criterion: nn.Module = None,
+                    training_config: dict = None) -> None:
     '''
     Save model / optimizer / (optional) scheduler / epoch state to output_path.
 
@@ -53,6 +54,10 @@ def save_checkpoint(model,
         'best_val_loss': best_val_loss,
         'best_ep': best_ep,
         'criterion_state_dict': criterion.state_dict() if criterion is not None else None,
+        # Graph buffers and several architecture choices cannot be recovered
+        # reliably from state_dict keys alone. Persist the CLI configuration so
+        # downstream representation export can reconstruct the exact model.
+        'training_config': dict(training_config) if training_config is not None else None,
     }
     torch.save(checkpoint, output_path)
 
@@ -63,8 +68,8 @@ def build_lr_scheduler(optimizer: torch.optim.Optimizer,
                        min_lr_ratio: float = 0.1) -> LambdaLR:
     """
     LR schedule (per training step):
-        step < warmup          : linear ramp 0 → 1.0
-        warmup ≤ step ≤ total  : cosine decay 1.0 → min_lr_ratio
+        step < warmup          : linear ramp 0 -> 1.0
+        warmup <= step <= total  : cosine decay 1.0 -> min_lr_ratio
     multiplier is applied to the optimizer's base LR.
 
     A small min_lr_ratio ( > 0 ) keeps the model learning slowly at the tail
@@ -129,16 +134,25 @@ def _unpack_batch(batch, device, species_mode, has_meta=False):
     return seq_list, species_emb, species_ids, mic_values, meta
 
 
-def _model_forward(model, input_ids, species_emb, species_ids, species_mode):
+def _model_forward(model, input_ids, species_emb, species_ids, species_mode,
+                   attention_mask=None):
     """Dispatch to ``ESM2.forward`` with the right keyword args per mode."""
+    kw = {} if attention_mask is None else {"attention_mask": attention_mask}
     if species_mode == "none":
-        return model(input_ids)
+        return model(input_ids, **kw)
     if species_mode == "adapter":
-        return model(input_ids, species_emb=species_emb)
+        return model(input_ids, species_emb=species_emb, **kw)
     if species_mode == "gnn":
-        return model(input_ids, species_ids=species_ids)
+        return model(input_ids, species_ids=species_ids, **kw)
     # both
-    return model(input_ids, species_emb=species_emb, species_ids=species_ids)
+    return model(input_ids, species_emb=species_emb, species_ids=species_ids, **kw)
+
+
+def _tokenize(seq_list, tokenizer, device, need_mask: bool):
+    """Return ``(input_ids, attention_mask_or_None)`` for one batch."""
+    if need_mask:
+        return seq2token(seq_list, tokenizer, device, return_mask=True)
+    return seq2token(seq_list, tokenizer, device), None
 
 
 def _build_loss_meta(meta, loss_meta_global, loss_type):
@@ -192,7 +206,7 @@ class _FileLogger:
 
 def train_epoch(epoch, model, train_loader, tokenizer, criterion, optimizer,
                 device, species_mode="none", scheduler=None,
-                loss_type="mse", loss_meta_global=None):
+                loss_type="mse", loss_meta_global=None, need_mask=False):
     model.train()
     train_loss = []
     train_epoch_time = 0.0
@@ -205,9 +219,10 @@ def train_epoch(epoch, model, train_loader, tokenizer, criterion, optimizer,
     for batch in pbar:
         seq_list, species_emb, species_ids, mic_values, meta = _unpack_batch(
             batch, device, species_mode, has_meta=has_meta)
-        input_ids = seq2token(seq_list, tokenizer, device)
+        input_ids, attn_mask = _tokenize(seq_list, tokenizer, device, need_mask)
         t1 = time.time()
-        outputs = _model_forward(model, input_ids, species_emb, species_ids, species_mode)
+        outputs = _model_forward(model, input_ids, species_emb, species_ids, species_mode,
+                                 attention_mask=attn_mask)
         loss_meta = _build_loss_meta(meta, loss_meta_global or {}, loss_type)
         loss = criterion(outputs, mic_values, meta=loss_meta) if loss_meta is not None \
                else criterion(outputs, mic_values, meta=None)
@@ -232,7 +247,7 @@ def train_epoch(epoch, model, train_loader, tokenizer, criterion, optimizer,
 
 def validate_epoch(epoch, model, val_loader, tokenizer, criterion, device,
                    species_mode="none", has_meta=False, loss_type="mse",
-                   loss_meta_global=None):
+                   loss_meta_global=None, need_mask=False):
     """Validation always uses MSE (the official metric), regardless of training loss."""
     model.eval()
     val_loss = []
@@ -244,8 +259,9 @@ def validate_epoch(epoch, model, val_loader, tokenizer, criterion, device,
         for batch in pbar:
             seq_list, species_emb, species_ids, mic_values, _meta = _unpack_batch(
                 batch, device, species_mode, has_meta=has_meta)
-            input_ids = seq2token(seq_list, tokenizer, device)
-            outputs = _model_forward(model, input_ids, species_emb, species_ids, species_mode)
+            input_ids, attn_mask = _tokenize(seq_list, tokenizer, device, need_mask)
+            outputs = _model_forward(model, input_ids, species_emb, species_ids, species_mode,
+                                     attention_mask=attn_mask)
             loss = mse_eval(outputs, mic_values)
             val_loss.append(loss.item())
 
@@ -256,7 +272,7 @@ def validate_epoch(epoch, model, val_loader, tokenizer, criterion, device,
 
 def bucketed_test_eval(model, test_loader, tokenizer, criterion, device,
                        species_mode, train_csv_path,
-                       has_meta=False,
+                       has_meta=False, need_mask=False,
                        buckets=((0, 5), (5, 20), (20, 100), (100, float("inf")))):
     """Run inference on the test loader and return per-species-count-bucket MSE."""
     train_df = pd.read_csv(train_csv_path)
@@ -268,8 +284,9 @@ def bucketed_test_eval(model, test_loader, tokenizer, criterion, device,
         for batch in tqdm(test_loader, desc="bucketed test"):
             seq_list, species_emb, species_ids, mic_values, _meta = _unpack_batch(
                 batch, device, species_mode, has_meta=has_meta)
-            input_ids = seq2token(seq_list, tokenizer, device)
-            outputs = _model_forward(model, input_ids, species_emb, species_ids, species_mode)
+            input_ids, attn_mask = _tokenize(seq_list, tokenizer, device, need_mask)
+            outputs = _model_forward(model, input_ids, species_emb, species_ids, species_mode,
+                                     attention_mask=attn_mask)
             sq = (outputs - mic_values).pow(2).squeeze(-1).detach().cpu().tolist()
             # Recover per-row species name. We rely on the dataset stashing it
             # in test_loader.dataset.species_names (only set when species_mode != 'none').
@@ -311,6 +328,20 @@ def bucketed_test_eval(model, test_loader, tokenizer, criterion, device,
     return {"overall_mse": overall_mse, "buckets": bucket_stats}
 
 
+def save_bucket_report(report: dict, path: str, label: str = "") -> None:
+    """Persist bucketed test MSE (overall + per train-count bucket) to CSV."""
+    if report is None:
+        return
+    rows = [{"split": label, "train_count_bucket": "overall",
+             "n_test_samples": sum(b["n_test_samples"] for b in report["buckets"]),
+             "n_unique_species": None, "mse": report["overall_mse"]}]
+    for b in report["buckets"]:
+        rows.append({"split": label, **b})
+    os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
+    pd.DataFrame(rows).to_csv(path, index=False)
+    print(f"[bucket_report] Saved -> {path}")
+
+
 def _split_test_results_subdir(data_path: str) -> str:
     """e.g. /NAS/.../splits1 -> splits1_test (matches test_scripts layout)."""
     base = os.path.basename(os.path.normpath(data_path))
@@ -347,7 +378,8 @@ def load_model_checkpoint(model, ckpt_path: str, device) -> dict:
 
 
 def predict_on_test_loader(model, test_loader, tokenizer, device,
-                           species_mode: str, has_meta: bool = False):
+                           species_mode: str, has_meta: bool = False,
+                           need_mask: bool = False):
     """Run forward on ``test_loader`` (shuffle=False) and return predictions in row order."""
     model.eval()
     preds = []
@@ -355,8 +387,9 @@ def predict_on_test_loader(model, test_loader, tokenizer, device,
         for batch in tqdm(test_loader, desc="test inference"):
             seq_list, species_emb, species_ids, _mic_values, _meta = _unpack_batch(
                 batch, device, species_mode, has_meta=has_meta)
-            input_ids = seq2token(seq_list, tokenizer, device)
-            outputs = _model_forward(model, input_ids, species_emb, species_ids, species_mode)
+            input_ids, attn_mask = _tokenize(seq_list, tokenizer, device, need_mask)
+            outputs = _model_forward(model, input_ids, species_emb, species_ids, species_mode,
+                                     attention_mask=attn_mask)
             preds.extend(outputs.squeeze(-1).detach().cpu().tolist())
     return preds
 
@@ -386,13 +419,14 @@ def run_post_train_test_eval(
     train_csv_path: str,
     has_meta: bool,
     label: str,
+    need_mask: bool = False,
 ):
     """Test-set MSE + optional bucketed breakdown; ``label`` prefixes log lines."""
     print("\n", "*" * 30, f"Testing model ({label})...", "*" * 30, "\n")
     avg_test_loss, _test_loss = validate_epoch(
         0, model, test_loader, tokenizer, criterion, device,
         species_mode=species_mode, has_meta=has_meta,
-        loss_type="mse", loss_meta_global=None,
+        loss_type="mse", loss_meta_global=None, need_mask=need_mask,
     )
     print(f"[{label}] Test MSE Loss: {avg_test_loss:.4f}")
 
@@ -404,7 +438,7 @@ def run_post_train_test_eval(
                 model, test_loader, tokenizer, criterion, device,
                 species_mode=species_mode,
                 train_csv_path=train_csv_path,
-                has_meta=has_meta,
+                has_meta=has_meta, need_mask=need_mask,
             )
         except Exception as exc:
             print(f"[{label}][warn] bucketed eval failed: {exc}")
@@ -426,7 +460,23 @@ def main():
                         type=str,
                         default="esm2-8M")  
     parser.add_argument("--head_type", type=str, default="3MLP")
-    parser.add_argument("--plm_output", type=str, default="mean")
+    parser.add_argument("--plm_output", type=str, default="mean",
+                        choices=["mean", "mean_masked", "cls"],
+                        help="Peptide read-out. 'mean' averages over the whole "
+                             "fixed-width window (requires --pad_mode fill); "
+                             "'mean_masked' averages over true residue positions "
+                             "only, excluding <cls>/<eos>/<pad> (requires "
+                             "--pad_mode none).")
+    parser.add_argument("--pad_mode", type=str, default="fill",
+                        choices=["fill", "none"],
+                        help="'fill': right-pad every peptide with 'X' up to "
+                             "--max_seq_len so the tokenizer never emits <pad> "
+                             "(historical default). 'none': emit raw sequences and "
+                             "let the tokenizer pad each batch to its longest "
+                             "member, producing a real attention mask.")
+    parser.add_argument("--max_seq_len", type=int, default=70,
+                        help="Fill width used when --pad_mode fill. Ignored when "
+                             "--pad_mode none.")
     parser.add_argument("--finetune_plm", type=bool, default=True)
 
     # ----- species channel ----------------------------------------------------
@@ -441,7 +491,7 @@ def main():
                         help="[deprecated] same as --species_mode adapter.")
     parser.add_argument("--species_mode", type=str, default=None,
                         choices=["none", "adapter", "gnn", "both"],
-                        help="How to inject species information; supersedes --use_species.")
+                        help="How to inject species information")
     parser.add_argument("--species_emb_path", type=str,
                         default="/NAS/luyq/AMP_datasets/species_embeddings.pkl")
     parser.add_argument("--species_emb_dim", type=int, default=768)
@@ -485,6 +535,14 @@ def main():
                         help="Skip connection inside each GCN layer.")
     parser.add_argument("--gnn_layernorm", action="store_true",
                         help="Apply LayerNorm between GCN layers.")
+    parser.add_argument("--gnn_random_init", type=int, default=0, choices=[0, 1],
+                        help="Baseline control: replace the 768-d PubMedBERT node "
+                             "features with random Gaussian vectors (scaled to the "
+                             "real features' std) before the GNN. Isolates the value "
+                             "of the pretrained text embedding.")
+    parser.add_argument("--gnn_random_init_seed", type=int, default=None,
+                        help="Seed for the random node-feature draw when "
+                             "--gnn_random_init 1. Defaults to --seed if unset.")
     parser.add_argument("--fusion_strategy", type=str, default="concat",
                         choices=["concat", "gated", "film", "cross_attn", "bilinear"],
                         help="How to combine ESM peptide embedding with the GNN species emb.")
@@ -628,6 +686,17 @@ def main():
     # legacy --use_species bool (True -> 'adapter', False -> 'none').
     if args.species_mode is None:
         args.species_mode = "adapter" if args.use_species else "none"
+
+    # The read-out and the padding scheme must agree: 'mean_masked' needs a real
+    # attention mask, which only exists when the tokenizer does the padding.
+    if args.plm_output == "mean_masked" and args.pad_mode != "none":
+        raise ValueError("--plm_output mean_masked requires --pad_mode none.")
+    if args.plm_output != "mean_masked" and args.pad_mode == "none":
+        raise ValueError(
+            f"--pad_mode none produces <pad> tokens that --plm_output "
+            f"{args.plm_output!r} would average over; use --pad_mode fill."
+        )
+    need_mask = args.plm_output == "mean_masked"
     print(args)
     set_seed(args.seed)
 
@@ -641,6 +710,8 @@ def main():
         batch_size=args.batch_size,
         num_workers=8,
         seed=args.seed,
+        max_length=args.max_seq_len,
+        pad_mode=args.pad_mode,
         species_mode=args.species_mode,
         species_emb_path=args.species_emb_path if args.species_mode in ("adapter", "both") else None,
         species_emb_dim=args.species_emb_dim,
@@ -692,6 +763,10 @@ def main():
         lora_rank=args.lora_rank,
         gnn_residual=args.gnn_residual,
         gnn_layernorm=args.gnn_layernorm,
+        gnn_random_init=bool(args.gnn_random_init),
+        gnn_random_init_seed=(args.gnn_random_init_seed
+                              if args.gnn_random_init_seed is not None
+                              else args.seed),
         fusion_strategy=args.fusion_strategy,
         species_inject=args.species_inject,
         prefix_pool=args.prefix_pool,
@@ -844,7 +919,7 @@ def main():
         # -- starting epoch --
         saved_ep = int(ckpt.get("epoch") or 0)
         start_epoch = saved_ep + 1
-        print(f"[Resume] Saved epoch = {saved_ep} → training will start at epoch {start_epoch}")
+        print(f"[Resume] Saved epoch = {saved_ep}; training will start at epoch {start_epoch}")
 
         # -- best val loss tracking --
         if (not args.resume_reset_best) and ckpt.get("best_val_loss") is not None:
@@ -863,7 +938,7 @@ def main():
 
 
     # ------------------------------------------------------------------
-    # LR scheduler: linear warmup → cosine decay (per-step update)
+    # LR scheduler: linear warmup then cosine decay (per-step update)
     # When resuming we build a FRESH scheduler covering the new [1..epochs]
     # horizon and fast-forward it past the already-completed steps.
     # ------------------------------------------------------------------
@@ -892,7 +967,7 @@ def main():
                 warnings.simplefilter("ignore")
                 for _ in range(completed_steps):
                     scheduler.step()
-            print(f"[LR scheduler] fast-forwarded {completed_steps} steps → "
+            print(f"[LR scheduler] fast-forwarded {completed_steps} steps; "
                   f"LR now = {optimizer.param_groups[0]['lr']:.2e}")
     else:
         print("[LR scheduler] disabled (constant LR)")
@@ -910,16 +985,18 @@ def main():
         avg_train_loss, train_loss = train_epoch(
             epoch, model, train_loader, tokenizer, criterion, optimizer, device,
             species_mode=args.species_mode, scheduler=scheduler,
-            loss_type=args.loss_type, loss_meta_global=loss_meta_global)
+            loss_type=args.loss_type, loss_meta_global=loss_meta_global,
+            need_mask=need_mask)
 
         if args.loss_type == "group_dro" and args.loss_dro_log_path and hasattr(criterion, "log_stats"):
             logger = _FileLogger(args.loss_dro_log_path)
             criterion.log_stats(logger, header=f"[epoch {epoch}]")
-        # --- 验证 ---
+        # --- validation ---
         avg_val_loss, val_loss = validate_epoch(
             epoch, model, val_loader, tokenizer, criterion, device,
             species_mode=args.species_mode, has_meta=has_meta,
-            loss_type=args.loss_type, loss_meta_global=loss_meta_global)
+            loss_type=args.loss_type, loss_meta_global=loss_meta_global,
+            need_mask=need_mask)
         print(f"Epoch {epoch} Complete. Train MSE: {avg_train_loss:.4f} | Val MSE: {avg_val_loss:.4f}")
 
         cur_lr = optimizer.param_groups[0]["lr"]
@@ -942,8 +1019,7 @@ def main():
             )
         
         if avg_val_loss < best_val_loss:
-            # 保存最佳模型
-            # 如果上一个最佳模型存在且不是当前模型，则删除上一个最佳模型文件
+            # save best model; remove previous val_best checkpoint if different epoch
             prev_ckp_path = os.path.join(
                 ckp_path,
                 f"{_checkpoint_basename(args.plm, args.lr, args.batch_size, best_ep, 'val_best', seed=args.seed)}.pth",
@@ -959,7 +1035,7 @@ def main():
                             ),
                             scheduler=scheduler, epoch=epoch,
                             best_val_loss=best_val_loss, best_ep=best_ep,
-                            criterion=criterion)
+                            criterion=criterion, training_config=vars(args))
 
         # ------------------------------------------------------------------
         # Early stopping: only activates AFTER --es_min_epoch (i.e. give the
@@ -977,14 +1053,14 @@ def main():
                             os.path.join(ckp_path, f"{es_stem}.pth"),
                             scheduler=scheduler, epoch=epoch,
                             best_val_loss=best_val_loss, best_ep=best_ep,
-                            criterion=criterion)
+                            criterion=criterion, training_config=vars(args))
             break
         elif args.early_stopping and epoch < args.es_min_epoch and (epoch - best_ep) >= args.early_stop_patience:
-            # still in warmup/peak phase – log but do NOT stop
+            # still in warmup/peak phase - log but do NOT stop
             print(f"[early-stop disabled until epoch {args.es_min_epoch}] "
                   f"val loss hasn't improved for {epoch - best_ep} epochs, continuing.")
 
-        # 最后一个epoch结束保存模型
+        # save model at final epoch
         if epoch == args.epochs:
             print(f"Training complete. Saving final model at epoch {epoch}. Best Val MSE: {best_val_loss:.4f} at epoch {best_ep}.")
             save_checkpoint(model, optimizer,
@@ -994,7 +1070,7 @@ def main():
                             ),
                             scheduler=scheduler, epoch=epoch,
                             best_val_loss=best_val_loss, best_ep=best_ep,
-                            criterion=criterion)
+                            criterion=criterion, training_config=vars(args))
 
     # ------------------------------------------------------------------
     # Post-training evaluation on test.csv
@@ -1026,11 +1102,13 @@ def main():
             train_csv_path=train_csv_path,
             has_meta=has_meta,
             label=f"val_best (epoch {best_ep})",
+            need_mask=need_mask,
         )
         try:
             preds = predict_on_test_loader(
                 model, test_loader, tokenizer, device,
                 species_mode=args.species_mode, has_meta=has_meta,
+                need_mask=need_mask,
             )
             csv_name = (
                 f"{_checkpoint_basename(args.plm, args.lr, args.batch_size, best_ep, 'val_best', seed=args.seed)}"
@@ -1072,6 +1150,7 @@ def main():
         train_csv_path=train_csv_path,
         has_meta=has_meta,
         label=final_label,
+        need_mask=need_mask,
     )
 
     metrics_df = pd.DataFrame(metrics_rows)
@@ -1089,7 +1168,21 @@ def main():
         except Exception as e:
             print(f"[Resume] Could not read previous metrics ({e}); writing fresh.")
     metrics_df.to_csv(metrics_path, index=False)
-    
+
+    bucket_summary_path = os.path.join(args.save_dir, "bucket_summary.csv")
+    if bucket_report_val_best is not None:
+        save_bucket_report(
+            bucket_report_val_best,
+            bucket_summary_path,
+            label=f"val_best_ep{best_ep}",
+        )
+    if bucket_report_final is not None and bucket_report_final is not bucket_report_val_best:
+        save_bucket_report(
+            bucket_report_final,
+            os.path.join(args.save_dir, "bucket_summary_final.csv"),
+            label=f"final_ep{last_epoch}",
+        )
+
     if args.use_wandb:
         log_payload = {
             "best_val_mse": best_val_loss,
